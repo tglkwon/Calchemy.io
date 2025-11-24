@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alchemist Auto-Battler v1.2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-900 text-white overflow-hidden select-none">
+    <div id="app" class="w-screen h-screen flex flex-col">
+        <!-- Header / Top Bar -->
+        <header class="h-12 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4">
+            <h1 class="text-lg font-bold text-yellow-500">연금술사 오토 배틀러 <span class="text-xs text-gray-400">v1.2</span>
+            </h1>
+            <div class="flex gap-2">
+                <button id="asset-toggle-btn"
+                    class="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-500 rounded transition-colors">
+                    모드: 이모지
+                </button>
+                <button id="log-toggle-btn"
+                    class="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded transition-colors">
+                    로그 보기
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="flex-1 flex overflow-hidden">
+            <!-- Col 1: Golem Stats -->
+            <section id="golem-panel"
+                class="w-1/4 min-w-[250px] border-r border-gray-700 p-4 flex flex-col gap-4 bg-gray-800/50 overflow-y-auto">
+                <h2 class="text-xl font-bold text-center mb-2">골렘 (아군)</h2>
+                <!-- Stats will be injected here -->
+                <div id="golem-stats-container" class="flex flex-col gap-2"></div>
+
+                <!-- Total Damage Display -->
+                <div class="mt-2 p-2 bg-gray-900 rounded border border-gray-700 text-center">
+                    <div class="text-xs text-gray-400">이번 턴 총 피해량</div>
+                    <div id="golem-total-damage" class="text-xl font-bold text-red-500">0</div>
+                </div>
+            </section>
+
+            <!-- Col 2: Battle Arena (Grid) -->
+            <section id="arena-panel" class="flex-1 flex flex-col items-center justify-center p-4 relative">
+                <!-- Turn Timer -->
+                <div class="w-full max-w-md h-2 bg-gray-700 rounded-full mb-6 overflow-hidden">
+                    <div id="turn-timer-bar" class="h-full bg-yellow-500 w-0 transition-all duration-100 ease-linear">
+                    </div>
+                </div>
+
+                <!-- 4x4 Grid -->
+                <div id="bingo-grid"
+                    class="grid grid-cols-4 gap-2 mb-6 p-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <!-- Controls -->
+                <div class="flex gap-4">
+                    <button id="start-btn"
+                        class="px-6 py-2 bg-green-600 hover:bg-green-500 font-bold rounded shadow-lg transform active:scale-95 transition-all">
+                        전투 시작
+                    </button>
+                    <button id="pause-btn"
+                        class="px-6 py-2 bg-yellow-600 hover:bg-yellow-500 font-bold rounded shadow-lg transform active:scale-95 transition-all hidden">
+                        일시정지
+                    </button>
+                </div>
+            </section>
+
+            <!-- Col 3: Minions -->
+            <section id="minion-panel"
+                class="w-1/4 min-w-[250px] border-l border-gray-700 p-4 flex flex-col gap-4 bg-gray-800/50 overflow-y-auto">
+                <h2 class="text-xl font-bold text-center mb-2">적군</h2>
+                <!-- Minions will be injected here -->
+                <div id="minions-container" class="flex flex-col gap-4"></div>
+            </section>
+        </main>
+
+        <!-- Battle Log Modal (Hidden by default) -->
+        <div id="log-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center">
+            <div class="bg-gray-800 w-3/4 h-3/4 rounded-lg border border-gray-600 flex flex-col shadow-2xl">
+                <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900 rounded-t-lg">
+                    <h3 class="font-bold text-lg">전투 로그</h3>
+                    <div class="flex gap-2">
+                        <button id="log-restart-btn"
+                            class="px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition-colors">
+                            다시 하기
+                        </button>
+                        <button id="log-close-btn" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                </div>
+                <div id="log-content" class="flex-1 p-4 overflow-y-auto font-mono text-sm text-gray-300 space-y-1">
+                    <!-- Logs go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-600 text-center max-w-md w-full">
+            <h2 id="game-over-title" class="text-4xl font-bold mb-4 text-white">게임 종료</h2>
+            <p id="game-over-message" class="text-gray-300 mb-6 text-lg">결과 내용</p>
+
+            <div class="bg-gray-900 p-4 rounded mb-6 text-left text-sm text-gray-400">
+                <p>총 턴 수: <span id="stat-turns" class="text-white font-bold">0</span></p>
+                <p>총 빙고 횟수: <span id="stat-bingos" class="text-white font-bold">0</span></p>
+            </div>
+
+            <div class="flex gap-4 justify-center">
+                <button id="restart-btn"
+                    class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded shadow transition-colors">
+                    다시 하기
+                </button>
+                <button id="game-over-log-btn"
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow transition-colors">
+                    로그 보기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>
