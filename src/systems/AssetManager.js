@@ -19,10 +19,11 @@ export class AssetManager {
             'MINION_2': { emoji: '💀', image: 'assets/images/minion_2.png' },
             'MINION_3': { emoji: '👿', image: 'assets/images/minion_3.png' },
 
-            // Intents
-            'INTENT_ATTACK': { emoji: '⚔️', image: null },
-            'INTENT_DEFEND': { emoji: '🛡️', image: null },
-            'INTENT_BUFF': { emoji: '💪', image: null },
+            RELIC_START_SWORD: {
+                emoji: '⚔️',
+                image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M12 52 L52 12 M20 52 L12 60 L4 52 L12 44 Z M44 20 L52 12 L60 20 L52 28 Z" stroke="%239CA3AF" stroke-width="6" stroke-linecap="round"/><path d="M12 52 L52 12" stroke="%23D1D5DB" stroke-width="2"/></svg>',
+                color: 'text-gray-300'
+            },
         };
     }
 
@@ -50,8 +51,13 @@ export class AssetManager {
         }
 
         // Default to Emoji with color class if available
-        const colorClass = asset.color || '';
-        return `<span class="text-4xl ${colorClass}">${asset.emoji}</span>`;
+        if (asset.emoji) {
+            const colorClass = asset.color || '';
+            return `<span class="text-4xl ${colorClass}">${asset.emoji}</span>`;
+        }
+
+        // Fallback for simple string assets (if any remain)
+        return `<span class="text-4xl">${asset}</span>`;
     }
 
     /**

@@ -5,11 +5,13 @@
 
 import { Unit } from '../entities/Unit.js';
 import { CardSystem } from '../systems/CardSystem.js';
+import { RelicSystem } from '../systems/RelicSystem.js';
 
 export class GameEngine {
     constructor(uiManager) {
         this.uiManager = uiManager;
         this.cardSystem = new CardSystem();
+        this.relicSystem = new RelicSystem();
 
         // Game State
         this.isPaused = false;
@@ -339,7 +341,9 @@ export class GameEngine {
         return {
             golem: this.golem.getState(),
             minions: this.minions.map(m => m.getState()),
-            isPaused: this.isPaused
+            isPaused: this.isPaused,
+            relics: this.relicSystem.getAllRelics(),
+            relicSystem: this.relicSystem
         };
     }
 }

@@ -34,6 +34,12 @@ export class UIManager {
         this.restartBtn = document.getElementById('restart-btn');
         this.gameOverLogBtn = document.getElementById('game-over-log-btn');
 
+        // Relic Elements
+        this.relicContainer = document.getElementById('relic-container');
+        this.tooltip = document.getElementById('tooltip');
+        this.tooltipTitle = document.getElementById('tooltip-title');
+        this.tooltipDesc = document.getElementById('tooltip-desc');
+
         // State
         this.timerAnim = null;
     }
@@ -129,6 +135,9 @@ export class UIManager {
     render(gameState) {
         this.renderGolem(gameState.golem, gameState.isPaused);
         this.renderMinions(gameState.minions, gameState.isPaused);
+        if (gameState.relics) {
+            this.renderRelics(gameState.relics, gameState.relicSystem);
+        }
     }
 
     renderGolem(golem, isPaused) {
@@ -252,6 +261,60 @@ export class UIManager {
         }, 1500);
     }
 
+    renderRelics(relics, relicSystem) {
+        this.relicContainer.innerHTML = '';
+        relics.forEach(relic => {
+            const div = document.createElement('div');
+            div.className = `
+                w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-xl cursor-pointer transition-all duration-200 border-2
+                ${relic.isActive ? 'bg-gray-800 border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-100 opacity-100' : 'bg-gray-900 border-gray-700 grayscale opacity-50 hover:opacity-75'}
+            `;
+            div.innerHTML = this.assetManager.get(relic.id);
+
+            // Events
+            div.addEventListener('click', () => {
+                relicSystem.toggleRelic(relic.id);
+                this.renderRelics(relicSystem.getAllRelics(), relicSystem); // Re-render self
+            });
+
+            div.addEventListener('mouseenter', (e) => {
+                this.showTooltip(relic, e.target);
+            });
+
+            div.addEventListener('mouseleave', () => {
+                this.hideTooltip();
+            });
+
+            this.relicContainer.appendChild(div);
+        });
+    }
+
+    showTooltip(relic, targetEl) {
+        this.tooltipTitle.textContent = relic.name;
+        this.tooltipTitle.className = `font-bold text-sm mb-1 ${relic.rarity === 'RARE' ? 'text-blue-400' : 'text-yellow-400'}`;
+        this.tooltipDesc.innerHTML = relic.description; // Allow HTML if needed
+
+        this.tooltip.classList.remove('hidden');
+
+        // Positioning
+        const rect = targetEl.getBoundingClientRect();
+        const tooltipRect = this.tooltip.getBoundingClientRect();
+
+        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        let top = rect.bottom + 10; // Below the icon
+
+        // Boundary checks
+        if (left < 10) left = 10;
+        if (left + tooltipRect.width > window.innerWidth - 10) left = window.innerWidth - tooltipRect.width - 10;
+
+        this.tooltip.style.left = `${left}px`;
+        this.tooltip.style.top = `${top}px`;
+    }
+
+    hideTooltip() {
+        this.tooltip.classList.add('hidden');
+    }
+
     // --- Helpers ---
 
     getIntentIcon(intent) {
@@ -315,41 +378,33 @@ export class UIManager {
         });
     }
 
+    getInputValue(id) {
+        const el = document.getElementById(id);
+        if (!el) return undefined;
+        const val = parseInt(el.value);
+        return isNaN(val) ? undefined : val;
+    }
+
     getInputsState() {
         // Collects all input values to sync back to game state
         const state = {
             golem: {
-                hp: parseInt(document.getElementById('golem-hp').value) || 0,
-                maxHp: parseInt(document.getElementById('golem-maxHp').value) || 0,
-                block: parseInt(document.getElementById('golem-block').value) || 0,
-                baseAttack: parseInt(document.getElementById('golem-baseAttack').value) || 0,
-                baseShield: parseInt(document.getElementById('golem-baseShield').value) || 0,
-                swordBonus: parseInt(document.getElementById('golem-swordBonus').value) || 0,
-                shieldBonus: parseInt(document.getElementById('golem-shieldBonus').value) || 0,
-                attackBuffs: parseInt(document.getElementById('golem-attackBuffs').value) || 0,
+                baseAttack: this.getInputValue('golem-baseAttack'),
+                baseShield: this.getInputValue('golem-baseShield'),
+                swordBonus: this.getInputValue('golem-swordBonus'),
+                shieldBonus: this.getInputValue('golem-shieldBonus'),
+                attackBuffs: this.getInputValue('golem-attackBuffs'),
             },
             minions: []
         };
 
         // Minions
         for (let i = 0; i < 3; i++) {
-            const hp = document.getElementById(`minion-${i}-hp`);
-            const block = document.getElementById(`minion-${i}-block`);
-            const atk = document.getElementById(`minion-${i}-atk`);
-            const def = document.getElementById(`minion-${i}-def`);
-            const debuff = document.getElementById(`minion-${i}-debuff`);
-
-            if (hp) {
-                state.minions.push({
-                    hp: parseInt(hp.value) || 0,
-                    block: parseInt(block.value) || 0,
-                    baseAttack: parseInt(atk.value) || 0,
-                    baseDefense: parseInt(def.value) || 0,
-                    attackDebuffs: parseInt(debuff.value) || 0
-                });
-            } else {
-                state.minions.push({}); // No update
-            }
+            state.minions.push({
+                baseAttack: this.getInputValue(`minion-${i}-atk`),
+                baseDefense: this.getInputValue(`minion-${i}-def`),
+                attackDebuffs: this.getInputValue(`minion-${i}-debuff`)
+            });
         }
         return state;
     }

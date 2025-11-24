@@ -45,9 +45,18 @@
 
             <!-- Col 2: Battle Arena (Grid) -->
             <section id="arena-panel" class="flex-1 flex flex-col items-center justify-center p-4 relative">
-                <!-- Turn Timer -->
-                <div class="w-full max-w-md h-2 bg-gray-700 rounded-full mb-6 overflow-hidden">
-                    <div id="turn-timer-bar" class="h-full bg-yellow-500 w-0 transition-all duration-100 ease-linear">
+                <!-- Relics & Timer -->
+                <div class="w-full flex flex-col items-center mb-4">
+                    <!-- Relic Container -->
+                    <div id="relic-container" class="flex gap-2 mb-2 overflow-x-auto p-2 max-w-full no-scrollbar">
+                        <!-- Relics injected here -->
+                    </div>
+
+                    <!-- Turn Timer -->
+                    <div class="w-full max-w-md h-1 bg-gray-700 rounded-full overflow-hidden">
+                        <div id="turn-timer-bar"
+                            class="h-full bg-yellow-500 w-0 transition-all duration-100 ease-linear">
+                        </div>
                     </div>
                 </div>
 
@@ -120,6 +129,16 @@
                     로그 보기
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="fixed hidden pointer-events-none z-[100] max-w-xs">
+        <div class="bg-black/90 border border-gray-600 rounded-lg p-3 shadow-xl backdrop-blur-sm">
+            <div id="tooltip-title" class="font-bold text-sm mb-1 text-yellow-400"></div>
+            <div class="h-px bg-gray-700 my-1"></div>
+            <div id="tooltip-desc" class="text-xs text-gray-300 leading-relaxed"></div>
+            <div class="mt-2 text-[10px] text-gray-500 text-right">(클릭하여 토글)</div>
         </div>
     </div>
 
