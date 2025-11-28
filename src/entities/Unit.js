@@ -17,6 +17,9 @@ export class Unit {
 
         // Buffs/Debuffs
         this.attackDebuffs = 0; // Minion
+        this.attackBuffs = 0; // Golem (Added based on usage in GameEngine)
+        this.swordBonus = 0; // Golem
+        this.shieldBonus = 0; // Golem
 
         // Turn Stats
         this.totalDamageThisTurn = 0;
@@ -107,6 +110,8 @@ export class Unit {
             baseAttack: this.baseAttack,
             baseDefense: this.baseDefense,
             baseShield: this.baseShield,
+            swordBonus: this.swordBonus,
+            shieldBonus: this.shieldBonus,
             attackBuffs: this.attackBuffs,
             attackDebuffs: this.attackDebuffs,
             totalDamageThisTurn: this.totalDamageThisTurn,
@@ -127,6 +132,8 @@ export class Unit {
         if (newState.baseAttack !== undefined) this.baseAttack = newState.baseAttack;
         if (newState.baseDefense !== undefined) this.baseDefense = newState.baseDefense;
         if (newState.baseShield !== undefined) this.baseShield = newState.baseShield;
+        if (newState.swordBonus !== undefined) this.swordBonus = newState.swordBonus;
+        if (newState.shieldBonus !== undefined) this.shieldBonus = newState.shieldBonus;
         if (newState.attackBuffs !== undefined) this.attackBuffs = newState.attackBuffs;
         if (newState.attackDebuffs !== undefined) this.attackDebuffs = newState.attackDebuffs;
 

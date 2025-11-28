@@ -19,11 +19,17 @@ export class AssetManager {
             'MINION_2': { emoji: '💀', image: 'assets/images/minion_2.png' },
             'MINION_3': { emoji: '👿', image: 'assets/images/minion_3.png' },
 
-            RELIC_START_SWORD: {
-                emoji: '⚔️',
-                image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M12 52 L52 12 M20 52 L12 60 L4 52 L12 44 Z M44 20 L52 12 L60 20 L52 28 Z" stroke="%239CA3AF" stroke-width="6" stroke-linecap="round"/><path d="M12 52 L52 12" stroke="%23D1D5DB" stroke-width="2"/></svg>',
-                color: 'text-gray-300'
-            },
+            // Intents
+            'INTENT_ATTACK': { emoji: '⚔️', color: 'text-red-500' },
+            'INTENT_DEFEND': { emoji: '🛡️', color: 'text-blue-500' },
+            'INTENT_BUFF': { emoji: '💪', color: 'text-yellow-500' },
+
+            // Relics (using emoji for now as fallback)
+            'RELIC_T_SPIN': { emoji: '🧩', color: 'text-purple-400' },
+            'RELIC_L_STEP': { emoji: '👢', color: 'text-orange-400' },
+            'RELIC_O_BLOCK': { emoji: '📦', color: 'text-yellow-400' },
+            'RELIC_FIRE_BOOST': { emoji: '🔥', color: 'text-red-500' },
+            'RELIC_START_SWORD': { emoji: '🗡️', color: 'text-gray-300' },
         };
     }
 
@@ -38,32 +44,18 @@ export class AssetManager {
     }
 
     /**
-     * Returns the asset for the given key based on current mode.
-     * @param {string} key - The asset key (e.g., 'FIRE', 'GOLEM').
-     * @returns {string|object} The emoji string or image path.
+     * Returns the asset data for the given key.
+     * @param {string} key 
+     * @returns {object} { type: 'emoji'|'image', content: string, color?: string }
      */
     get(key) {
         const asset = this.assets[key];
-        if (!asset) return '?';
+        if (!asset) return { type: 'text', content: '?' };
 
         if (this.mode === 'IMAGE' && asset.image) {
-            return `<img src="${asset.image}" alt="${key}" class="w-full h-full object-contain drop-shadow-md">`;
+            return { type: 'image', content: asset.image };
         }
 
-        // Default to Emoji with color class if available
-        if (asset.emoji) {
-            const colorClass = asset.color || '';
-            return `<span class="text-4xl ${colorClass}">${asset.emoji}</span>`;
-        }
-
-        // Fallback for simple string assets (if any remain)
-        return `<span class="text-4xl">${asset}</span>`;
-    }
-
-    /**
-     * Helper to get raw data if needed
-     */
-    getData(key) {
-        return this.assets[key];
+        return { type: 'emoji', content: asset.emoji || '?', color: asset.color };
     }
 }

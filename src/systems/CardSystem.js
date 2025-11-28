@@ -71,6 +71,49 @@ export class CardSystem {
      * Checks for Bingo lines (Rows, Cols, Diagonals).
      * Returns an object with bingo details.
      */
+    /**
+     * Returns all cards currently in the game (Deck + Discard + Grid).
+     */
+    getAllCards() {
+        return [...this.deck, ...this.discardPile, ...this.grid];
+    }
+
+    /**
+     * Adds a card to the deck.
+     * @param {string} type - Element type (FIRE, WATER, etc.)
+     */
+    addCard(type) {
+        const id = `${type}_${Date.now()}`; // Simple unique ID
+        this.deck.push({ type, id });
+    }
+
+    /**
+     * Removes a card by ID from wherever it is (Deck, Discard, or Grid).
+     * @param {string} id 
+     */
+    removeCard(id) {
+        // Try Deck
+        let idx = this.deck.findIndex(c => c.id === id);
+        if (idx !== -1) {
+            this.deck.splice(idx, 1);
+            return;
+        }
+
+        // Try Discard
+        idx = this.discardPile.findIndex(c => c.id === id);
+        if (idx !== -1) {
+            this.discardPile.splice(idx, 1);
+            return;
+        }
+
+        // Try Grid
+        idx = this.grid.findIndex(c => c.id === id);
+        if (idx !== -1) {
+            this.grid.splice(idx, 1);
+            return;
+        }
+    }
+
     checkBingos() {
         const lines = [];
 

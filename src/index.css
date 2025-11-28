@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@layer utilities {
+    @keyframes pulse-strong {
+
+        0%,
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 rgba(234, 179, 8, 0);
+        }
+
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+            background-color: rgba(234, 179, 8, 0.2);
+        }
+    }
+
+    @keyframes bingo-flash {
+
+        0%,
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        50% {
+            transform: scale(1.15);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 1);
+            border-color: rgba(255, 255, 255, 1);
+            background-color: rgba(59, 130, 246, 0.5);
+        }
+    }
+
+    .animate-pulse-strong {
+        animation: pulse-strong 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .animate-bingo-flash {
+        animation: bingo-flash 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+}
