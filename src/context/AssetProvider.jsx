@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { AssetManager } from '../utils/AssetManager';
-
-const AssetContext = createContext(null);
+import { AssetContext } from './AssetContext';
 
 export const AssetProvider = ({ children }) => {
-    const [manager] = useState(new AssetManager());
+    // Initialize lazily
+    const [manager] = useState(() => new AssetManager());
     const [mode, setMode] = useState(manager.mode);
 
     const toggleMode = () => {
@@ -21,12 +21,4 @@ export const AssetProvider = ({ children }) => {
             {children}
         </AssetContext.Provider>
     );
-};
-
-export const useAsset = () => {
-    const context = useContext(AssetContext);
-    if (!context) {
-        throw new Error("useAsset must be used within an AssetProvider");
-    }
-    return context;
 };

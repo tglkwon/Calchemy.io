@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { GameProvider } from './context/GameContext';
-import { AssetProvider, useAsset } from './context/AssetContext';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { GameProvider } from './context/GameProvider';
+import { AssetProvider } from './context/AssetProvider';
+import { useAsset } from './context/AssetContext';
 import BattlePage from './pages/BattlePage';
 import LogPage from './pages/LogPage';
 import DeckPage from './pages/DeckPage';

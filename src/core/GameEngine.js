@@ -245,7 +245,7 @@ export class GameEngine {
     triggerCardEffect(card) {
         let logMsg = "";
         switch (card.type) {
-            case 'FIRE':
+            case 'FIRE': {
                 const dmg = this.golem.baseAttack; // Simplified
                 const target = this.getRandomTarget();
                 if (target) {
@@ -254,16 +254,19 @@ export class GameEngine {
                     logMsg = `🔥 불 카드: ${target.name}에게 ${taken} 피해`;
                 }
                 break;
-            case 'EARTH':
+            }
+            case 'EARTH': {
                 const block = this.golem.baseShield;
                 this.golem.addBlock(block);
                 logMsg = `🌱 대지 카드: 골렘 방어도 +${block}`;
                 break;
-            case 'WATER':
+            }
+            case 'WATER': {
                 const heal = Math.floor(this.golem.maxHp / 8);
                 const healed = this.golem.heal(heal);
                 logMsg = `💧 물 카드: 골렘 체력 +${healed}`;
                 break;
+            }
             case 'WIND':
                 // 50% Buff Golem / 50% Debuff Enemy
                 if (Math.random() < 0.5) {

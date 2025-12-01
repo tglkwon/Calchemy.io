@@ -1,15 +1,17 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GameEngine } from '../core/GameEngine';
-
-const GameContext = createContext(null);
+import { GameContext } from './GameContext';
 
 export const GameProvider = ({ children }) => {
-    // Use ref to keep the engine instance stable across renders
-    const engineRef = useRef(new GameEngine());
-    const [gameState, setGameState] = useState(engineRef.current.getGameState());
+    // Use state to keep the engine instance stable across renders
+    // Initialize lazily to ensure it's created only once
+    const [gameEngine] = useState(() => new GameEngine());
+
+    // Initialize gameState from the engine
+    const [gameState, setGameState] = useState(() => gameEngine.getGameState());
 
     useEffect(() => {
-        const engine = engineRef.current;
+        const engine = gameEngine;
 
         // Subscribe to engine updates
         const unsubscribe = engine.subscribe((newState) => {
@@ -25,19 +27,11 @@ export const GameProvider = ({ children }) => {
             unsubscribe();
             engine.stop();
         };
-    }, []);
+    }, [gameEngine]);
 
     return (
-        <GameContext.Provider value={{ gameState, gameEngine: engineRef.current }}>
+        <GameContext.Provider value={{ gameState, gameEngine }}>
             {children}
         </GameContext.Provider>
     );
-};
-
-export const useGame = () => {
-    const context = useContext(GameContext);
-    if (!context) {
-        throw new Error("useGame must be used within a GameProvider");
-    }
-    return context;
 };
