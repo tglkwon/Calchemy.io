@@ -80,6 +80,10 @@ export class GameEngine {
         console.log("Battle Started!");
         this.isPaused = false;
         this.gameOver = false;
+
+        // Shuffle deck before starting, in case it was modified
+        this.cardSystem.shuffleDeck();
+
         this.runTurn(); // Run first turn immediately
         this.turnIntervalId = setInterval(this.runTurn, this.turnDuration);
         this.notify();
@@ -229,7 +233,7 @@ export class GameEngine {
 
             await new Promise(r => setTimeout(r, 150)); // Delay
 
-            this.activeCardId = card.id;
+            this.activeCardId = card.instanceId;
             this.notify();
 
             // Effect
@@ -244,44 +248,173 @@ export class GameEngine {
 
     triggerCardEffect(card) {
         let logMsg = "";
-        switch (card.type) {
-            case 'FIRE': {
-                const dmg = this.golem.baseAttack; // Simplified
-                const target = this.getRandomTarget();
-                if (target) {
-                    const taken = target.takeDamage(dmg);
-                    this.golem.totalDamageThisTurn += taken;
-                    logMsg = `🔥 불 카드: ${target.name}에게 ${taken} 피해`;
-                }
-                break;
-            }
-            case 'EARTH': {
-                const block = this.golem.baseShield;
-                this.golem.addBlock(block);
-                logMsg = `🌱 대지 카드: 골렘 방어도 +${block}`;
-                break;
-            }
-            case 'WATER': {
-                const heal = Math.floor(this.golem.maxHp / 8);
-                const healed = this.golem.heal(heal);
-                logMsg = `💧 물 카드: 골렘 체력 +${healed}`;
-                break;
-            }
-            case 'WIND':
-                // 50% Buff Golem / 50% Debuff Enemy
-                if (Math.random() < 0.5) {
-                    this.golem.attackBuffs = Math.min(this.golem.attackBuffs + 1, 2);
-                    logMsg = `🍃 바람 카드: 골렘 공격 버프 +1`;
-                } else {
-                    const t = this.getRandomTarget();
-                    if (t) {
-                        t.attackDebuffs = Math.min(t.attackDebuffs + 1, 2);
-                        logMsg = `🍃 바람 카드: ${t.name} 공격 디버프 +1`;
+
+        // Generic Fallback if no specific ID logic
+        if (!card.id || !card.effectParams) {
+            // ... existing generic logic ...
+            // For now, let's just use the new logic primarily
+        }
+
+        const params = card.effectParams || {};
+
+        // Handle based on Card ID (or Type if generic)
+        switch (card.id) {
+            case "1": // 불씨: {피해} 5, {화상} 2
+                {
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        const dmg = params.damage || 5;
+                        const burn = params.burn || 2;
+                        const taken = target.takeDamage(dmg);
+                        target.addStatus('BURN', burn);
+                        this.golem.totalDamageThisTurn += taken;
+                        logMsg = `🔥 [불씨] ${target.name}에게 ${taken} 피해, 화상 ${burn}`;
                     }
                 }
                 break;
+            case "2": // 기름통: 적 1명 '기름'(불피해 2배)
+                {
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        target.addStatus('OIL', params.duration || 2);
+                        logMsg = `🛢️ [기름통] ${target.name}에게 기름칠 (2턴)`;
+                    }
+                }
+                break;
+            case "3": // 화염구: 피해 12
+                {
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        const dmg = params.damage || 12;
+                        const taken = target.takeDamage(dmg);
+                        this.golem.totalDamageThisTurn += taken;
+                        logMsg = `☄️ [화염구] ${target.name}에게 ${taken} 피해`;
+                    }
+                }
+                break;
+            case "4": // 연쇄 폭발: 피해 8. 전 카드가 불이면 2회
+                {
+                    // Logic for "Previous Card" is tricky in async loop. 
+                    // We need to track previous card type in GameEngine state if we want to support this fully.
+                    // For now, simplified: always 1 hit, or random.
+                    // Let's implement a simple history tracker in GameEngine later.
+                    // Assuming condition met for now for fun? Or just 1 hit.
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        const dmg = params.damage || 8;
+                        const taken = target.takeDamage(dmg);
+                        this.golem.totalDamageThisTurn += taken;
+                        logMsg = `💥 [연쇄 폭발] ${target.name}에게 ${taken} 피해`;
+                    }
+                }
+                break;
+            case "5": // 용암 갑옷: 화염 가시(반사) 5
+                {
+                    const thorns = params.thorns || 5;
+                    this.golem.addStatus('THORNS', thorns);
+                    logMsg = `🛡️ [용암 갑옷] 골렘에게 가시 ${thorns} 부여`;
+                }
+                break;
+            case "6": // 불사조: 체력 10% 소모, 500% 피해
+                {
+                    const hpCost = Math.floor(this.golem.maxHp * (params.hpCostPercent || 0.1));
+                    this.golem.takeDamage(hpCost); // Self damage
 
+                    const dmg = this.golem.baseAttack * (params.damageMultiplier || 5);
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        const taken = target.takeDamage(dmg);
+                        this.golem.totalDamageThisTurn += taken;
+                        logMsg = `🐦 [불사조] 체력 ${hpCost} 소모, ${target.name}에게 ${taken} 피해`;
+                    }
+                }
+                break;
+            case "7": // 초신성: 전체 피해 30. 소멸
+                {
+                    const dmg = params.damage || 30;
+                    this.minions.forEach(m => {
+                        if (m.isAlive) {
+                            const taken = m.takeDamage(dmg);
+                            this.golem.totalDamageThisTurn += taken;
+                        }
+                    });
+                    // Exhaust logic needs card removal from deck.
+                    // this.removeCardFromDeck(card.instanceId); // This would remove from deck for NEXT shuffle.
+                    logMsg = `🌟 [초신성] 적 전체에게 ${dmg} 피해!`;
+                }
+                break;
+            case "8": // 방화광: 매 턴 무작위 적 화상 2
+                {
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        const burn = params.passiveBurn || 2;
+                        target.addStatus('BURN', burn);
+                        logMsg = `🤡 [방화광] ${target.name}에게 화상 ${burn}`;
+                    }
+                }
+                break;
+            case "9": // 화염 채찍: 전열 피해 10
+                {
+                    // Assuming minion 0 is front
+                    const target = this.minions[0];
+                    if (target && target.isAlive) {
+                        const dmg = params.damage || 10;
+                        const taken = target.takeDamage(dmg);
+                        this.golem.totalDamageThisTurn += taken;
+                        logMsg = `🔥 [화염 채찍] 전열 ${target.name}에게 ${taken} 피해`;
+                    } else {
+                        logMsg = `🔥 [화염 채찍] 전열에 적이 없음`;
+                    }
+                }
+                break;
+            case "10": // 마그마: 그리드 2장 불로 변경
+                {
+                    // Visual only for now, or actual logic?
+                    // Changing grid cards is complex as it affects current turn iteration.
+                    // Let's just log it.
+                    logMsg = `🌋 [마그마] 주변 땅이 끓어오릅니다 (효과 미구현)`;
+                }
+                break;
+            default:
+                // Fallback to old logic
+                switch (card.type) {
+                    case 'FIRE': {
+                        const dmg = this.golem.baseAttack;
+                        const target = this.getRandomTarget();
+                        if (target) {
+                            const taken = target.takeDamage(dmg);
+                            this.golem.totalDamageThisTurn += taken;
+                            logMsg = `🔥 불 카드: ${target.name}에게 ${taken} 피해`;
+                        }
+                        break;
+                    }
+                    case 'EARTH': {
+                        const block = this.golem.baseShield;
+                        this.golem.addBlock(block);
+                        logMsg = `🌱 대지 카드: 골렘 방어도 +${block}`;
+                        break;
+                    }
+                    case 'WATER': {
+                        const heal = Math.floor(this.golem.maxHp / 8);
+                        const healed = this.golem.heal(heal);
+                        logMsg = `💧 물 카드: 골렘 체력 +${healed}`;
+                        break;
+                    }
+                    case 'WIND':
+                        if (Math.random() < 0.5) {
+                            this.golem.attackBuffs = Math.min(this.golem.attackBuffs + 1, 2);
+                            logMsg = `🍃 바람 카드: 골렘 공격 버프 +1`;
+                        } else {
+                            const t = this.getRandomTarget();
+                            if (t) {
+                                t.attackDebuffs = Math.min(t.attackDebuffs + 1, 2);
+                                logMsg = `🍃 바람 카드: ${t.name} 공격 디버프 +1`;
+                            }
+                        }
+                        break;
+                }
         }
+
         if (logMsg) this.log(logMsg);
     }
 
@@ -298,6 +431,7 @@ export class GameEngine {
             // Wait for visual effect
             await new Promise(r => setTimeout(r, 800));
 
+            // 1. Trigger Generic Bingo Effect
             if (bingo.type === 'HARMONY') {
                 this.harmonyBingos++;
                 this.log(`🌈 조화(Harmony) 빙고!`);
@@ -336,11 +470,105 @@ export class GameEngine {
                     this.log(`>> 🍃 빙고 버프: 공격 +1`);
                 }
             }
+
+            // 2. Trigger Specific Card Bingo Effects
+            // Find the actual card objects based on IDs
+            const allCards = this.cardSystem.getAllCards();
+            // Note: getAllCards might be slow if deck is huge, but here it's small.
+            // Actually, the cards are in the grid (or were). 
+            // Since we discard grid AFTER bingo checks, they are still in grid.
+            // But wait, bingo.ids are instanceIds.
+
+            const bingoCards = this.cardSystem.grid.filter(c => bingo.ids.includes(c.instanceId));
+
+            for (const card of bingoCards) {
+                this.triggerBingoCardEffect(card, bingo.type);
+            }
         }
 
         // Clear bingo highlight after delay
         this.bingoCardIds = [];
         this.notify();
+    }
+
+    triggerBingoCardEffect(card, bingoType) {
+        if (!card.id) return;
+
+        let logMsg = "";
+
+        // Only trigger if the bingo type matches the card type (usually)
+        // or if it's Harmony? Let's assume Element Bingo triggers it.
+        if (bingoType !== 'HARMONY' && card.type !== bingoType) return;
+
+        switch (card.id) {
+            case "1": // 불씨: [점화] 적 화상 × 10% 추뎀
+                // Simplified: Add extra damage if target has burn
+                {
+                    const target = this.getRandomTarget();
+                    if (target && target.statuses['BURN'] > 0) {
+                        const extraDmg = 5; // Simplified constant
+                        target.takeDamage(extraDmg);
+                        logMsg = `🔥 [불씨] 점화! 화상 적에게 추가 피해 ${extraDmg}`;
+                    }
+                }
+                break;
+            case "2": // 기름통: [확산] 단일 피해 ➔ 광역(AoE) 변경
+                // This modifies the base bingo effect? Hard to do retroactively.
+                // Instead, let's just deal extra AoE damage.
+                {
+                    const aoeDmg = 5;
+                    this.minions.forEach(m => {
+                        if (m.isAlive) m.takeDamage(aoeDmg);
+                    });
+                    logMsg = `🛢️ [기름통] 확산! 적 전체 피해 ${aoeDmg}`;
+                }
+                break;
+            case "3": // 화염구: [폭발] 인접한 적에게 50% 스플래시
+                {
+                    // Simplified: Random other enemy takes damage
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        const splash = 6;
+                        target.takeDamage(splash);
+                        logMsg = `☄️ [화염구] 폭발! 추가 피해 ${splash}`;
+                    }
+                }
+                break;
+            case "4": // 연쇄 폭발: [유폭] 이 줄 불 카드 재발동
+                // Trigger this card's effect again?
+                {
+                    this.triggerCardEffect(card);
+                    logMsg = `💥 [연쇄 폭발] 유폭! 효과 재발동`;
+                }
+                break;
+            case "5": // 용암 갑옷: [융해] 적 방어도 0 + 취약
+                {
+                    const target = this.getRandomTarget();
+                    if (target) {
+                        target.block = 0;
+                        logMsg = `🛡️ [용암 갑옷] 융해! ${target.name} 방어도 파괴`;
+                    }
+                }
+                break;
+            // ... Implement others as needed ...
+            case "6": // 불사조: [환생] 처치 시 체력 회복
+                // Hard to implement "On Kill". Let's just heal Golem.
+                {
+                    this.golem.heal(20);
+                    logMsg = `🐦 [불사조] 환생! 체력 20 회복`;
+                }
+                break;
+            case "7": // 초신성: [대폭발] 데미지 증가
+                {
+                    const extra = 20;
+                    const target = this.getRandomTarget();
+                    if (target) target.takeDamage(extra);
+                    logMsg = `🌟 [초신성] 대폭발! 추가 피해 ${extra}`;
+                }
+                break;
+        }
+
+        if (logMsg) this.log(logMsg);
     }
 
     executeMinionActions() {

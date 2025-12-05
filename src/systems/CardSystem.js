@@ -3,6 +3,8 @@
  * Manages the Deck, Grid, and Bingo logic.
  */
 
+import { CardDefinitions } from './CardDefinitions.js';
+
 export class CardSystem {
     constructor() {
         this.elements = ['FIRE', 'EARTH', 'WATER', 'WIND'];
@@ -20,9 +22,20 @@ export class CardSystem {
         this.discardPile = [];
         for (const el of this.elements) {
             for (let i = 0; i < 8; i++) {
-                this.deck.push({ type: el, id: `${el}_${i}` });
+                // Basic cards don't have special IDs from definitions initially, 
+                // but we might want to support them later. 
+                // For now, revert to basic behavior as requested.
+                const id = `${el}_${i}`;
+                this.deck.push({ type: el, id: id, instanceId: `${id}_${Date.now()}` });
             }
         }
+        this.shuffle(this.deck);
+    }
+
+    /**
+     * Shuffles the current deck.
+     */
+    shuffleDeck() {
         this.shuffle(this.deck);
     }
 
@@ -80,34 +93,45 @@ export class CardSystem {
 
     /**
      * Adds a card to the deck.
-     * @param {string} type - Element type (FIRE, WATER, etc.)
+     * @param {string} typeOrId - Element type or Card Definition ID
      */
-    addCard(type) {
-        const id = `${type}_${Date.now()}`; // Simple unique ID
-        this.deck.push({ type, id });
+    addCard(typeOrId) {
+        // Check if it's a specific card ID
+        if (CardDefinitions[typeOrId]) {
+            const def = CardDefinitions[typeOrId];
+            this.deck.push({
+                ...def,
+                instanceId: `${def.type}_${def.id}_${Date.now()}`
+            });
+        } else {
+            // Fallback for generic element type
+            const type = typeOrId;
+            const id = `${type}_${Date.now()}`;
+            this.deck.push({ type, id, instanceId: id });
+        }
     }
 
     /**
-     * Removes a card by ID from wherever it is (Deck, Discard, or Grid).
-     * @param {string} id 
+     * Removes a card by instanceId from wherever it is (Deck, Discard, or Grid).
+     * @param {string} instanceId 
      */
-    removeCard(id) {
+    removeCard(instanceId) {
         // Try Deck
-        let idx = this.deck.findIndex(c => c.id === id);
+        let idx = this.deck.findIndex(c => c.instanceId === instanceId);
         if (idx !== -1) {
             this.deck.splice(idx, 1);
             return;
         }
 
         // Try Discard
-        idx = this.discardPile.findIndex(c => c.id === id);
+        idx = this.discardPile.findIndex(c => c.instanceId === instanceId);
         if (idx !== -1) {
             this.discardPile.splice(idx, 1);
             return;
         }
 
         // Try Grid
-        idx = this.grid.findIndex(c => c.id === id);
+        idx = this.grid.findIndex(c => c.instanceId === instanceId);
         if (idx !== -1) {
             this.grid.splice(idx, 1);
             return;
@@ -137,7 +161,7 @@ export class CardSystem {
             if (line.every(card => card.type === firstType)) {
                 results.push({
                     type: firstType,
-                    ids: line.map(c => c.id)
+                    ids: line.map(c => c.instanceId)
                 });
                 continue; // Cannot be harmony if all same
             }
@@ -147,11 +171,30 @@ export class CardSystem {
             if (types.has('FIRE') && types.has('EARTH') && types.has('WATER') && types.has('WIND')) {
                 results.push({
                     type: 'HARMONY',
-                    ids: line.map(c => c.id)
+                    ids: line.map(c => c.instanceId)
                 });
             }
         }
 
         return results;
+    }
+    /**
+     * Returns all available card definitions for the library.
+     */
+    getLibraryCards() {
+        return Object.values(CardDefinitions);
+    }
+
+    /**
+     * Loads dynamic definitions from CSV or other sources.
+     * @param {Object} newDefinitions 
+     */
+    loadDefinitions(newDefinitions) {
+        // Merge into the existing CardDefinitions object
+        // Note: CardDefinitions is an imported constant object, so we can mutate it.
+        Object.assign(CardDefinitions, newDefinitions);
+
+        // Re-init deck if needed, but usually this is done at start.
+        // If we want to update the library immediately, this is enough.
     }
 }

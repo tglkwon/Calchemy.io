@@ -27,6 +27,7 @@ export class Unit {
 
         // Status
         this.isAlive = true;
+        this.statuses = {}; // { BURN: 0, OIL: 0, THORNS: 0 }
     }
 
     /**
@@ -93,6 +94,11 @@ export class Unit {
         this.block += amount;
     }
 
+    addStatus(type, value) {
+        if (!this.statuses[type]) this.statuses[type] = 0;
+        this.statuses[type] += value;
+    }
+
     die() {
         this.isAlive = false;
         console.log(`${this.name} has died.`);
@@ -107,16 +113,9 @@ export class Unit {
             hp: this.hp,
             maxHp: this.maxHp,
             block: this.block,
-            baseAttack: this.baseAttack,
-            baseDefense: this.baseDefense,
-            baseShield: this.baseShield,
-            swordBonus: this.swordBonus,
-            shieldBonus: this.shieldBonus,
-            attackBuffs: this.attackBuffs,
-            attackDebuffs: this.attackDebuffs,
-            totalDamageThisTurn: this.totalDamageThisTurn,
+            isAlive: this.isAlive,
             intent: this.intent,
-            isAlive: this.isAlive
+            statuses: this.statuses
         };
     }
 
@@ -136,6 +135,7 @@ export class Unit {
         if (newState.shieldBonus !== undefined) this.shieldBonus = newState.shieldBonus;
         if (newState.attackBuffs !== undefined) this.attackBuffs = newState.attackBuffs;
         if (newState.attackDebuffs !== undefined) this.attackDebuffs = newState.attackDebuffs;
+        if (newState.statuses !== undefined) this.statuses = newState.statuses;
 
         // Re-check life status
         if (this.hp <= 0) this.isAlive = false;

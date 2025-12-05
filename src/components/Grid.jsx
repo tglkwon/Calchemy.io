@@ -5,8 +5,8 @@ const Grid = ({ grid, activeCardId, bingoCardIds }) => {
     return (
         <div className="grid grid-cols-4 gap-2 w-full max-w-md mx-auto aspect-square bg-gray-900 p-2 rounded-lg border border-gray-700">
             {grid.map((card) => {
-                const isActive = activeCardId === card.id;
-                const isBingo = bingoCardIds.includes(card.id);
+                const isActive = activeCardId === card.instanceId;
+                const isBingo = bingoCardIds.includes(card.instanceId);
 
                 let borderClass = 'border-gray-600';
                 let bgClass = 'bg-gray-800';
@@ -24,17 +24,26 @@ const Grid = ({ grid, activeCardId, bingoCardIds }) => {
 
                 return (
                     <div
-                        key={card.id}
+                        key={card.instanceId}
                         className={`
-                            relative flex items-center justify-center rounded border-2 transition-all duration-300
+                            relative flex items-center justify-center rounded border-2 transition-all duration-300 group cursor-help
                             ${borderClass} ${bgClass} ${scaleClass}
                         `}
                     >
                         <div className="text-4xl">
                             <AssetDisplay id={card.type} />
                         </div>
-                        {/* ID Debug (Optional) */}
-                        {/* <span className="absolute bottom-0 right-0 text-[8px] text-gray-600">{card.id}</span> */}
+
+                        {/* Tooltip */}
+                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 bg-black/90 text-xs text-gray-200 p-2 rounded border border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                            <div className="font-bold text-yellow-500 mb-1">{card.name}</div>
+                            <div className="mb-1">{card.description}</div>
+                            {card.bingoDescription && (
+                                <div className="text-blue-300 text-[10px]">
+                                    <span className="font-bold">Bingo:</span> {card.bingoDescription}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
             })}

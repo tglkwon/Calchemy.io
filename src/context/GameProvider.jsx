@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { GameEngine } from '../core/GameEngine';
 import { GameContext } from './GameContext';
+import { parseCardCSV } from '../utils/csvLoader';
 
 export const GameProvider = ({ children }) => {
     // Use state to keep the engine instance stable across renders
