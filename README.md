@@ -1,16 +1,209 @@
-# React + Vite
+# **연금술사 오토 배틀러 (v1.3) - 기획서**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## **1. 게임 개요**
 
-Currently, two official plugins are available:
+* **프로젝트명**: 연금술사 오토 배틀러 (Alchemist Auto-Battler)
+* **핵심 콘셉트**: 플레이어(골렘)가 4x4 마방진(빙고 그리드)에 무작위로 채워지는 4가지 원소 카드의 조합(빙고)을 활용하여 자동으로 적(잡몹)을 물리치는 오토 배틀러 게임.
+* **기술 스택**:  
+  * 프레임워크: React (Vite)
+  * 스타일링: Tailwind CSS
+  * 언어: JavaScript (ES6+)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## **2. 화면 구성 (UI 레이아웃)**
 
-## React Compiler
+전체 애플리케이션은 네비게이션 바를 통해 접근 가능한 4개의 주요 페이지로 구성된다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### **2.1. 공통 레이아웃**
+* **상단 네비게이션 바**:
+  * 페이지 이동 탭: [전투], [로그], [덱 구성], [유물]
+  * **에셋 토글 버튼**: 이모지 모드 / 이미지 모드 전환
 
-## Expanding the ESLint configuration
+### **2.2. 페이지별 구성**
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+#### **A. 전투 화면 (Battle Screen)**
+기존의 메인 게임 화면. 3개의 수직 컬럼 레이아웃 유지.
+* **좌측**: 골렘(아군) 정보 및 스탯 에디터.
+* **중앙**: 턴 타이머, 4x4 빙고 그리드, 전투 제어 버튼(시작/일시정지).
+* **우측**: 적(잡몹) 정보 및 스탯 에디터.
+
+#### **B. 전투 로그 페이지 (Battle Log Page)**
+* 전투 중 발생한 모든 로그를 상세히 확인하는 페이지.
+* 필터링 기능 (공격, 방어, 빙고 등) 제공 가능.
+* **다시 하기 버튼**: 로그 확인 후 즉시 재시작.
+
+#### **C. 덱 구성 페이지 (Deck Config Page)**
+* **기능**:
+  * 현재 보유한 모든 카드(덱 + 버림 패 + 그리드)를 한눈에 볼 수 있는 "전체 덱" 뷰 제공.
+  * 카드 클릭 시 덱에서 제거.
+  * 우측 라이브러리에서 원소 클릭 시 덱에 추가.
+  * 덱 구성은 실시간으로 게임에 반영됨 (테스트 용도).
+* **UI**:
+  * **카드 라이브러리**: 추가 가능한 모든 카드 목록.
+
+#### **D. 유물 구성 페이지 (Relic Config Page)**
+* **기능**: 게임 시작 전 또는 테스트 중에 유물을 자유롭게 활성화/비활성화하여 시너지를 테스트하는 기능.
+* **UI**:
+  * **보유 유물**: 현재 활성화된 유물.
+  * **전체 유물 목록**: 모든 유물 리스트 (클릭하여 토글).
+
+### **2.3. 게임 종료 팝업 (모달)**
+* 전투 화면 위에 오버레이로 표시.
+* 승리/패배 결과 및 통계 표시.
+* 버튼: 다시 하기, 로그 페이지로 이동.
+
+## **3. 핵심 게임 데이터**
+
+### **3.1. 원소 (Elements)**
+
+* FIRE (불, 🔥), EARTH (흙, 🌱), WATER (물, 💧), WIND (바람, 🍃)
+
+### **3.2. 카드 덱 (Deck)**
+
+* 총 32장 (각 원소별 8장). 덱 소진 시 버린 덱(discard)을 섞어 재충전.
+
+### **3.3. 캐릭터 스탯 (초기값)**
+
+| 대상 | 스탯 | 설명 | 초기값 |
+| :---- | :---- | :---- | :---- |
+| 골렘 | hp | 현재 체력 | 300 |
+|  | maxHp | 최대 체력 | 300 |
+|  | block | 현재 방어도 (매 턴 0) | 0 |
+|  | baseAttack | 기본 공격력 | 2 |
+|  | baseShield | 기본 방어도 | 2 |
+|  | swordBonus | 검 보너스 | 0 |
+|  | shieldBonus | 방패 보너스 | 0 |
+|  | attackBuffs | 공격 버프 중첩 | 0 |
+|  | totalDamageThisTurn | 이번 턴 총 피해 (UI 표시용) | 0 |
+| 잡몹 | hp | 현재 체력 | 100 |
+|  | maxHp | 최대 체력 | 100 |
+|  | block | 현재 방어도 | 0 |
+|  | baseAttack | 기본 공격력 | 8 |
+|  | baseDefense | 기본 방어도 | 8 |
+|  | attackDebuffs | 공격 디버프 중첩 | 0 |
+|  | intent | 현재 턴 행동 의도 | null |
+
+### **3.4. 게임 상태**
+
+| 스탯 | 설명 | 초기값 |
+| :---- | :---- | :---- |
+| isPaused | 일시정지 상태 여부 | false |
+| turnInterval | setInterval 핸들러 | null |
+| turnCount | 현재 턴 수 | 0 |
+| totalBingos | 누적 빙고 횟수 | 0 |
+
+## **4. 게임 흐름 (턴 로직)**
+
+게임은 isPaused가 false일 때 TURN_DURATION (5초) 마다 runTurn 함수를 통해 자동으로 진행된다.
+
+1. **턴 시작**
+   * 턴 카운트 증가.
+   * 턴 리셋: 골렘/잡몹 Block 초기화, 골렘 totalDamageThisTurn 초기화.
+2. **적 행동 의도 설정**
+   * 생존한 잡몹이 확률적으로 의도(공격/방어/버프)를 결정.
+   * **DEFENSE** 의도 시, 즉시 baseDefense만큼 block 획득.
+3. **UI 갱신**
+   * 의도 아이콘 표시.
+4. **카드 배치**
+   * 덱에서 16장 카드를 뽑아 4x4 그리드 채움.
+5. **카드 발동**
+   * 16개 카드가 순차적으로 발동 (150ms 간격).
+   * 발동 시 카드 배경색 강조 효과.
+6. **빙고 체크 및 발동**
+   * 가로, 세로, 대각선 라인 검사.
+   * **원소 빙고**: 한 줄이 모두 같은 원소일 때.
+   * **조화 빙고**: 한 줄에 4가지 원소가 모두 있을 때.
+   * **[연출]**: 빙고가 달성된 줄(Line)의 카드들만 하이라이트 효과.
+   * 효과 적용 후 카드 버림.
+7. **적 행동 실행**
+   * ATTACK: 골렘에게 피해.
+   * BUFF: 자신의 공격력/방어력 영구 증가.
+8. **게임 종료 체크**
+   * 승리/패배 조건 확인 후 종료 팝업 표시.
+
+## **5. 핵심 효과 로직**
+
+## **6. 특수 기능 (스탯 에디터)**
+
+**목표**: 테스트와 밸런싱을 위해 모든 유닛의 핵심 스탯을 '일시정지' 상태에서 안전하게 수정하는 기능.
+
+### **6.1. 확장된 수정 가능 항목**
+
+* **골렘**: HP, MaxHP, Block, 기본 공격력, 기본 방어도, 검 보너스, 방패 보너스, 공격 버프.
+* **잡몹**: HP, Block, 기본 공격력, 기본 방어도, 공격 디버프.
+
+### **6.2. 동작 방식**
+
+* **일시정지 시**: 모든 input 필드가 활성화(Enable)되며 테두리가 강조됨. 값을 자유롭게 수정 가능.
+* **재개 시**: 수정된 값이 게임 상태(GameState)에 반영되고 게임이 계속됨.
+
+## **7. 유물 시스템 (Relics)**
+
+**목표**: 전투 보상으로 '유물'을 획득하여 특별한 패시브 효과를 얻는 시스템. (현재 개발 중)
+
+### **7.1. 유물 목록 (구현됨)**
+
+현재 코드베이스에 정의되어 있으며 UI상에서 확인 가능한 유물들입니다.
+
+* **T-스핀 유물 (Rare)**:
+  * **효과**: T자 모양(4칸)으로 같은 원소가 모이면 1-빙고로 인정.
+  * **아이콘**: 🧩
+
+* **L-스텝 유물 (Rare)**:
+  * **효과**: L자 모양(4칸)으로 같은 원소가 모이면 1-빙고로 인정.
+  * **아이콘**: 👢
+
+* **O-블록 유물 (Rare)**:
+  * **효과**: O자 모양(2x2)으로 같은 원소가 모이면 1-빙고로 인정.
+  * **아이콘**: 📦
+
+* **화염의 정수 (Common)**:
+  * **효과**: 불(FIRE) 빙고 발동 시, 무작위 적에게 5의 추가 피해.
+  * **아이콘**: 🔥
+
+* **오래된 검 (Common)**:
+  * **효과**: 전투 시작 시 검 보너스 +10을 가지고 시작.
+  * **아이콘**: 🗡️
+
+### **7.2. 구현 현황**
+
+* **UI**: 유물 아이콘 표시, 툴팁(이름, 설명, 등급 색상), 클릭 시 활성화/비활성화 토글 기능 구현 완료.
+* **로직**: 유물 데이터 정의 완료. 실제 게임 내 효과(빙고 판정 변경, 스탯 보너스 등)는 아직 연결되지 않음.
+## **8. 개발 현황 및 변경점 (v1.3)**
+
+### **8.1. 구현 완료 기능**
+*   **전투 시스템**: 턴제 진행, 카드 배포, 일반/조화 빙고 판정, 승패 조건.
+*   **UI/UX**:
+    *   4개 탭 구성 (전투, 로그, 덱, 유물).
+    *   스탯 에디터 (일시정지 시 활성화).
+    *   반응형 레이아웃 및 Tailwind CSS 스타일링.
+    *   에셋 토글 (이모지/이미지 모드).
+*   **덱 관리**: 덱에서 카드 제거 및 라이브러리에서 추가 기능.
+
+### **8.2. 미구현 기능 (To-Do)**
+*   **유물 효과 로직**: UI상에서 유물을 활성화해도 실제 전투 로직(빙고 판정 완화, 스탯 보너스 등)에 반영되지 않음.
+    *   `RelicSystem.js`에 데이터는 존재하나 `GameEngine.js`에서 이를 참조하여 분기 처리하는 로직 부재.
+
+### **8.3. 기획 변경 사항**
+*   **활성 유물 표시**: 전투 화면 중앙 상단에 현재 활성화된 유물 아이콘을 표시하여 직관성 개선.
+*   **기술 스택**: Context API 구조 개선 (`GameProvider`, `AssetProvider` 분리)으로 렌더링 최적화 및 Fast Refresh 지원.
+
+## **9. 배포 (Deployment)**
+
+### **9.1. 배포 도구**
+*   **패키지명**: `gh-pages`
+*   **용도**: `dist` 폴더의 빌드 결과물을 GitHub 저장소의 `gh-pages` 브랜치로 자동 업로드하여 GitHub Pages 호스팅을 활성화함.
+
+### **9.2. 설정 현황**
+*   **설치**: `npm install gh-pages --save-dev`
+*   **스크립트 (`package.json`)**:
+    *   `"predeploy": "npm run build"`: 배포 전 자동으로 최신 빌드 생성.
+    *   `"deploy": "gh-pages -d dist"`: `dist` 폴더 내용을 `gh-pages` 브랜치에 푸시.
+*   **경로 설정**:
+    *   `package.json`: `"homepage": "https://tglkwon.github.io/Calchemy.io"` 추가.
+    *   `vite.config.js`: `base: '/Calchemy.io/'` 설정으로 에셋 경로 문제 해결.
+
+### **9.3. 배포 방법**
+터미널에서 다음 명령어를 실행하면 빌드부터 배포까지 자동으로 수행된다.
+```bash
+npm run deploy
+```

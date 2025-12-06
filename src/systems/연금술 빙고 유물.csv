@@ -1,0 +1,3 @@
+No,Artifact_ID,Name_KR,Rarity,Passive_Key,Trigger_Cond,Effect_Value,Value_Mult,Description,Note
+고유 번호,유물 ID,유물 이름,희귀도,적용될 효과 키워드,"발동 조건 (TurnStart, BattleStart, Always)",효과 수치,★ 핵심: 가치 보정 승수 (보통 5.0 ~ 10.0),유물 설명 텍스트,비고
+1,ART_GREED,탐욕의 항아리,Rare,KEY_AUTO_DRAW,TurnStart,1,10,매 턴 카드를 1장 추가로 뽑습니다.,밸런스 주의: 드로우 관련
