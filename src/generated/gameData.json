@@ -1,0 +1,3494 @@
+{
+  "cards": [
+    {
+      "id": "1",
+      "name": "불씨",
+      "grade": "Common",
+      "element": "불",
+      "description": "{피해} 5, {화상} 2",
+      "bingoDescription": "[점화] 적 화상 × 10% 추뎀",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "ATTACK",
+          "value": "B_ATTACK"
+        }
+      ],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "damage": 5,
+        "burn": 2
+      }
+    },
+    {
+      "id": "2",
+      "name": "기름통",
+      "grade": "Common",
+      "element": "물",
+      "description": "적 1명 '기름'(불피해 2배)",
+      "bingoDescription": "[확산] 단일 피해 ➔ 광역(AoE) 변경",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "HEAL",
+          "value": 2
+        }
+      ],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "status": "OIL",
+        "duration": 2
+      }
+    },
+    {
+      "id": "3",
+      "name": "화염구",
+      "grade": "Common",
+      "element": "흙",
+      "description": "피해 12",
+      "bingoDescription": "[폭발] 인접한 적에게 50% 스플래시",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "BLOCK",
+          "value": 2
+        }
+      ],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "damage": 12
+      }
+    },
+    {
+      "id": "4",
+      "name": "연쇄 폭발",
+      "grade": "Uncommon",
+      "element": "바람",
+      "description": "피해 8. 전 카드가 불이면 2회",
+      "bingoDescription": "[유폭] 이 줄 불 카드 재발동",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "HEAL",
+          "value": 2
+        }
+      ],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "damage": 8,
+        "condition": "PREV_FIRE",
+        "repeat": 2
+      }
+    },
+    {
+      "id": "5",
+      "name": "용암 갑옷",
+      "grade": "Uncommon",
+      "element": null,
+      "description": "화염 가시(반사) 5",
+      "bingoDescription": "[융해] 적 방어도 0 + 취약",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "thorns": 5
+      }
+    },
+    {
+      "id": "6",
+      "name": "불사조",
+      "grade": "Rare",
+      "element": null,
+      "description": "체력 10% 소모, 500% 피해",
+      "bingoDescription": "[환생] 처치 시 체력 회복",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [
+        {
+          "type": "BLOCK",
+          "value": 0
+        }
+      ],
+      "type": "FIRE",
+      "effectParams": {
+        "hpCostPercent": 0.1,
+        "damageMultiplier": 5
+      }
+    },
+    {
+      "id": "7",
+      "name": "초신성",
+      "grade": "Legendary",
+      "element": null,
+      "description": "전체 피해 30. 소멸",
+      "bingoDescription": "[대폭발] 데미지 지수함수 증가",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "damage": 30,
+        "aoe": true,
+        "exhaust": true
+      }
+    },
+    {
+      "id": "8",
+      "name": "방화광",
+      "grade": "Uncommon",
+      "element": null,
+      "description": "매 턴 무작위 적 화상 2",
+      "bingoDescription": "[광기] 화상 10 이상인 적 즉사",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "passiveBurn": 2
+      }
+    },
+    {
+      "id": "9",
+      "name": "화염 채찍",
+      "grade": "Common",
+      "element": null,
+      "description": "전열 피해 10",
+      "bingoDescription": "[강타] 전열 피해 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "damage": 10,
+        "target": "FRONT"
+      }
+    },
+    {
+      "id": "10",
+      "name": "마그마",
+      "grade": "Rare",
+      "element": null,
+      "description": "그리드 2장 불로 변경",
+      "bingoDescription": "[분출] 변경된 수 × 10 피해",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [],
+      "type": "FIRE",
+      "effectParams": {
+        "changeCount": 2,
+        "changeType": "FIRE"
+      }
+    },
+    {
+      "id": "11",
+      "name": null,
+      "grade": "마그마 (R)",
+      "element": null,
+      "description": "그리드 2장 불로 변경 ➔ 3장",
+      "bingoDescription": "[분출] 변경된 수 × 10 피해 ➔ ×15",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [
+        {
+          "type": "ATTACK",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "name": null,
+      "grade": "재투성이 (C)",
+      "element": null,
+      "description": "적 명중률 -30% ➔ -50%",
+      "bingoDescription": "[연막] 아군 회피율 증가 ➔ +20%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "13",
+      "name": null,
+      "grade": "내면의 열기 (U)",
+      "element": null,
+      "description": "공격력 +50%. 턴끝 체력 -5 ➔ -0",
+      "bingoDescription": "[과열] 공격력 버프 영구화",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "14",
+      "name": null,
+      "grade": "소각 (R)",
+      "element": null,
+      "description": "덱에서 카드 1장 영구 제거 ➔ 2장",
+      "bingoDescription": "[정제] 제거된 카드 등급비례 뎀 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "15",
+      "name": null,
+      "grade": "불꽃 춤 (U)",
+      "element": null,
+      "description": "다음 2회 회피 ➔ 3회",
+      "bingoDescription": "[잔상] 회피 성공 시 적 화상 3 ➔ 5",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "16",
+      "name": null,
+      "grade": "지옥불 (L)",
+      "element": null,
+      "description": "모든 캐릭터(아군포함) 피해 20 ➔ 적만",
+      "bingoDescription": "[멸망] 필드 모든 카드 파괴+대미지",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "17",
+      "name": null,
+      "grade": "작은 불꽃 (C)",
+      "element": null,
+      "description": "피해 3, 화상 1 ➔ 피해 5, 화상 2",
+      "bingoDescription": "[점화] 적 화상 × 5% 추뎀 ➔ 10%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "18",
+      "name": null,
+      "grade": "발화 (U)",
+      "element": null,
+      "description": "적의 화상 스택을 즉시 데미지로 변환 ➔ 1.5배",
+      "bingoDescription": "[폭죽] 화상 해제되지 않음 ➔ 2배 적용",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "19",
+      "name": null,
+      "grade": "불기둥 (R)",
+      "element": null,
+      "description": "무작위 적 3회 타격 (3x5) ➔ (3x8)",
+      "bingoDescription": "[집중] 한 명에게 모든 타격 집중 ➔ +화상",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "20",
+      "name": null,
+      "grade": "숯덩이 (C)",
+      "element": null,
+      "description": "(지속) 효과 없음. 파괴 시 적 전체 화상 5 ➔ 10",
+      "bingoDescription": "[매연] 적 전체 명중률 -10% ➔ -20%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "21",
+      "name": null,
+      "grade": "다이너마이트 (U)",
+      "element": null,
+      "description": "3턴 후 폭발 (피해 50) ➔ 2턴 후",
+      "bingoDescription": "[기폭] 타이머 1턴 감소 ➔ 즉시 폭발",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "22",
+      "name": null,
+      "grade": "용접 (C)",
+      "element": null,
+      "description": "아군 방어도 +5, 기계류 회복 ➔ +10",
+      "bingoDescription": "[결속] 인접한 방어 카드 효과 +50% ➔ 100%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "23",
+      "name": null,
+      "grade": "플레어 (C)",
+      "element": null,
+      "description": "적의 은신/회피 상태 제거 ➔ +취약",
+      "bingoDescription": "[조명] 치명타 확률 +10% ➔ +20%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "24",
+      "name": null,
+      "grade": "화염 방사 (R)",
+      "element": null,
+      "description": "이 카드가 있는 열(Row)에 매턴 피해 5 ➔ 8",
+      "bingoDescription": "[화벽] 해당 열 적 공격 차단 ➔ 반사",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "25",
+      "name": null,
+      "grade": "불의 정령 (L)",
+      "element": null,
+      "description": "불의 정령 소환 (매턴 화염구 발사) ➔ 2마리",
+      "bingoDescription": "[군단] 소환수 공격력 +5 ➔ +10",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "26",
+      "name": null,
+      "grade": "잿더미 (C)",
+      "element": null,
+      "description": "적 회복 효과 50% 감소 ➔ 100% 감소",
+      "bingoDescription": "[오염] 치유 감소량만큼 데미지 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "27",
+      "name": null,
+      "grade": "기초석 (C)",
+      "element": null,
+      "description": "방어도 5 ➔ 8",
+      "bingoDescription": "[보존] 방어도 50% 이월 ➔ 75%",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "BLOCK",
+          "value": 5
+        }
+      ],
+      "bingoEffects": [
+        {
+          "type": "BLOCK",
+          "value": 50
+        }
+      ]
+    },
+    {
+      "id": "28",
+      "name": null,
+      "grade": "강철 벽 (U)",
+      "element": null,
+      "description": "(지속) 방어 +5. 사라지지 않음 ➔ +10",
+      "bingoDescription": "[요새화] 현재 방어도 2배 ➔ 2.5배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [
+        {
+          "type": "BLOCK",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "name": null,
+      "grade": "투석기 (U)",
+      "element": null,
+      "description": "방어도만큼 피해 ➔ 1.5배",
+      "bingoDescription": "[공성] 적 방어 의도 해제 ➔ +스턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "29",
+      "name": null,
+      "grade": "진흙탕 (R)",
+      "element": null,
+      "description": "적 공격력 -5 ➔ -8",
+      "bingoDescription": "[속박] 적 행동 1턴 지연 ➔ 2턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "30",
+      "name": null,
+      "grade": "황금 광맥 (R)",
+      "element": null,
+      "description": "방어 5, 골드 +10 ➔ +20",
+      "bingoDescription": "[연금] 빙고 줄 수 × 골드 획득 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "31",
+      "name": null,
+      "grade": "지각 변동 (L)",
+      "element": null,
+      "description": "흙 카드 인접하게 재배치 ➔ 전체",
+      "bingoDescription": "[산사태] 인접 보너스 2배 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "32",
+      "name": null,
+      "grade": "돌의 피부 (C)",
+      "element": null,
+      "description": "받는 피해 -3 고정감소 ➔ -5",
+      "bingoDescription": "[경화] MaxHP +10 (일시) ➔ +20",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "33",
+      "name": null,
+      "grade": "가시 방패 (U)",
+      "element": null,
+      "description": "방어 10, 가시 3 ➔ 가시 5",
+      "bingoDescription": "[반격] 가시 데미지 3배 적용 ➔ 4배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "34",
+      "name": null,
+      "grade": "거인의 발 (L)",
+      "element": null,
+      "description": "피해 50. 다음 턴 휴식 ➔ 휴식 X",
+      "bingoDescription": "[압살] 체력 30% 이하 즉사 ➔ 50%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "35",
+      "name": null,
+      "grade": "모래성 (C)",
+      "element": null,
+      "description": "(지속) 피격 1회 무효화. 소멸 ➔ 2회",
+      "bingoDescription": "[재건] 파괴된 구조물 부활 ➔ 강화부활",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "36",
+      "name": null,
+      "grade": "대지의 울림 (U)",
+      "element": null,
+      "description": "적 전체 공격력 -2 ➔ -4",
+      "bingoDescription": "[공명] 적 디버프 지속시간 +1턴 ➔ +2턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "37",
+      "name": null,
+      "grade": "낙석 (C)",
+      "element": null,
+      "description": "무작위 적 피해 15 ➔ 20",
+      "bingoDescription": "[붕괴] 방어도 있는 적에게 2배 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "38",
+      "name": null,
+      "grade": "지하 벙커 (R)",
+      "element": null,
+      "description": "3턴간 받는 피해 50% 감소 ➔ 70%",
+      "bingoDescription": "[피신] 체력 20% 이하 시 완전무적 ➔ 30%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "39",
+      "name": null,
+      "grade": "화석 (U)",
+      "element": null,
+      "description": "사용한 카드 1장 덱으로 회수 ➔ 2장",
+      "bingoDescription": "[발굴] 무덤에서 카드 1장 가져옴 ➔ 2장",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "40",
+      "name": null,
+      "grade": "자갈 (C)",
+      "element": null,
+      "description": "방어도 2. (지속) 사라지지 않음 ➔ 방어도 4",
+      "bingoDescription": "[누적] 자갈 개수 × 5 방어도 ➔ × 8",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "BLOCK",
+          "value": 2
+        }
+      ],
+      "bingoEffects": [
+        {
+          "type": "BLOCK",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "id": "41",
+      "name": null,
+      "grade": "바위 던지기 (C)",
+      "element": null,
+      "description": "피해 10. 확률로 기절 ➔ 확정 기절",
+      "bingoDescription": "[충격] 기절한 적에게 2배 피해 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "42",
+      "name": null,
+      "grade": "철광석 (U)",
+      "element": null,
+      "description": "효과 없음. 대장장이 이벤트 시 강화됨 ➔ 즉시 강화",
+      "bingoDescription": "[제련] 장비 카드 효과 +50% ➔ +100%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "43",
+      "name": null,
+      "grade": "지진 (R)",
+      "element": null,
+      "description": "적 전체 피해 10. 방어도 파괴 ➔ 피해 20",
+      "bingoDescription": "[균열] 지상형 적 즉사 ➔ 체력 반감",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "44",
+      "name": null,
+      "grade": "도자기 (C)",
+      "element": null,
+      "description": "(지속) 파괴 시 카드 1장 드로우 ➔ 2장",
+      "bingoDescription": "[파편] 파괴 시 적 전체 출혈 2 ➔ 4",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "45",
+      "name": null,
+      "grade": "점토 인형 (U)",
+      "element": null,
+      "description": "(지속) 대신 맞아주는 인형(HP 20) ➔ HP 40",
+      "bingoDescription": "[복제] 인형이 하나 더 생성 ➔ HP 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "46",
+      "name": null,
+      "grade": "동굴 (C)",
+      "element": null,
+      "description": "이 칸에 배치된 유닛 회피율 +30% ➔ +50%",
+      "bingoDescription": "[은신처] 매 턴 체력 5 회복 ➔ 10",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": [
+        {
+          "type": "HEAL",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "id": "47",
+      "name": null,
+      "grade": "모래시계 (R)",
+      "element": null,
+      "description": "적 행동 턴을 1턴 뒤로 미룸 ➔ 2턴",
+      "bingoDescription": "[지연] 아군 쿨타임 1턴 감소 ➔ 2턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "48",
+      "name": null,
+      "grade": "비석 (C)",
+      "element": null,
+      "description": "죽은 아군/카드 수만큼 공격력 증가 ➔ 2배",
+      "bingoDescription": "[추모] 무덤의 카드 3장 덱으로 ➔ 5장",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "49",
+      "name": null,
+      "grade": "협곡 (L)",
+      "element": null,
+      "description": "적이 아군에게 오지 못하게 막음(근접무효) ➔ 원거리반감",
+      "bingoDescription": "[낙사] 이동하려는 적 즉사 ➔ 보스 제외",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "50",
+      "name": null,
+      "grade": "단단한 껍질 (C)",
+      "element": null,
+      "description": "다음 1회 피격 데미지 1로 고정 ➔ 0으로",
+      "bingoDescription": "[철벽] 방어도 관통 공격 무효 ➔ 반사",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "51",
+      "name": null,
+      "grade": "치유의 샘 (C)",
+      "element": null,
+      "description": "체력 10% 회복 ➔ 15%",
+      "bingoDescription": "[과치유] 초과분 보호막 전환 ➔ 150%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "52",
+      "name": null,
+      "grade": "수은 (U)",
+      "element": null,
+      "description": "(와일드) 모든 원소 취급 ➔ 효과 2배",
+      "bingoDescription": "[융합] 인접 타 원소 빙고 발동 ➔ 80%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "53",
+      "name": null,
+      "grade": "정화의 비 (U)",
+      "element": null,
+      "description": "아군 디버프 제거 ➔ 모두 제거",
+      "bingoDescription": "[세례] 적 버프 제거 ➔ 제거후 뎀",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "54",
+      "name": null,
+      "grade": "복제 거울 (R)",
+      "element": null,
+      "description": "직전 카드 효과 복사 ➔ 2회 복사",
+      "bingoDescription": "[반사] 최강 빙고 효과 재발동 ➔ 2회",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "55",
+      "name": null,
+      "grade": "얼음 감옥 (R)",
+      "element": null,
+      "description": "적 1명 동결 ➔ 전체 동결",
+      "bingoDescription": "[절대영도] 적 턴 딜레이 추가 ➔ +뎀",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "56",
+      "name": null,
+      "grade": "해일 (L)",
+      "element": null,
+      "description": "적 후열로 밀기 ➔ 밀기+스턴",
+      "bingoDescription": "[쓰나미] 그리드 전체 물로 변환 ➔ 강화",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "57",
+      "name": null,
+      "grade": "증기막 (C)",
+      "element": null,
+      "description": "회피율 +20% ➔ +40%",
+      "bingoDescription": "[안개] 적 명중률 -20% ➔ -40%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "58",
+      "name": null,
+      "grade": "물총 (C)",
+      "element": null,
+      "description": "피해 8. 1드로우 ➔ 2드로우",
+      "bingoDescription": "[급류] 뽑은 카드 즉시 발동 ➔ 2장",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "59",
+      "name": null,
+      "grade": "연금 용액 (R)",
+      "element": null,
+      "description": "손패 흙->물 변환 ➔ 전체 변환",
+      "bingoDescription": "[치환] 변환 수 × 체력 회복 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "60",
+      "name": null,
+      "grade": "깊은 바다 (U)",
+      "element": null,
+      "description": "코스트 -1 (패시브) ➔ -2",
+      "bingoDescription": "[수압] 적 현재체력 비례 뎀 ➔ 15%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "61",
+      "name": null,
+      "grade": "산성비 (U)",
+      "element": null,
+      "description": "적 전체 방어력 -5 ➔ -10",
+      "bingoDescription": "[부식] 금속류 적에게 3배 피해 ➔ 4배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "62",
+      "name": null,
+      "grade": "얼음창 (C)",
+      "element": null,
+      "description": "피해 10. 동결된 적 3배 ➔ 4배",
+      "bingoDescription": "[관통] 보호막 무시 피해 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "63",
+      "name": null,
+      "grade": "오아시스 (R)",
+      "element": null,
+      "description": "그리드 1칸 '회복존' 설정 ➔ 2칸",
+      "bingoDescription": "[풍요] 매 턴 무작위 버프 획득 ➔ 2개",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "64",
+      "name": null,
+      "grade": "거품 (C)",
+      "element": null,
+      "description": "다음 1회 피해 0으로 만듦 ➔ 반사",
+      "bingoDescription": "[부유] 함정/가시 데미지 면역 ➔ 힐",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "65",
+      "name": null,
+      "grade": "이슬 (C)",
+      "element": null,
+      "description": "체력 5 회복. 코스트 0 ➔ 체력 10",
+      "bingoDescription": "[스며듦] 사용한 물 카드 덱으로 복귀 ➔ 2장",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "HEAL",
+          "value": 5
+        }
+      ],
+      "bingoEffects": []
+    },
+    {
+      "id": "66",
+      "name": null,
+      "grade": "소용돌이 (U)",
+      "element": null,
+      "description": "적들의 위치를 무작위로 섞음 ➔ 스턴",
+      "bingoDescription": "[혼류] 적 의도(공격/방어)를 바꿈 ➔ 취소",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "67",
+      "name": null,
+      "grade": "눈덩이 (C)",
+      "element": null,
+      "description": "피해 5. 맞을 때마다 피해 증가 ➔ 증가폭 2배",
+      "bingoDescription": "[굴리기] 빙고 줄 수만큼 데미지 증폭 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "68",
+      "name": null,
+      "grade": "간헐천 (U)",
+      "element": null,
+      "description": "(지속) 밟으면 적을 공중으로 띄움 ➔ 피해 추가",
+      "bingoDescription": "[분출] 띄워진 적에게 사격 시 100% 명중 ➔ 치명타",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "69",
+      "name": null,
+      "grade": "폭포 (R)",
+      "element": null,
+      "description": "세로줄 적 전체에게 피해 20 ➔ 30",
+      "bingoDescription": "[낙수] 적의 방어도를 체력 회복으로 뺏음 ➔ 전량",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "70",
+      "name": null,
+      "grade": "얼음 조각 (C)",
+      "element": null,
+      "description": "(지속) 체력 10 벽 생성. 파괴시 동결 ➔ 전체 동결",
+      "bingoDescription": "[빙벽] 인접한 적 속도 감소 ➔ 동결",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "71",
+      "name": null,
+      "grade": "성수 (U)",
+      "element": null,
+      "description": "언데드/악마 타입에게 3배 피해 ➔ 즉사",
+      "bingoDescription": "[정화] 아군 모든 상태이상 해제 ➔ 축복",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "72",
+      "name": null,
+      "grade": "미역 (C)",
+      "element": null,
+      "description": "적 회피 불가 (속박) ➔ 공격불가",
+      "bingoDescription": "[미끄러짐] 적이 공격하다가 넘어짐(자해) ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "73",
+      "name": null,
+      "grade": "수증기 폭발 (R)",
+      "element": null,
+      "description": "화상 상태인 적에게 치명타 피해 ➔ 즉사급 피해",
+      "bingoDescription": "[팽창] 그리드의 빈 칸을 '증기'로 채움 ➔ +회피",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "74",
+      "name": null,
+      "grade": "아쿠아맨 (L)",
+      "element": null,
+      "description": "골렘이 물의 정령으로 변신 (스탯↑) ➔ 스탯↑↑",
+      "bingoDescription": "[동화] 물 카드 효과 100% 증가 ➔ 200%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "75",
+      "name": null,
+      "grade": "물물교환 (C)",
+      "element": null,
+      "description": "체력 10을 골드 10으로 바꿈 ➔ 골드 20",
+      "bingoDescription": "[상인] 상점 아이템 1개 무료 ➔ 2개",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "76",
+      "name": null,
+      "grade": "순풍 (C)",
+      "element": null,
+      "description": "다음 카드 즉시발동 ➔ 2장 즉시",
+      "bingoDescription": "[가속] 다음 턴 드로우 2배 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "77",
+      "name": null,
+      "grade": "메아리 (U)",
+      "element": null,
+      "description": "다음 효과 2번 발동 ➔ 3번",
+      "bingoDescription": "[공명] 빙고 효과 2번 발동 ➔ 3번",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "78",
+      "name": null,
+      "grade": "돌풍 (U)",
+      "element": null,
+      "description": "카드 2장 위치 교체 ➔ 지정 교체",
+      "bingoDescription": "[혼돈] 그리드 셔플 + 강화 ➔ 2회",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "79",
+      "name": null,
+      "grade": "진공 칼날 (R)",
+      "element": null,
+      "description": "체력 50% 이상 적 2배 뎀 ➔ 3배",
+      "bingoDescription": "[압력] 체력 비례 데미지 ➔ +",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "80",
+      "name": null,
+      "grade": "폭풍의 눈 (R)",
+      "element": null,
+      "description": "중앙 4칸 카드 즉시 발동 ➔ 2회",
+      "bingoDescription": "[태풍] 매 턴 바람카드 생성 ➔ 2장",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "81",
+      "name": null,
+      "grade": "에테르 형상 (L)",
+      "element": null,
+      "description": "이번 턴 무적 ➔ 다음 턴까지",
+      "bingoDescription": "[무형] 영구 회피율 증가 ➔ +35%n",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "82",
+      "name": null,
+      "grade": "깃털 댄스 (C)",
+      "element": null,
+      "description": "3회 공격 ➔ 4회 공격",
+      "bingoDescription": "[연타] 공격 횟수 + n회 ➔ +2n",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "83",
+      "name": null,
+      "grade": "역풍 (U)",
+      "element": null,
+      "description": "적 게이지 -30% ➔ -50%",
+      "bingoDescription": "[저항] 적 받는 피해 증가 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "84",
+      "name": null,
+      "grade": "속삭임 (R)",
+      "element": null,
+      "description": "덱 3장 순서 조작 ➔ 5장",
+      "bingoDescription": "[예지] 다음 턴 조커 확정 ➔ 강화조커",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "85",
+      "name": null,
+      "grade": "진공 (C)",
+      "element": null,
+      "description": "적 버프 지속시간 -1턴 ➔ 제거",
+      "bingoDescription": "[질식] 적 체력 재생 불가 ➔ 자해",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "86",
+      "name": null,
+      "grade": "토네이도 (U)",
+      "element": null,
+      "description": "전체 피해 5. 위치 섞음 ➔ 피해 10",
+      "bingoDescription": "[소용돌이] 적들을 1턴간 공중에 띄움 ➔ 2턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "87",
+      "name": null,
+      "grade": "번개 (R)",
+      "element": null,
+      "description": "피해 20. 25% 확률 스턴 ➔ 50%",
+      "bingoDescription": "[감전] 스턴이 인접 적에게 전이 ➔ 전체",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "88",
+      "name": null,
+      "grade": "구름다리 (C)",
+      "element": null,
+      "description": "카드 1장을 빈 칸으로 이동 ➔ 2장",
+      "bingoDescription": "[연결] 떨어진 빙고 라인 연결 ➔ 강화",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "89",
+      "name": null,
+      "grade": "산들바람 (C)",
+      "element": null,
+      "description": "카드 1장 뽑음. 코스트 0 ➔ 2장 뽑음",
+      "bingoDescription": "[환기] 패의 불필요한 카드 1장 교체 ➔ 모두",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "90",
+      "name": null,
+      "grade": "부메랑 (C)",
+      "element": null,
+      "description": "피해 5. 다음 턴에 패로 돌아옴 ➔ 피해 10",
+      "bingoDescription": "[회귀] 사용한 카드 다시 손으로 ➔ 비용 0",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "91",
+      "name": null,
+      "grade": "에어버스트 (U)",
+      "element": null,
+      "description": "적 1명을 뒤로 밀침 ➔ 맵 밖으로(즉사)",
+      "bingoDescription": "[충격파] 밀려난 적이 뒷 적과 충돌(추뎀) ➔ 광역",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "92",
+      "name": null,
+      "grade": "신기루 (R)",
+      "element": null,
+      "description": "분신 생성 (피격 시 사라짐) ➔ 폭발함",
+      "bingoDescription": "[환영] 적 공격이 빗나갈 확률 50% ➔ 80%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "93",
+      "name": null,
+      "grade": "진공청소기 (C)",
+      "element": null,
+      "description": "적의 버프를 뺏어옴 ➔ 모두 뺏음",
+      "bingoDescription": "[흡입] 그리드의 아이템을 한곳으로 모음 ➔ 자동획득",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "94",
+      "name": null,
+      "grade": "활공 (C)",
+      "element": null,
+      "description": "(지속) 턴 종료 시 카드 1장 보존 ➔ 2장",
+      "bingoDescription": "[비행] 지상 공격 면역 ➔ 반격",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "95",
+      "name": null,
+      "grade": "음속 돌파 (U)",
+      "element": null,
+      "description": "카드를 빨리 낼수록 데미지 증가 ➔ 증가폭 2배",
+      "bingoDescription": "[쇼크] 이번 턴 모든 쿨타임 제거 ➔ 다음턴도",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "96",
+      "name": null,
+      "grade": "선풍각 (C)",
+      "element": null,
+      "description": "인접한 적 2명 동시 공격 ➔ 3명",
+      "bingoDescription": "[회전] 빙고 라인을 90도 회전시킴 ➔ 180도",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "97",
+      "name": null,
+      "grade": "연 (C)",
+      "element": null,
+      "description": "다음 방의 적/이벤트 확인 ➔ 보상 확인",
+      "bingoDescription": "[실타래] 멀리 있는 빙고 연결 ➔ 2개 연결",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "98",
+      "name": null,
+      "grade": "구름 (U)",
+      "element": null,
+      "description": "원거리 공격 데미지 반감 ➔ 무효화",
+      "bingoDescription": "[운무] 아군 전체 은신 ➔ 공격력 증가",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "99",
+      "name": null,
+      "grade": "휘파람 (C)",
+      "element": null,
+      "description": "랜덤한 아군(동물) 소환 ➔ 강한 동물",
+      "bingoDescription": "[호령] 소환수 공격력 2배 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "100",
+      "name": null,
+      "grade": "종말의 태풍 (L)",
+      "element": null,
+      "description": "모든 유닛 체력을 1로 만듦 ➔ 적만",
+      "bingoDescription": "[초토화] 그리드 초기화 및 보너스 ➔ 대량 보너스",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "101",
+      "name": null,
+      "grade": "증기 (C)",
+      "element": null,
+      "description": "피해 10 + 회피율 10% ➔ 수치 2배",
+      "bingoDescription": "[증발] 이번 턴 회피 100% ➔ 반격",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "102",
+      "name": null,
+      "grade": "마그마 (U)",
+      "element": null,
+      "description": "피해 10 + 방어도 10 ➔ 수치 1.5배",
+      "bingoDescription": "[분화] 방어도를 공격력에 합산 ➔ 2배 합산",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "BLOCK",
+          "value": 10
+        }
+      ],
+      "bingoEffects": []
+    },
+    {
+      "id": "103",
+      "name": null,
+      "grade": "열풍 (U)",
+      "element": null,
+      "description": "전체 피해 5 + 화상 2 ➔ 화상 4",
+      "bingoDescription": "[확산] 화상을 모든 적에게 전이 ➔ +폭발",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "104",
+      "name": null,
+      "grade": "진흙 (C)",
+      "element": null,
+      "description": "적 속도 감소 + 체력 회복 ➔ 2배",
+      "bingoDescription": "[늪] 적 행동 불가 (1턴) ➔ 2턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "105",
+      "name": null,
+      "grade": "모래폭풍 (U)",
+      "element": null,
+      "description": "전체 피해 + 명중 감소 ➔ 실명",
+      "bingoDescription": "[침식] 적 방어도 매 턴 감소 ➔ 완전파괴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "106",
+      "name": null,
+      "grade": "폭풍우 (R)",
+      "element": null,
+      "description": "전체 번개 피해 + 스턴 ➔ 2배",
+      "bingoDescription": "[감전] 적 전체 마비 ➔ +취약",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "107",
+      "name": null,
+      "grade": "흑요석 (R)",
+      "element": null,
+      "description": "날카로운 방어도(반사) ➔ 2배",
+      "bingoDescription": "[절단] 체력 10% 이하 적 처형 ➔ 20%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "108",
+      "name": null,
+      "grade": "안개 (C)",
+      "element": null,
+      "description": "적 공격 50% 빗나감 ➔ 75%",
+      "bingoDescription": "[은신] 골렘 타겟 지정 불가 ➔ 다음턴도",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "109",
+      "name": null,
+      "grade": "나무 (U)",
+      "element": null,
+      "description": "(지속) 매 턴 체력 5 회복 ➔ 10",
+      "bingoDescription": "[성장] 턴마다 효과 2배 증가 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "HEAL",
+          "value": 5
+        }
+      ],
+      "bingoEffects": []
+    },
+    {
+      "id": "110",
+      "name": null,
+      "grade": "유리 (R)",
+      "element": null,
+      "description": "공격력 +100% 받음 2배 ➔ 받음 1배",
+      "bingoDescription": "[파편] 피격 시 공격자에게 출혈 ➔ 치명상",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "111",
+      "name": null,
+      "grade": "연기 (C)",
+      "element": null,
+      "description": "적 시야 차단(공격 실패) ➔ 2회 실패",
+      "bingoDescription": "[질식] 매 턴 체력 5% 감소 ➔ 10%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "112",
+      "name": null,
+      "grade": "눈보라 (U)",
+      "element": null,
+      "description": "전체 피해 + 동결 ➔ 강화 동결",
+      "bingoDescription": "[혹한] 동결된 적 즉사 확률 10% ➔ 20%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "113",
+      "name": null,
+      "grade": "황사 (C)",
+      "element": null,
+      "description": "적 회복 불가 + 도트뎀 ➔ 2배",
+      "bingoDescription": "[오염] 기계류 적 고장(스턴) ➔ 영구스턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "114",
+      "name": null,
+      "grade": "온천 (R)",
+      "element": null,
+      "description": "체력 회복 + 디버프 해제 ➔ 풀피",
+      "bingoDescription": "[휴식] 행동력 2배 회복 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "115",
+      "name": null,
+      "grade": "운석 (L)",
+      "element": null,
+      "description": "1턴 뒤 거대 피해(100) ➔ 즉시",
+      "bingoDescription": "[충돌] 그리드 4칸 파괴(사용불가) ➔ 2칸",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "116",
+      "name": null,
+      "grade": "벼락 (U)",
+      "element": null,
+      "description": "단일 대상 극대 피해(관통) ➔ 2배",
+      "bingoDescription": "[과부하] 주변 적에게 체인 라이트닝 ➔ 전체",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "117",
+      "name": null,
+      "grade": "빙하 (R)",
+      "element": null,
+      "description": "(지속) 거대 방벽(HP 100) ➔ HP 200",
+      "bingoDescription": "[빙하시대] 적 전체 속도 50% 감소 ➔ 80%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "118",
+      "name": null,
+      "grade": "덩굴 (C)",
+      "element": null,
+      "description": "적 1명 속박(이동불가) ➔ 2명",
+      "bingoDescription": "[조리기] 속박된 적 흡혈 ➔ 2배 흡혈",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "119",
+      "name": null,
+      "grade": "세라믹 (C)",
+      "element": null,
+      "description": "방어도 +15. 1회용 ➔ 2회용",
+      "bingoDescription": "[절연] 전기/마법 데미지 면역 ➔ 반사",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "120",
+      "name": null,
+      "grade": "산호 (C)",
+      "element": null,
+      "description": "(지속) 가시 데미지 반사 ➔ 2배",
+      "bingoDescription": "[군락] 인접한 물 카드 수만큼 방어 ➔ 공격",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "121",
+      "name": null,
+      "grade": "플라즈마 (L)",
+      "element": null,
+      "description": "방어 무시 고정 피해 50 ➔ 100",
+      "bingoDescription": "[융해] 적 장비 파괴 ➔ 강탈",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "122",
+      "name": null,
+      "grade": "진흙 괴물 (U)",
+      "element": null,
+      "description": "소환수(재생함) ➔ 분열함",
+      "bingoDescription": "[증식] 턴마다 개체수 증가 ➔ 스탯증가",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "123",
+      "name": null,
+      "grade": "먼지 (C)",
+      "element": null,
+      "description": "적 명중률 소폭 감소 ➔ 대폭 감소",
+      "bingoDescription": "[알러지] 적이 재채기하느라 턴 넘김 ➔ 자해",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "124",
+      "name": null,
+      "grade": "끓는 물 (C)",
+      "element": null,
+      "description": "피해 + 화상 + 젖음 ➔ 수치증가",
+      "bingoDescription": "[살균] 적의 버프/재생 효과 제거 ➔ 영구제거",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "125",
+      "name": null,
+      "grade": "소금 (U)",
+      "element": null,
+      "description": "민달팽이/점액 적 즉사 ➔ 모두에게 뎀",
+      "bingoDescription": "[보존] 음식 아이템 효과 2배 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "126",
+      "name": null,
+      "grade": "오로라 (R)",
+      "element": null,
+      "description": "다음 턴 마나/코스트 무제한 ➔ 2턴간",
+      "bingoDescription": "[환상] 적이 공격 대신 춤을 춤 ➔ 아군회복",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "127",
+      "name": null,
+      "grade": "숯 (C)",
+      "element": null,
+      "description": "정화 효과 + 화상 부여 ➔ 강화",
+      "bingoDescription": "[흡착] 독 데미지 제거 ➔ 체력전환",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "128",
+      "name": null,
+      "grade": "벽돌 (C)",
+      "element": null,
+      "description": "던져서 피해 10 + 스턴 ➔ 피해 20",
+      "bingoDescription": "[건축] 방어 구조물 생성 ➔ 요새생성",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "129",
+      "name": null,
+      "grade": "피 (U)",
+      "element": null,
+      "description": "체력 소모하여 공격력 증가 ➔ 소모감소",
+      "bingoDescription": "[혈마법] 체력으로 스킬 사용 ➔ 효율2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "130",
+      "name": null,
+      "grade": "에너지 드링크 (C)",
+      "element": null,
+      "description": "속도 대폭 증가, 후유증(스턴) ➔ 후유증X",
+      "bingoDescription": "[각성] 3턴간 모든 스탯 2배 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "131",
+      "name": null,
+      "grade": "독 병 (C)",
+      "element": null,
+      "description": "독(매턴 피해) 5 부여 ➔ 8",
+      "bingoDescription": "[중독] 독 데미지 2배 가속 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "132",
+      "name": null,
+      "grade": "단검 (C)",
+      "element": null,
+      "description": "출혈(행동시 피해) 5 부여 ➔ 8",
+      "bingoDescription": "[과다출혈] 출혈 스택 2배 뻥튀기 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "133",
+      "name": null,
+      "grade": "수면 가루 (U)",
+      "element": null,
+      "description": "적 수면(피격시 깸/2배) ➔ 3배",
+      "bingoDescription": "[악몽] 수면 중인 적에게 도트뎀 ➔ 즉사",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "134",
+      "name": null,
+      "grade": "저주 인형 (R)",
+      "element": null,
+      "description": "내가 받는 피해 적도 받음 ➔ 2배",
+      "bingoDescription": "[고통] 내 체력 낮을수록 뎀증 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "135",
+      "name": null,
+      "grade": "쇠약의 부적 (U)",
+      "element": null,
+      "description": "적 공격력 50% 감소 ➔ 75%",
+      "bingoDescription": "[무력화] 공격력 0 이하 적 즉사 ➔ 보스포함",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "136",
+      "name": null,
+      "grade": "부식성 산 (C)",
+      "element": null,
+      "description": "적 방어도 절반 파괴 ➔ 완전 파괴",
+      "bingoDescription": "[용해] 파괴한 만큼 뎀지 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "137",
+      "name": null,
+      "grade": "혼란 (R)",
+      "element": null,
+      "description": "적이 아군(적)을 공격 ➔ 확률 100%",
+      "bingoDescription": "[자멸] 적끼리 서로 공격 ➔ 치명타",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "138",
+      "name": null,
+      "grade": "역병 (L)",
+      "element": null,
+      "description": "적 사망 시 디버프 전이 ➔ 전이+강화",
+      "bingoDescription": "[팬데믹] 모든 적에게 독 100 ➔ 독 200",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "139",
+      "name": null,
+      "grade": "거미줄 (C)",
+      "element": null,
+      "description": "회피 불가 상태 부여 ➔ 이동 불가",
+      "bingoDescription": "[포박] 날아다니는 적 격추 ➔ 스턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "140",
+      "name": null,
+      "grade": "마비 침 (C)",
+      "element": null,
+      "description": "50% 확률로 행동 불가 ➔ 75%",
+      "bingoDescription": "[감전] 기계류 적 즉시 처치 ➔ 폭발",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "141",
+      "name": null,
+      "grade": "공포의 가면 (U)",
+      "element": null,
+      "description": "적이 도망감 (보상 없음) ➔ 보상 있음",
+      "bingoDescription": "[패닉] 적 방어도/회피율 0 ➔ 공격력 0",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "142",
+      "name": null,
+      "grade": "매혹 (R)",
+      "element": null,
+      "description": "적 1명을 아군으로 만듦 ➔ 2명",
+      "bingoDescription": "[배신] 적이 가장 강한 적 공격 ➔ 2회",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "143",
+      "name": null,
+      "grade": "동상 (C)",
+      "element": null,
+      "description": "받는 피해 30% 증가 ➔ 50%",
+      "bingoDescription": "[깨짐] 타격 시 즉사 확률 부여 ➔ 확률업",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "144",
+      "name": null,
+      "grade": "맹독 (U)",
+      "element": null,
+      "description": "독 스택이 줄어들지 않음 ➔ 2배로 늠",
+      "bingoDescription": "[부패] 체력 회복을 독 피해로 전환 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "145",
+      "name": null,
+      "grade": "상처 벌리기 (C)",
+      "element": null,
+      "description": "출혈 상태인 적에게 큰 피해 ➔ 2배",
+      "bingoDescription": "[혈폭풍] 출혈 스택을 주변에 뿌림 ➔ 전체",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "146",
+      "name": null,
+      "grade": "침묵 (U)",
+      "element": null,
+      "description": "적 스킬/마법 사용 불가 ➔ 영구",
+      "bingoDescription": "[고요] 마법형 적 공격력 0 ➔ 자해",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "147",
+      "name": null,
+      "grade": "실명 (C)",
+      "element": null,
+      "description": "명중률 0%로 만듦 (1턴) ➔ 2턴",
+      "bingoDescription": "[암전] 적 전체 실명 ➔ 아군 은신",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "148",
+      "name": null,
+      "grade": "표식 (C)",
+      "element": null,
+      "description": "지정 대상 받는 피해 50% 증가 ➔ 100%",
+      "bingoDescription": "[집중포화] 모든 아군이 표식 공격 ➔ 치명타",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "149",
+      "name": null,
+      "grade": "노화 (L)",
+      "element": null,
+      "description": "매 턴 적 최대 체력 감소 ➔ 대폭 감소",
+      "bingoDescription": "[세월] 적 스탯 절반으로 감소 ➔ 1로",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "150",
+      "name": null,
+      "grade": "바이러스 (U)",
+      "element": null,
+      "description": "적 덱에 '쓰레기 카드'를 넣음 ➔ 3장 넣음",
+      "bingoDescription": "[오류] 적 AI가 오작동함 ➔ 아군지원",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "151",
+      "name": null,
+      "grade": "롱소드 (C)",
+      "element": null,
+      "description": "(지속) 기본 공격력 +2 ➔ +4",
+      "bingoDescription": "[검술] 검 보너스 + n ➔ +2n",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "152",
+      "name": null,
+      "grade": "타워실드 (C)",
+      "element": null,
+      "description": "(지속) 기본 방어도 +2 ➔ +4",
+      "bingoDescription": "[방진] 방패 보너스 + n ➔ +2n",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "153",
+      "name": null,
+      "grade": "마법봉 (U)",
+      "element": null,
+      "description": "(지속) 원소 효과 20% 증폭 ➔ 40%",
+      "bingoDescription": "[마력] 마나 재생 (카드 드로우) ➔ 2장",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "154",
+      "name": null,
+      "grade": "흡혈의 검 (R)",
+      "element": null,
+      "description": "피해의 20% 회복 ➔ 40%",
+      "bingoDescription": "[피의갈망] 체력 가득차면 공증 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "155",
+      "name": null,
+      "grade": "가시 갑옷 (U)",
+      "element": null,
+      "description": "피격 시 5 반사 ➔ 10 반사",
+      "bingoDescription": "[가시밭] 모든 적에게 매턴 피해 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "156",
+      "name": null,
+      "grade": "현자의 안경 (R)",
+      "element": null,
+      "description": "빙고 조건 1개 완화 ➔ 조화 완화",
+      "bingoDescription": "[통찰] 적 의도 상세 확인 ➔ 약점노출",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "157",
+      "name": null,
+      "grade": "헤르메스 신발 (U)",
+      "element": null,
+      "description": "회피율 +10% ➔ +20%",
+      "bingoDescription": "[신속] 턴 시작 시 카드 1장 뽑음 ➔ 코스트0",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "158",
+      "name": null,
+      "grade": "황금 곡괭이 (R)",
+      "element": null,
+      "description": "바위/장애물 즉시 파괴 ➔ 골드 획득",
+      "bingoDescription": "[채굴] 구조물 파괴 시 보상 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "159",
+      "name": null,
+      "grade": "폭탄 배낭 (L)",
+      "element": null,
+      "description": "사망 시 자폭(500뎀) ➔ 1000뎀",
+      "bingoDescription": "[카미카제] 죽어도 승리 처리 ➔ 보상2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "160",
+      "name": null,
+      "grade": "재생의 반지 (U)",
+      "element": null,
+      "description": "매 턴 체력 5 회복 ➔ 10",
+      "bingoDescription": "[활력] 최대 체력 증가 ➔ +50",
+      "cost": 0,
+      "singleEffects": [
+        {
+          "type": "HEAL",
+          "value": 5
+        }
+      ],
+      "bingoEffects": []
+    },
+    {
+      "id": "161",
+      "name": null,
+      "grade": "거대 도끼 (C)",
+      "element": null,
+      "description": "공격력 +5. 명중률 -20% ➔ 명중률 정상",
+      "bingoDescription": "[절단] 체력 50% 이하 적 즉사 ➔ 70%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "162",
+      "name": null,
+      "grade": "장창 (C)",
+      "element": null,
+      "description": "후열 공격 가능. 공격력 +3 ➔ +5",
+      "bingoDescription": "[관통] 방어도 무시 공격 ➔ 2명 공격",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "163",
+      "name": null,
+      "grade": "투명 망토 (R)",
+      "element": null,
+      "description": "첫 턴 은신. 방어 +2 ➔ 영구 은신",
+      "bingoDescription": "[기습] 은신 중 공격력 2배 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "164",
+      "name": null,
+      "grade": "강철 투구 (C)",
+      "element": null,
+      "description": "치명타 피격 면역. 방어 +3 ➔ +5",
+      "bingoDescription": "[도탄] 원거리 공격 튕겨냄 ➔ 반사",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "165",
+      "name": null,
+      "grade": "행운의 부적 (U)",
+      "element": null,
+      "description": "확률형 효과 발동률 +20% ➔ +50%",
+      "bingoDescription": "[기적] 사망 시 1회 부활 ➔ 체력 50%",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "166",
+      "name": null,
+      "grade": "토템 (C)",
+      "element": null,
+      "description": "(지속) 매 턴 무작위 버프 ➔ 강화 버프",
+      "bingoDescription": "[숭배] 인접 카드 효과 증폭 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "167",
+      "name": null,
+      "grade": "쌍안경 (C)",
+      "element": null,
+      "description": "시야 거리 증가 ➔ 숨은 길 찾기",
+      "bingoDescription": "[조준] 명중률 100% 고정 ➔ 치명타",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "168",
+      "name": null,
+      "grade": "숫돌 (U)",
+      "element": null,
+      "description": "무기 카드 공격력 영구 +1 ➔ +2",
+      "bingoDescription": "[연마] 덱의 모든 공격 카드 강화 ➔ +3",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "169",
+      "name": null,
+      "grade": "배낭 (C)",
+      "element": null,
+      "description": "손패 최대치 +1 ➔ +2",
+      "bingoDescription": "[보급] 매 턴 무작위 아이템 생성 ➔ 고급",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "170",
+      "name": null,
+      "grade": "저주받은 검 (L)",
+      "element": null,
+      "description": "공격력 +50. 해제 불가 ➔ +100",
+      "bingoDescription": "[광란] 아군도 공격할 수 있음 ➔ 적만",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "171",
+      "name": null,
+      "grade": "프리즘 (U)",
+      "element": null,
+      "description": "인접 색상에 맞춤 ➔ 모든 색상",
+      "bingoDescription": "[굴절] 모든 게이지 + 2 ➔ +3",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "172",
+      "name": null,
+      "grade": "블랙홀 (R)",
+      "element": null,
+      "description": "그리드 칸 삭제(압축) ➔ 2칸",
+      "bingoDescription": "[소멸] 삭제 비례 스탯 증가 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "173",
+      "name": null,
+      "grade": "현자의 돌 (L)",
+      "element": null,
+      "description": "4원소 효과 무작위 발동 ➔ 2회씩",
+      "bingoDescription": "[연금술] 조화 빙고 조건 2칸 ➔ 1칸",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "174",
+      "name": null,
+      "grade": "모방자 (R)",
+      "element": null,
+      "description": "적 의도 카피 ➔ 2배 카피",
+      "bingoDescription": "[학습] 적 스킬 영구 획득 ➔ 강화",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "175",
+      "name": null,
+      "grade": "공백 (C)",
+      "element": null,
+      "description": "효과 없음(패스) ➔ 1드로우",
+      "bingoDescription": "[여백] 빙고 계산 제외(연결) ➔ 보너스",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "176",
+      "name": null,
+      "grade": "데이터 오류 (H)",
+      "element": null,
+      "description": "무작위 긍정/부정 효과 ➔ 긍정만",
+      "bingoDescription": "[버그] 적 체력/방어 교체 ➔ 체력 1",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "177",
+      "name": null,
+      "grade": "시간의 모래 (E)",
+      "element": null,
+      "description": "전투 5초 되감기 ➔ 10초",
+      "bingoDescription": "[회귀] 전투 리셋(보상 유지) ➔ 체력참고",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "178",
+      "name": null,
+      "grade": "황금 알 (U)",
+      "element": null,
+      "description": "3턴 후 레전더리 변신 ➔ 즉시",
+      "bingoDescription": "[부화] 골드 대량 획득 ➔ 유물 획득",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "179",
+      "name": null,
+      "grade": "도박사의 주사위 (U)",
+      "element": null,
+      "description": "1~6배 데미지 랜덤 ➔ 4~8배",
+      "bingoDescription": "[잭팟] 777 데미지 고정 ➔ 7777",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "180",
+      "name": null,
+      "grade": "조커 (R)",
+      "element": null,
+      "description": "덱의 아무 카드로 변신 ➔ 강화",
+      "bingoDescription": "[변장] 빙고 라인 색상 통일 ➔ 전체",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "181",
+      "name": null,
+      "grade": "변이 (C)",
+      "element": null,
+      "description": "내 카드 1장 무작위 변경 ➔ 등급 상승",
+      "bingoDescription": "[진화] 그리드 모든 카드 등급업 ➔ 레전더리",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "182",
+      "name": null,
+      "grade": "탐욕의 항아리 (C)",
+      "element": null,
+      "description": "카드 2장 뽑기 ➔ 3장",
+      "bingoDescription": "[욕망] 손패 10장 될때까지 드로우 ➔ 코스트0",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "183",
+      "name": null,
+      "grade": "희생 (U)",
+      "element": null,
+      "description": "아군 1명 처치, 나머지 풀피 ➔ 공증",
+      "bingoDescription": "[순교] 사망 아군 부활 ➔ 풀피부활",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "184",
+      "name": null,
+      "grade": "중력 역전 (L)",
+      "element": null,
+      "description": "떨어지는 방향 역전(위로) ➔ 좌우로",
+      "bingoDescription": "[무중력] 모든 카드 둥둥 뜸(배치자유) ➔ 자동",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "185",
+      "name": null,
+      "grade": "그림자 (U)",
+      "element": null,
+      "description": "내 분신 소환(약함) ➔ 강함",
+      "bingoDescription": "[협공] 분신과 함께 공격 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "186",
+      "name": null,
+      "grade": "거울상 (R)",
+      "element": null,
+      "description": "데미지->힐, 힐->데미지 ➔ 수치2배",
+      "bingoDescription": "[반전] 적/아군 타겟 뒤집기 ➔ 영구",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "187",
+      "name": null,
+      "grade": "자석 (C)",
+      "element": null,
+      "description": "특정 원소 끌어당김 ➔ 전체",
+      "bingoDescription": "[인력] 빙고 만들기 쉽게 정렬 ➔ 자동완성",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "188",
+      "name": null,
+      "grade": "폭죽 (C)",
+      "element": null,
+      "description": "화려한 이펙트(뎀1) ➔ 뎀10",
+      "bingoDescription": "[축제] 모든 유닛 춤춤(스턴) ➔ 3턴",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "189",
+      "name": null,
+      "grade": "보물상자 (C)",
+      "element": null,
+      "description": "파괴 시 아이템 드롭 ➔ 레어 드롭",
+      "bingoDescription": "[개봉] 상자 즉시 파괴 및 획득 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "190",
+      "name": null,
+      "grade": "미믹 상자 (U)",
+      "element": null,
+      "description": "상자인 척 하는 적 소환 ➔ 강한 적",
+      "bingoDescription": "[기습] 적을 잡아먹음(즉사) ➔ 보스뎀",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "191",
+      "name": null,
+      "grade": "퀘스트 스크롤 (C)",
+      "element": null,
+      "description": "\"이번 턴에 불 빙고 하기\" ➔ 보상 강화",
+      "bingoDescription": "[완료] 미션 성공 시 보상 획득 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "192",
+      "name": null,
+      "grade": "도박장 (U)",
+      "element": null,
+      "description": "골드 걸고 주사위 게임 ➔ 승률업",
+      "bingoDescription": "[올인] 가진 골드 2배 or 0 ➔ 3배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "193",
+      "name": null,
+      "grade": "성소 (R)",
+      "element": null,
+      "description": "체력 완전 회복 or 강화 ➔ 둘 다",
+      "bingoDescription": "[축복] 영구 스탯 버프 획득 ➔ 2배",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "194",
+      "name": null,
+      "grade": "상인 (C)",
+      "element": null,
+      "description": "카드 1장 구매 가능 ➔ 할인",
+      "bingoDescription": "[매매] 필요 없는 카드 판매 ➔ 비싸게",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "195",
+      "name": null,
+      "grade": "모닥불 (C)",
+      "element": null,
+      "description": "체력 30% 회복 ➔ 50%",
+      "bingoDescription": "[정비] 카드 1장 강화 ➔ 2장",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "196",
+      "name": null,
+      "grade": "함정 (C)",
+      "element": null,
+      "description": "밟으면 피해 10 ➔ 20",
+      "bingoDescription": "[해제] 함정 제거 및 부품 획득 ➔ 폭탄획득",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "197",
+      "name": null,
+      "grade": "열쇠 (U)",
+      "element": null,
+      "description": "잠긴 상자/문 열기 ➔ 마스터키",
+      "bingoDescription": "[해정] 보스 방 바로 이동 ➔ 체력깎고",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "198",
+      "name": null,
+      "grade": "지도 (C)",
+      "element": null,
+      "description": "전체 맵 구조 확인 ➔ 비밀방 포함",
+      "bingoDescription": "[탐험] 다음 이벤트 선택 가능 ➔ 2개",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "199",
+      "name": null,
+      "grade": "나침반 (C)",
+      "element": null,
+      "description": "출구 방향 알려줌 ➔ 지름길",
+      "bingoDescription": "[인도] 최적의 경로 자동 선택 ➔ 보상만",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "200",
+      "name": null,
+      "grade": "개발자의 분노 (H)",
+      "element": null,
+      "description": "적 즉사 (치트) ➔ -",
+      "bingoDescription": "[너프] 적 스탯 절반 감소 ➔ 체력 1",
+      "cost": 0,
+      "singleEffects": [],
+      "bingoEffects": []
+    },
+    {
+      "id": "FIRE",
+      "name": "불",
+      "type": "FIRE",
+      "grade": "Basic",
+      "description": "기본 공격 피해",
+      "bingoDescription": "불 빙고: 추가 피해",
+      "effectParams": {}
+    },
+    {
+      "id": "EARTH",
+      "name": "대지",
+      "type": "EARTH",
+      "grade": "Basic",
+      "description": "방어도 획득",
+      "bingoDescription": "대지 빙고: 추가 방어도",
+      "effectParams": {}
+    },
+    {
+      "id": "WATER",
+      "name": "물",
+      "type": "WATER",
+      "grade": "Basic",
+      "description": "체력 회복",
+      "bingoDescription": "물 빙고: 추가 회복",
+      "effectParams": {}
+    },
+    {
+      "id": "WIND",
+      "name": "바람",
+      "type": "WIND",
+      "grade": "Basic",
+      "description": "공격력 버프 또는 적 디버프",
+      "bingoDescription": "바람 빙고: 공격력 증가",
+      "effectParams": {}
+    }
+  ],
+  "keywords": [
+    {
+      "No": "고유 번호",
+      "Key_ID": "키워드 ID (코드 참조용)",
+      "Name_KR": "게임 내 표시 이름",
+      "Desc_Template": "툴팁 텍스트 템플릿",
+      " Keyword_Logic": "키워드 로직",
+      "Note": "비고 (기획 메모)"
+    },
+    {
+      "No": 0,
+      "Key_ID": "KEY_BURN",
+      "Name_KR": "화상",
+      "Desc_Template": "2 만큼 화상을 입힙니다.",
+      " Keyword_Logic": "{\"화상\" : 2}",
+      "Note": "도트 데미지는 즉발보다 가치 낮게 책정"
+    },
+    {
+      "No": 1,
+      "Key_ID": "ATTACT",
+      "Name_KR": "공격",
+      "Desc_Template": null,
+      " Keyword_Logic": null,
+      "Note": "기본 카드"
+    },
+    {
+      "No": 2,
+      "Key_ID": "DEFENCE",
+      "Name_KR": "방어",
+      "Desc_Template": null,
+      " Keyword_Logic": null,
+      "Note": "기본 카드"
+    },
+    {
+      "No": 3,
+      "Key_ID": "HEAL",
+      "Name_KR": "회복",
+      "Desc_Template": null,
+      " Keyword_Logic": null,
+      "Note": null
+    },
+    {
+      "No": 4,
+      "Key_ID": "ACID",
+      "Name_KR": "화상/부패/독/풍화",
+      "Desc_Template": "{val} 만큼 화상을 입힙니다. 매 공격 턴 마다 {val}만큼 데미지를 주고, {val}를 1 줄입니다. ",
+      " Keyword_Logic": null,
+      "Note": null
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "ART_GREED",
+      "artifactId": "ART_GREED",
+      "name": "탐욕의 항아리",
+      "rarity": "Rare",
+      "passiveKey": "KEY_AUTO_DRAW",
+      "triggerCondition": "TurnStart",
+      "description": "매 턴 카드를 1장 추가로 뽑습니다."
+    },
+    {
+      "id": "1",
+      "artifactId": "ART_1",
+      "name": "화염의 심장",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "FIRE 카드의 개별 피해량이 getBAttack×1.5로 증가합니다."
+    },
+    {
+      "id": "2",
+      "artifactId": "ART_2",
+      "name": "대지의 벽",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "EARTH 카드의 개별 방어도 획득량이 getBShield+3으로 증가합니다."
+    },
+    {
+      "id": "3",
+      "artifactId": "ART_3",
+      "name": "생명의 근원",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WATER 카드의 개별 회복 효과가 이월 가능하게 됩니다."
+    },
+    {
+      "id": "4",
+      "artifactId": "ART_4",
+      "name": "질풍의 날개",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WIND 카드의 버프/디버프 성공 확률이 50%에서 75%로 증가합니다."
+    },
+    {
+      "id": "5",
+      "artifactId": "ART_5",
+      "name": "이글거리는 용광로",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "FIRE 빙고 발동 시, $\\text{damage}$만큼의 추가 피해를 무작위 적에게 입힙니다."
+    },
+    {
+      "id": "6",
+      "artifactId": "ART_6",
+      "name": "거대한 방패",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "EARTH 빙고 발동 시, 추가로 getBShield×2의 방어도를 획득합니다."
+    },
+    {
+      "id": "7",
+      "artifactId": "ART_7",
+      "name": "깊은 샘물",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WATER 빙고 발동 시, 이월 회복 턴(n)이 n+1로 증가합니다."
+    },
+    {
+      "id": "8",
+      "artifactId": "ART_8",
+      "name": "영구적인 바람",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WIND 빙고 발동 시, swordBonus와 shieldBonus 획득량이 n+1로 증가합니다."
+    },
+    {
+      "id": "9",
+      "artifactId": "ART_9",
+      "name": "흙의 숨결",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "매 턴 종료 시, 생존한 모든 적에게 $\\text{getBShield}$만큼의 피해를 반사합니다."
+    },
+    {
+      "id": "10",
+      "artifactId": "ART_10",
+      "name": "바람의 은총",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WIND 카드로 아군 버프(attackBuffs)가 발동했을 때, 최대 중첩이 2에서 3으로 증가합니다."
+    },
+    {
+      "id": "11",
+      "artifactId": "ART_11",
+      "name": "O-블록 유물",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "2x2 정사각형('O') 모양으로 같은 원소 4칸이 모이면 1-빙고로 인정됩니다."
+    },
+    {
+      "id": "12",
+      "artifactId": "ART_12",
+      "name": "L-스텝 유물",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "L'자 모양으로 같은 원소 4칸이 모이면 1-빙고로 인정됩니다."
+    },
+    {
+      "id": "13",
+      "artifactId": "ART_13",
+      "name": "T-스핀 유물",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "T'자 모양으로 같은 원소 4칸이 모이면 1-빙고로 인정됩니다."
+    },
+    {
+      "id": "14",
+      "artifactId": "ART_14",
+      "name": "Z-라인 유물",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "Z'자 모양으로 같은 원소 4칸이 모이면 1-빙고로 인정됩니다."
+    },
+    {
+      "id": "15",
+      "artifactId": "ART_15",
+      "name": "3-색 조합",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "3가지 원소만 포함된 가로/세로/대각선 라인에 대해 조화 빙고의 21​ 효과가 발동됩니다."
+    },
+    {
+      "id": "16",
+      "artifactId": "ART_16",
+      "name": "조화의 공명",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "조화 빙고 발동 시, 모든 빙고 효과(FIRE, EARTH, WATER, WIND)가 1줄씩 추가로 발동합니다."
+    },
+    {
+      "id": "17",
+      "artifactId": "ART_17",
+      "name": "대각선 전문가",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "대각선 빙고(원소 및 조화)가 발동했을 때, 효과량이 2배로 증가합니다."
+    },
+    {
+      "id": "18",
+      "artifactId": "ART_18",
+      "name": "십자형 구원",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "중앙 셀을 중심으로 십자형(5칸)으로 같은 원소 4개가 모이면 1-빙고로 인정됩니다."
+    },
+    {
+      "id": "19",
+      "artifactId": "ART_19",
+      "name": "2칸 빙고",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "동일한 원소 2칸이 인접하면 해당 원소의 개별 카드 효과가 1회 추가 발동합니다."
+    },
+    {
+      "id": "20",
+      "artifactId": "ART_20",
+      "name": "완전 조화",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "조화 빙고의 고정 피해/방어도 획득량이 10×n에서 15×n으로 증가합니다."
+    },
+    {
+      "id": "21",
+      "artifactId": "ART_21",
+      "name": "강화 골격",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "전투 시작 시 maxHp가 50 증가합니다."
+    },
+    {
+      "id": "22",
+      "artifactId": "ART_22",
+      "name": "전술 훈련",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "전투 시작 시 swordBonus가 5 증가합니다."
+    },
+    {
+      "id": "23",
+      "artifactId": "ART_23",
+      "name": "철벽 태세",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "전투 시작 시 shieldBonus가 5 증가합니다."
+    },
+    {
+      "id": "24",
+      "artifactId": "ART_24",
+      "name": "응급 복구",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "골렘 HP가 50% 미만일 때, 획득하는 모든 회복량이 50% 증가합니다."
+    },
+    {
+      "id": "25",
+      "artifactId": "ART_25",
+      "name": "분노의 포식자",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "$\\text{totalDamageThisTurn}$이 50을 초과할 경우, $\\text{baseAttack}$이 영구적으로 1 증가합니다."
+    },
+    {
+      "id": "26",
+      "artifactId": "ART_26",
+      "name": "기본 방어막",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "매 턴 시작 시, $\\text{baseShield}$만큼의 방어도를 추가 획득합니다."
+    },
+    {
+      "id": "27",
+      "artifactId": "ART_27",
+      "name": "부식 저항",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "적의 공격 디버프(attackDebuffs) 중첩 최대값이 2에서 1로 감소합니다."
+    },
+    {
+      "id": "28",
+      "artifactId": "ART_28",
+      "name": "고속 충전",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "이월 회복(waterOverflow)이 턴 시작 시 2배의 속도로 적용됩니다."
+    },
+    {
+      "id": "29",
+      "artifactId": "ART_29",
+      "name": "굳건한 태도",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "적이 ATTACK 의도로 행동 시, 골렘 $\\text{block}$을 5 추가합니다."
+    },
+    {
+      "id": "30",
+      "artifactId": "ART_30",
+      "name": "영구 강화",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "공격 버프(attackBuffs)가 턴 종료 시 초기화되지 않고, 최대 중첩만 초기화됩니다."
+    },
+    {
+      "id": "31",
+      "artifactId": "ART_31",
+      "name": "방어구 보정",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "골렘 $\\text{baseShield}$가 영구적으로 4 증가합니다."
+    },
+    {
+      "id": "32",
+      "artifactId": "ART_32",
+      "name": "집중 공격",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "골렘 $\\text{baseAttack}$이 영구적으로 4 증가합니다."
+    },
+    {
+      "id": "33",
+      "artifactId": "ART_33",
+      "name": "피해 흡수",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "입힌 총 피해량(totalDamageThisTurn)의 10%만큼 $\\text{block}$을 추가 획득합니다."
+    },
+    {
+      "id": "34",
+      "artifactId": "ART_34",
+      "name": "반격 체계",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "적의 공격을 방어도로 전부 막아냈을 경우, 해당 적에게 $\\text{baseAttack}$만큼 피해를 반사합니다."
+    },
+    {
+      "id": "35",
+      "artifactId": "ART_35",
+      "name": "활력의 숨결",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "매 턴 시작 시, $\\text{baseShield}$만큼 체력을 회복합니다."
+    },
+    {
+      "id": "36",
+      "artifactId": "ART_36",
+      "name": "집중의 렌즈",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "덱에서 FIRE와 WIND 카드를 4장씩 제거하고, EARTH와 WATER 카드를 4장씩 추가합니다."
+    },
+    {
+      "id": "37",
+      "artifactId": "ART_37",
+      "name": "전술적 유연성",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "덱에 4가지 원소 카드를 2장씩 추가합니다. (총 8장 추가)"
+    },
+    {
+      "id": "38",
+      "artifactId": "ART_38",
+      "name": "재활용 장치",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "카드가 버린 덱으로 이동할 때, 10% 확률로 덱으로 즉시 돌아갑니다."
+    },
+    {
+      "id": "39",
+      "artifactId": "ART_39",
+      "name": "원소 증폭기",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "카드 발동(triggerCardEffect) 시, 해당 카드의 효과가 2회 발동됩니다 (동일 원소 카드만)."
+    },
+    {
+      "id": "40",
+      "artifactId": "ART_40",
+      "name": "강제 재분배",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "덱 소진 시, 버린 덱을 섞지 않고 덱을 2배로 늘려 즉시 16장 카드를 뽑습니다."
+    },
+    {
+      "id": "41",
+      "artifactId": "ART_41",
+      "name": "필터링 시스템",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "덱에서 WIND 카드를 모두 제거합니다."
+    },
+    {
+      "id": "42",
+      "artifactId": "ART_42",
+      "name": "단일 집중",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "덱 소진 시, 버린 덱을 섞을 때 특정 원소(선택) 카드만 4장을 추가합니다."
+    },
+    {
+      "id": "43",
+      "artifactId": "ART_43",
+      "name": "폭발성 잉크",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "FIRE 카드가 발동할 때, 모든 적에게 getBAttack×0.5의 광역 피해를 입힙니다."
+    },
+    {
+      "id": "44",
+      "artifactId": "ART_44",
+      "name": "흙의 정화",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "EARTH 카드가 발동할 때, 아군 공격 버프(attackBuffs)의 턴 지속 시간을 1 늘립니다."
+    },
+    {
+      "id": "45",
+      "artifactId": "ART_45",
+      "name": "물의 순환",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WATER 카드가 발동할 때, 무작위 적 1명의 공격 디버프(attackDebuffs) 턴 지속 시간을 1 늘립니다."
+    },
+    {
+      "id": "46",
+      "artifactId": "ART_46",
+      "name": "바람의 속삭임",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WIND 카드가 발동할 때, 버프/디버프 중 효과가 더 적은 쪽을 우선합니다."
+    },
+    {
+      "id": "47",
+      "artifactId": "ART_47",
+      "name": "시간의 모래시계",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "턴 타이머 바(5초)가 1초 증가합니다. (6초)"
+    },
+    {
+      "id": "48",
+      "artifactId": "ART_48",
+      "name": "적의 의도 예측",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "적의 의도 설정(minionsDrawAndSetIntent) 전에, 50% 확률로 적의 의도를 변경할 수 있습니다 (ATTACK ↔ DEFENSE)."
+    },
+    {
+      "id": "49",
+      "artifactId": "ART_49",
+      "name": "불굴의 의지",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "골렘 HP가 1 이하로 떨어지는 피해를 입을 경우, 한 번만 HP 1을 남기고 생존합니다."
+    },
+    {
+      "id": "50",
+      "artifactId": "ART_50",
+      "name": "방어구 파쇄",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "적에게 피해를 입힐 때마다, 해당 적의 현재 $\\text{block}$을 20% 무시하고 피해를 입힙니다."
+    },
+    {
+      "id": "51",
+      "artifactId": "ART_51",
+      "name": "디버프 전문가",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "적에게 공격 디버프(attackDebuffs)가 중첩될 때마다, $\\text{baseDefense}$가 영구적으로 1 감소합니다."
+    },
+    {
+      "id": "52",
+      "artifactId": "ART_52",
+      "name": "버프 전달자",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "골렘에게 공격 버프(attackBuffs)가 중첩될 때마다, $\\text{baseAttack}$이 영구적으로 1 증가합니다."
+    },
+    {
+      "id": "53",
+      "artifactId": "ART_53",
+      "name": "무모한 돌진",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "골렘 $\\text{BAttack}$이 50% 증가하지만, $\\text{BShield}$가 50% 감소합니다."
+    },
+    {
+      "id": "54",
+      "artifactId": "ART_54",
+      "name": "안전 제일",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "골렘 $\\text{BShield}$가 50% 증가하지만, $\\text{BAttack}$이 50% 감소합니다."
+    },
+    {
+      "id": "55",
+      "artifactId": "ART_55",
+      "name": "조기 발동",
+      "rarity": "C",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "턴 시작 시, 무작위 카드 1장의 개별 카드 효과가 즉시 발동됩니다."
+    },
+    {
+      "id": "56",
+      "artifactId": "ART_56",
+      "name": "적절한 휴식",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "턴 종료 시, 모든 $\\text{block}$이 0으로 초기화되지 않고 50%만 초기화됩니다."
+    },
+    {
+      "id": "57",
+      "artifactId": "ART_57",
+      "name": "생존 본능",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "잡몹의 $\\text{hp}$가 25% 미만일 때, 받는 피해가 50% 증가합니다."
+    },
+    {
+      "id": "58",
+      "artifactId": "ART_58",
+      "name": "광역 파괴",
+      "rarity": "R",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "FIRE 빙고 발동 시, 무작위 적 1명이 아닌 가장 체력이 낮은 적에게 피해를 입힙니다."
+    },
+    {
+      "id": "59",
+      "artifactId": "ART_59",
+      "name": "보너스 증폭",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "WIND 빙고 효과로 획득하는 $\\text{swordBonus}$와 $\\text{shieldBonus}$가 2배로 적용됩니다."
+    },
+    {
+      "id": "60",
+      "artifactId": "ART_60",
+      "name": "원소 균형",
+      "rarity": "L",
+      "passiveKey": null,
+      "triggerCondition": null,
+      "description": "매 턴 종료 시, 현재 $\\text{waterOverflow}$가 있다면 $\\text{totalDamageThisTurn}$에 해당 값의 10%만큼 피해를 추가합니다."
+    }
+  ],
+  "potions": [
+    {
+      "id": "0",
+      "potionId": "POT_HEAL_S",
+      "name": "소형 물약",
+      "rarity": "Common",
+      "effectKey": "KEY_HEAL",
+      "effectValue": 20,
+      "price": 50,
+      "description": "체력을 20 회복합니다."
+    },
+    {
+      "id": "1",
+      "potionId": null,
+      "name": "소형 체력 포션",
+      "rarity": null,
+      "effectKey": "회복",
+      "effectValue": null,
+      "price": null,
+      "description": "골렘 HP 50 회복"
+    },
+    {
+      "id": "2",
+      "potionId": null,
+      "name": "대형 체력 포션",
+      "rarity": null,
+      "effectKey": "회복",
+      "effectValue": null,
+      "price": null,
+      "description": "골렘 HP 150 회복"
+    },
+    {
+      "id": "3",
+      "potionId": null,
+      "name": "완벽한 치유의 물약",
+      "rarity": null,
+      "effectKey": "회복",
+      "effectValue": null,
+      "price": null,
+      "description": "골렘 HP 최대치로 회복"
+    },
+    {
+      "id": "4",
+      "potionId": null,
+      "name": "강화 방어 포션 I",
+      "rarity": null,
+      "effectKey": "방어",
+      "effectValue": null,
+      "price": null,
+      "description": "골렘에게 block 30 추가"
+    },
+    {
+      "id": "5",
+      "potionId": null,
+      "name": "강화 방어 포션 II",
+      "rarity": null,
+      "effectKey": "방어",
+      "effectValue": null,
+      "price": null,
+      "description": "골렘에게 block 60 추가"
+    },
+    {
+      "id": "6",
+      "potionId": null,
+      "name": "화염의 기본 공격력 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "baseAttack +2 영구 증가"
+    },
+    {
+      "id": "7",
+      "potionId": null,
+      "name": "대지의 기본 방어도 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "baseShield +2 영구 증가"
+    },
+    {
+      "id": "8",
+      "potionId": null,
+      "name": "검술 숙련의 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "swordBonus +4 영구 증가"
+    },
+    {
+      "id": "9",
+      "potionId": null,
+      "name": "방패술 숙련의 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "shieldBonus +4 영구 증가"
+    },
+    {
+      "id": "10",
+      "potionId": null,
+      "name": "최대 체력의 정수 I",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "maxHp +50 영구 증가"
+    },
+    {
+      "id": "11",
+      "potionId": null,
+      "name": "최대 체력의 정수 II",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "maxHp +100 영구 증가"
+    },
+    {
+      "id": "12",
+      "potionId": null,
+      "name": "불꽃 연성 포션",
+      "rarity": null,
+      "effectKey": "공격 버프",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 attackBuffs +2 획득"
+    },
+    {
+      "id": "13",
+      "potionId": null,
+      "name": "대지 흡수의 포션",
+      "rarity": null,
+      "effectKey": "다음 턴",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 EARTH 카드의 block 효과 2배"
+    },
+    {
+      "id": "14",
+      "potionId": null,
+      "name": "물 정화의 포션",
+      "rarity": null,
+      "effectKey": "다음 턴",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 WATER 카드의 heal 효과 2배"
+    },
+    {
+      "id": "15",
+      "potionId": null,
+      "name": "바람 가속의 포션",
+      "rarity": null,
+      "effectKey": "다음 턴",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 WIND 카드의 버프/디버프 확률이 100%로 적용"
+    },
+    {
+      "id": "16",
+      "potionId": null,
+      "name": "연쇄 폭발의 포션",
+      "rarity": null,
+      "effectKey": "빙고 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 FIRE 빙고 피해량 50% 추가"
+    },
+    {
+      "id": "17",
+      "potionId": null,
+      "name": "철옹성 방어 포션",
+      "rarity": null,
+      "effectKey": "빙고 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 EARTH 빙고 방어도 50% 추가"
+    },
+    {
+      "id": "18",
+      "potionId": null,
+      "name": "범람하는 생명 포션",
+      "rarity": null,
+      "effectKey": "빙고 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 WATER 빙고 회복량 50% 추가"
+    },
+    {
+      "id": "19",
+      "potionId": null,
+      "name": "영원한 바람 포션",
+      "rarity": null,
+      "effectKey": "빙고 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 WIND 빙고의 swordBonus/shieldBonus 2배"
+    },
+    {
+      "id": "20",
+      "potionId": null,
+      "name": "조화 촉진의 액체",
+      "rarity": null,
+      "effectKey": "빙고 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 조화 빙고의 damage/block 효과 2배"
+    },
+    {
+      "id": "21",
+      "potionId": null,
+      "name": "맹독 디버프 포션",
+      "rarity": null,
+      "effectKey": "적 디버프",
+      "effectValue": null,
+      "price": null,
+      "description": "무작위 잡몹 1명에게 attackDebuffs +2 적용"
+    },
+    {
+      "id": "22",
+      "potionId": null,
+      "name": "모든 독성 포션",
+      "rarity": null,
+      "effectKey": "적 디버프",
+      "effectValue": null,
+      "price": null,
+      "description": "모든 잡몹에게 attackDebuffs +1 적용"
+    },
+    {
+      "id": "23",
+      "potionId": null,
+      "name": "방어 무시 포션",
+      "rarity": null,
+      "effectKey": "일시적 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 골렘 공격이 적의 block을 무시하고 HP에 직접 피해"
+    },
+    {
+      "id": "24",
+      "potionId": null,
+      "name": "공격 방어 포션",
+      "rarity": null,
+      "effectKey": "일시적 방어",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 적의 첫 공격만 block 100으로 방어"
+    },
+    {
+      "id": "25",
+      "potionId": null,
+      "name": "긴급 재활용 포션",
+      "rarity": null,
+      "effectKey": "카드",
+      "effectValue": null,
+      "price": null,
+      "description": "버려진 카드 덱을 즉시 섞어 덱에 보충"
+    },
+    {
+      "id": "26",
+      "potionId": null,
+      "name": "물 이월 포션 I",
+      "rarity": null,
+      "effectKey": "회복 이월",
+      "effectValue": null,
+      "price": null,
+      "description": "waterOverflow {amount: 20, turns: 2} 누적"
+    },
+    {
+      "id": "27",
+      "potionId": null,
+      "name": "물 이월 포션 II",
+      "rarity": null,
+      "effectKey": "회복 이월",
+      "effectValue": null,
+      "price": null,
+      "description": "waterOverflow {amount: 50, turns: 3} 누적"
+    },
+    {
+      "id": "28",
+      "potionId": null,
+      "name": "집중의 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "baseAttack +1, baseShield +1 영구 증가"
+    },
+    {
+      "id": "29",
+      "potionId": null,
+      "name": "화력 증강 포션",
+      "rarity": null,
+      "effectKey": "다음 턴",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 FIRE 카드의 damage 효과 50% 추가"
+    },
+    {
+      "id": "30",
+      "potionId": null,
+      "name": "무작위 스탯 증강 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "swordBonus 또는 shieldBonus 중 하나 +5 영구 증가"
+    },
+    {
+      "id": "31",
+      "potionId": null,
+      "name": "번개 속성 피해 포션",
+      "rarity": null,
+      "effectKey": "공격",
+      "effectValue": null,
+      "price": null,
+      "description": "모든 적에게 15의 고정 피해"
+    },
+    {
+      "id": "32",
+      "potionId": null,
+      "name": "수면 유도 포션",
+      "rarity": null,
+      "effectKey": "적 디버프",
+      "effectValue": null,
+      "price": null,
+      "description": "무작위 잡몹 1명의 다음 턴 행동 의도를 DEFENSE로 강제 변경"
+    },
+    {
+      "id": "33",
+      "potionId": null,
+      "name": "방패 파괴 포션",
+      "rarity": null,
+      "effectKey": "적 디버프",
+      "effectValue": null,
+      "price": null,
+      "description": "현재 잡몹들의 block을 모두 0으로 만듦"
+    },
+    {
+      "id": "34",
+      "potionId": null,
+      "name": "회복 증강의 영약",
+      "rarity": null,
+      "effectKey": "회복",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 waterOverflow 적용 시, 회복량이 2배"
+    },
+    {
+      "id": "35",
+      "potionId": null,
+      "name": "공성 병기의 기름",
+      "rarity": null,
+      "effectKey": "공격 버프",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 totalDamageThisTurn에 10의 추가 피해 합산"
+    },
+    {
+      "id": "36",
+      "potionId": null,
+      "name": "불의 결정 포션",
+      "rarity": null,
+      "effectKey": "카드",
+      "effectValue": null,
+      "price": null,
+      "description": "덱에 FIRE 카드 4장 추가"
+    },
+    {
+      "id": "37",
+      "potionId": null,
+      "name": "흙의 결정 포션",
+      "rarity": null,
+      "effectKey": "카드",
+      "effectValue": null,
+      "price": null,
+      "description": "덱에 EARTH 카드 4장 추가"
+    },
+    {
+      "id": "38",
+      "potionId": null,
+      "name": "물의 결정 포션",
+      "rarity": null,
+      "effectKey": "카드",
+      "effectValue": null,
+      "price": null,
+      "description": "덱에 WATER 카드 4장 추가"
+    },
+    {
+      "id": "39",
+      "potionId": null,
+      "name": "바람의 결정 포션",
+      "rarity": null,
+      "effectKey": "카드",
+      "effectValue": null,
+      "price": null,
+      "description": "덱에 WIND 카드 4장 추가"
+    },
+    {
+      "id": "40",
+      "potionId": null,
+      "name": "혼돈의 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "baseAttack +5, baseShield -2 영구 증가"
+    },
+    {
+      "id": "41",
+      "potionId": null,
+      "name": "균형의 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "baseAttack +3, baseShield +3 영구 증가"
+    },
+    {
+      "id": "42",
+      "potionId": null,
+      "name": "단일 표적 강화 포션",
+      "rarity": null,
+      "effectKey": "다음 턴",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 모든 단일 표적 공격이 무작위가 아닌 가장 낮은 HP의 적 공격"
+    },
+    {
+      "id": "43",
+      "potionId": null,
+      "name": "버프 보호 포션",
+      "rarity": null,
+      "effectKey": "일시적 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 골렘의 attackBuffs가 턴 종료 시 0으로 리셋되지 않음"
+    },
+    {
+      "id": "44",
+      "potionId": null,
+      "name": "디버프 정화 포션",
+      "rarity": null,
+      "effectKey": "버프/디버프",
+      "effectValue": null,
+      "price": null,
+      "description": "골렘의 attackBuffs가 최대치(2)로 상승, 모든 잡몹의 attackDebuffs 0으로 리셋"
+    },
+    {
+      "id": "45",
+      "potionId": null,
+      "name": "골렘의 집중 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 swordBonus/shieldBonus 영구 증가량이 2배"
+    },
+    {
+      "id": "46",
+      "potionId": null,
+      "name": "마법의 유리병",
+      "rarity": null,
+      "effectKey": "카드",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴, 마방진에 카드가 17장 (4x4 + 1) 생성됨 (추가 카드만 발동/버려짐)"
+    },
+    {
+      "id": "47",
+      "potionId": null,
+      "name": "지연된 치유의 포션",
+      "rarity": null,
+      "effectKey": "회복",
+      "effectValue": null,
+      "price": null,
+      "description": "3턴에 걸쳐 턴 시작 시마다 HP 30씩 회복"
+    },
+    {
+      "id": "48",
+      "potionId": null,
+      "name": "희생의 포션",
+      "rarity": null,
+      "effectKey": "스탯 영구",
+      "effectValue": null,
+      "price": null,
+      "description": "maxHp -20 영구 감소, baseAttack +4 영구 증가"
+    },
+    {
+      "id": "49",
+      "potionId": null,
+      "name": "파국적인 버프 포션",
+      "rarity": null,
+      "effectKey": "공격 버프",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴 attackBuffs +1 획득, 단 다음 턴에 block을 획득할 수 없음"
+    },
+    {
+      "id": "50",
+      "potionId": null,
+      "name": "연금술사의 대성공",
+      "rarity": null,
+      "effectKey": "빙고 강화",
+      "effectValue": null,
+      "price": null,
+      "description": "다음 턴, 첫 번째로 발동되는 빙고의 효과가 3배"
+    }
+  ],
+  "generatedAt": "2025-12-07T15:40:20.307Z"
+}

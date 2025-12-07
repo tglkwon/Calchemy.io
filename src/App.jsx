@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { GameProvider } from './context/GameProvider';
 import { AssetProvider } from './context/AssetProvider';
+import { GameDataProvider } from './context/GameDataProvider';
 import { useAsset } from './context/AssetContext';
 import BattlePage from './pages/BattlePage';
 import LogPage from './pages/LogPage';
@@ -35,23 +36,25 @@ const NavBar = () => {
 
 function App() {
   return (
-    <GameProvider>
-      <AssetProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-950 text-gray-100 font-sans">
-            <NavBar />
-            <main className="container mx-auto p-4 h-[calc(100vh-64px)] overflow-hidden">
-              <Routes>
-                <Route path="/" element={<BattlePage />} />
-                <Route path="/log" element={<LogPage />} />
-                <Route path="/deck" element={<DeckPage />} />
-                <Route path="/relic" element={<RelicPage />} />
-              </Routes>
-            </main>
-          </div>
-        </Router>
-      </AssetProvider>
-    </GameProvider>
+    <GameDataProvider>
+      <GameProvider>
+        <AssetProvider>
+          <Router>
+            <div className="min-h-screen bg-gray-950 text-gray-100 font-sans">
+              <NavBar />
+              <main className="container mx-auto p-4 h-[calc(100vh-64px)] overflow-hidden">
+                <Routes>
+                  <Route path="/" element={<BattlePage />} />
+                  <Route path="/log" element={<LogPage />} />
+                  <Route path="/deck" element={<DeckPage />} />
+                  <Route path="/relic" element={<RelicPage />} />
+                </Routes>
+              </main>
+            </div>
+          </Router>
+        </AssetProvider>
+      </GameProvider>
+    </GameDataProvider>
   );
 }
 

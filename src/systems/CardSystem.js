@@ -16,17 +16,27 @@ export class CardSystem {
 
     /**
      * Initializes the deck with 32 cards (8 of each element).
+     * Uses definitions "FIRE", "WATER", "EARTH", "WIND" if they exist.
      */
     initDeck() {
         this.deck = [];
         this.discardPile = [];
         for (const el of this.elements) {
             for (let i = 0; i < 8; i++) {
-                // Basic cards don't have special IDs from definitions initially, 
-                // but we might want to support them later. 
-                // For now, revert to basic behavior as requested.
-                const id = `${el}_${i}`;
-                this.deck.push({ type: el, id: id, instanceId: `${id}_${Date.now()}` });
+                // If a definition exists for the element name (e.g. "FIRE"), use it.
+                // Otherwise fallback to generic construction.
+                const defId = el;
+                if (CardDefinitions[defId]) {
+                    const def = CardDefinitions[defId];
+                    this.deck.push({
+                        ...def,
+                        instanceId: `${def.id}_${i}_${Date.now()}` // Unique Instance ID
+                    });
+                } else {
+                    // Legacy Fallback if definition not found
+                    const id = `${el}_${i}`;
+                    this.deck.push({ type: el, id: id, instanceId: `${id}_${Date.now()}` });
+                }
             }
         }
         this.shuffle(this.deck);
@@ -67,7 +77,9 @@ export class CardSystem {
                     this.shuffle(this.deck);
                 }
             }
-            this.grid.push(this.deck.pop());
+            if (this.deck.length > 0) {
+                this.grid.push(this.deck.pop());
+            }
         }
         return this.grid;
     }
@@ -80,10 +92,6 @@ export class CardSystem {
         this.grid = [];
     }
 
-    /**
-     * Checks for Bingo lines (Rows, Cols, Diagonals).
-     * Returns an object with bingo details.
-     */
     /**
      * Returns all cards currently in the game (Deck + Discard + Grid).
      */
@@ -178,6 +186,7 @@ export class CardSystem {
 
         return results;
     }
+
     /**
      * Returns all available card definitions for the library.
      */
@@ -187,14 +196,28 @@ export class CardSystem {
 
     /**
      * Loads dynamic definitions from CSV or other sources.
-     * @param {Object} newDefinitions 
+     * @param {Object|Array} newDefinitions 
      */
     loadDefinitions(newDefinitions) {
-        // Merge into the existing CardDefinitions object
-        // Note: CardDefinitions is an imported constant object, so we can mutate it.
-        Object.assign(CardDefinitions, newDefinitions);
+        // Convert Array to Object Map if input is Array
+        let defsToMerge = newDefinitions;
+        if (Array.isArray(newDefinitions)) {
+            defsToMerge = {};
+            newDefinitions.forEach(card => {
+                if (card.id) {
+                    defsToMerge[card.id] = card;
+                }
+            });
+        }
 
-        // Re-init deck if needed, but usually this is done at start.
-        // If we want to update the library immediately, this is enough.
+        // Merge into the existing CardDefinitions object
+        Object.assign(CardDefinitions, defsToMerge);
+        console.log("CardSystem: Definitions updated", Object.keys(defsToMerge));
+
+        // Re-init deck to reflect new definitions immediately
+        this.initDeck();
+        // Clear grid to force redraw with new cards
+        this.grid = [];
+        this.drawGrid();
     }
 }

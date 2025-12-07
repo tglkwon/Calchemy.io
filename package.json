@@ -1,12 +1,13 @@
 {
-  "name": "temp_react_app",
+  "name": "Calchemy.io",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "homepage": "https://tglkwon.github.io/Calchemy.io",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "gen-data": "node scripts/generateGameData.js",
+    "dev": "npm run gen-data && vite",
+    "build": "npm run gen-data && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",

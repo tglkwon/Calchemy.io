@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { GameEngine } from '../core/GameEngine';
 import { GameContext } from './GameContext';
-import { parseCardCSV } from '../utils/csvLoader';
+import { useGameData } from './GameDataProvider';
 
 export const GameProvider = ({ children }) => {
     // Use state to keep the engine instance stable across renders
@@ -11,6 +11,16 @@ export const GameProvider = ({ children }) => {
     // Initialize gameState from the engine
     const [gameState, setGameState] = useState(() => gameEngine.getGameState());
 
+    // Access Data from DataProvider
+    const { gameData } = useGameData();
+
+    // Inject Data when loaded
+    useEffect(() => {
+        if (gameData && gameData.cards && gameData.cards.length > 0) {
+            gameEngine.cardSystem.loadDefinitions(gameData.cards);
+        }
+    }, [gameData, gameEngine]);
+
     useEffect(() => {
         const engine = gameEngine;
 
@@ -18,11 +28,6 @@ export const GameProvider = ({ children }) => {
         const unsubscribe = engine.subscribe((newState) => {
             setGameState({ ...newState }); // Spread to ensure new object reference
         });
-
-        // Initial render
-        // engine.startBattle(); // Maybe don't start immediately, let UI trigger it?
-        // Let's start it for now to match legacy behavior or wait for user.
-        // Legacy started on button click.
 
         return () => {
             unsubscribe();

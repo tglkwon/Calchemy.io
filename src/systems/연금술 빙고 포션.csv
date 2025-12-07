@@ -1,3 +1,0 @@
-No,Potion_ID,Name_KR,Rarity,Effect_Key,Effect_Value,Gold_Price,Description,Note
-고유 번호,포션 ID,포션 이름,희귀도,효과 키워드,효과 수치,상점 구매 가격,아이템 설명 텍스트,비고
-1,POT_HEAL_S,소형 물약,Common,KEY_HEAL,20,50,체력을 20 회복합니다.,초반 튜토리얼 지급용

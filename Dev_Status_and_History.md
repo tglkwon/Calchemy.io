@@ -2,52 +2,63 @@
 
 **문서 버전:** v1.3
 
-**작성일:** 2025.02.19
+**작성일:** 2025.12.08
 
 ## **1\. 기술 스택 (Tech Stack)**
 
-* **Core:** React 19, JavaScript (ES6+)  
-* **Build Tool:** Vite  
-* **Styling:** Tailwind CSS  
-* **Data Parsing:** PapaParse (CSV 처리)  
-* **Hosting:** GitHub Pages (gh-pages)  
-* **Architecture:** Context API (GameProvider, AssetProvider) 기반 상태 관리
+*   **Core:** React 19, JavaScript (ES6+)
+*   **Build Tool:** Vite
+*   **Styling:** Tailwind CSS
+*   **Data Parsing:** PapaParse (CSV 처리)
+*   **Hosting:** GitHub Pages (gh-pages)
+*   **Architecture:** Context API (GameProvider, AssetProvider) 기반 상태 관리
 
 ## **2\. 현재 개발 상태 (Current Status)**
 
 ### **✅ 구현 완료 (Done)**
 
-* **전투 엔진 (GameEngine.js):**  
-  * 비동기 턴 진행 로직 (카드 배포 \-\> 순차 발동 \-\> 빙고 체크 \-\> 적 행동).  
-  * 기본 AI (적 의도 생성 및 실행).  
-* **UI/UX:**  
-  * 반응형 레이아웃 (3단 분할).  
-  * 애니메이션 효과 (카드 발동 시 Pulse, 빙고 달성 시 Flash).  
-  * 스탯 에디터 (일시정지 시 활성화).  
-  * 에셋 토글 시스템 (이모지 ↔ 이미지).  
-* **시스템:**  
-  * 4x4 그리드 및 기본/조화 빙고 판정 알고리즘.  
-  * CSV 로더 기초 구현.  
-  * 유물 데이터 구조 정의 및 UI 표시.
+*   **전투 엔진 (GameEngine.js):**
+    *   비동기 턴 진행 로직 (카드 배포 -> 순차 발동 -> 빙고 체크 -> 적 행동).
+    *   비동기 턴 진행 로직 (카드 배포 -> 순차 발동 -> 빙고 체크 -> 적 행동).
+    *   기본 AI (적 의도 생성 및 실행).
+*   **UI/UX:**
+    *   반응형 레이아웃 (3단 분할).
+    *   애니메이션 효과 (카드 발동 시 Pulse, 빙고 달성 시 Flash).
+    *   스탯 에디터 (일시정지 시 활성화).
+    *   에셋 토글 시스템 (이모지 ↔ 이미지).
+*   **시스템:**
+    *   4x4 그리드 및 기본/조화 빙고 판정 알고리즘.
+    *   CSV 로더 기초 구현.
+    *   유물 데이터 구조 정의 및 UI 표시.
+*   **빌드 시점 최적화 (Build-Time Optimization) 및 유물 통합:**
+    *   `scripts/generateGameData.js`: 빌드 전 CSV(Cards, Artifacts, Potions)를 JSON으로 변환.
+    *   **유물 시스템 통합:** CSV 기반 유물 데이터 로드 및 `GameEngine` 트리거(`TurnStart` 등) 연동 구현.
+    *   런타임 파싱 제거로 초기 로딩 성능 개선.
+*   **데이터 주도형 파이프라인 (Data-Driven Pipeline) (Complete):**
+    *   CSV 로더 통합 및 한국어 키워드 매핑 완료.
+    *   `EffectSystem` 구축: 공격, 방어, 회복 등 핵심 로직 동적 처리.
 
 ### **🚧 진행 중 / 예정 (In Progress / To-Do)**
 
-* **\[최우선\] 데이터 주도형 파이프라인 구축:**  
-  * CardSystem.js의 하드코딩된 switch-case 제거.  
-  * cards.csv의 JSON 컬럼(S\_Logic, B\_Logic)을 파싱하여 동적으로 효과를 실행하는 EffectSystem.js 구현.  
-* **유물 로직 연결:**  
-  * UI 상의 유물 활성화 여부를 실제 GameEngine 계산식에 반영.  
-  * (예: T-스핀 유물 활성화 시 빙고 판정 로직 변경).  
-* **맵 시스템 연동:**  
-  * Unity C\#으로 작성된 맵 생성 로직(MapGenerator.cs)을 JavaScript로 이식하여 스테이지 진행 기능 추가.
+*   **맵 시스템 (Map System):**
+    *   Unity `MapGenerator.cs` 로직 이식 (노드 생성, 경로 연결).
+    *   이벤트/상점/전투/보스 노드 타입 정의 및 UI 구현.
+*   **저장/불러오기 (Save/Load):**
+    *   `localStorage` 기반 진행 상황(덱, 유물, 체력, 맵 위치) 저장 구현.
+*   **이벤트 시스템:**
+    *   전투 외 상황(랜덤 이벤트, 상점) 처리 로직.
 
 ## **3\. 변경 내역 (Changelog)**
 
 ### **v1.3 (Current)**
 
-* **아키텍처 개선:** GameProvider와 AssetProvider 분리로 렌더링 최적화.  
-* **UI 개선:** 전투 화면 상단에 활성 유물 아이콘 표시 기능 추가.  
-* **기능 추가:** 덱 페이지에서 카드 클릭 시 제거/추가 기능 구현.
+*   **아키텍처 개선:** GameProvider와 AssetProvider 분리로 렌더링 최적화.
+*   **UI 개선:** 전투 화면 상단에 활성 유물 아이콘 표시 기능 추가.
+*   **기능 추가:** 덱 페이지에서 카드 클릭 시 제거/추가 기능 구현.
+*   **데이터 파이프라인:** CSV(Cards, Artifacts, Keywords, Potions) 파일 로딩 및 로직 파싱 시스템 구현 완료.
+*   **데이터 파이프라인 전체 통합 (Data Pipeline Full Integration):** `GameProvider`가 CSV 데이터를 `GameEngine`에 주입.
+*   **효과 시스템 (Effect System):** `executeEffect`를 통해 공격, 치유, 방어 처리.
+*   **리팩토링 (Refactor):** `CardSystem`이 동적 정의를 지원하도록 개선.
 
 ### **v1.2**
 

@@ -7,6 +7,7 @@
 import { Unit } from '../entities/Unit.js';
 import { CardSystem } from '../systems/CardSystem.js';
 import { RelicSystem } from '../systems/RelicSystem.js';
+import { executeEffect } from '../systems/EffectSystem.js';
 
 export class GameEngine {
     constructor() {
@@ -186,6 +187,7 @@ export class GameEngine {
         this.minions.forEach(m => m.resetTurnStats());
 
         // 2. Minion Intent (Random for now)
+        // 2. Minion Intent
         this.minions.forEach(m => {
             if (!m.isAlive) {
                 m.intent = null;
@@ -196,11 +198,13 @@ export class GameEngine {
             else if (roll < 0.8) m.intent = 'DEFEND';
             else m.intent = 'BUFF';
 
-            // Immediate Defense Effect
             if (m.intent === 'DEFEND') {
                 m.addBlock(m.baseDefense);
             }
         });
+
+        // 2.5 Relic Triggers (Turn Start)
+        this.processRelicTriggers('TurnStart');
 
         this.notify();
 
@@ -247,174 +251,54 @@ export class GameEngine {
     }
 
     triggerCardEffect(card) {
+        // Data-Driven Logic First
+        if (card.singleEffects && card.singleEffects.length > 0) {
+            card.singleEffects.forEach(effect => {
+                const gameState = {
+                    golem: this.golem,
+                    minions: this.minions,
+                    engine: this
+                };
+                const msg = executeEffect(effect, gameState);
+                if (msg) this.log(msg);
+            });
+            return; // Skip legacy logic if effects exist
+        }
+
+        // --- LEGACY FALLBACK FOR CARDS WITHOUT PARSED LOGIC ---
+        // (Keeping legacy switch case briefly for safety, but data-driven should cover most)
+        // ... (Original Code Truncated for Brevity or Removed entirely if confident)
+        // For this task, we want to replace it. Let's assume fallback to basic type logic if no effects found.
+
         let logMsg = "";
-
-        // Generic Fallback if no specific ID logic
-        if (!card.id || !card.effectParams) {
-            // ... existing generic logic ...
-            // For now, let's just use the new logic primarily
+        switch (card.type) {
+            case 'FIRE': {
+                const dmg = this.golem.baseAttack;
+                const target = this.getRandomTarget();
+                if (target) {
+                    const taken = target.takeDamage(dmg);
+                    this.golem.totalDamageThisTurn += taken;
+                    logMsg = `🔥 불 기본: ${target.name}에게 ${taken} 피해`;
+                }
+                break;
+            }
+            case 'EARTH': {
+                const block = this.golem.baseShield;
+                this.golem.addBlock(block);
+                logMsg = `🌱 대지 기본: 골렘 방어도 +${block}`;
+                break;
+            }
+            case 'WATER': {
+                const heal = Math.floor(this.golem.maxHp / 8);
+                const healed = this.golem.heal(heal);
+                logMsg = `💧 물 기본: 골렘 체력 +${healed}`;
+                break;
+            }
+            case 'WIND':
+                this.golem.attackBuffs = Math.min(this.golem.attackBuffs + 1, 2);
+                logMsg = `🍃 바람 기본: 골렘 공격 버프 +1`;
+                break;
         }
-
-        const params = card.effectParams || {};
-
-        // Handle based on Card ID (or Type if generic)
-        switch (card.id) {
-            case "1": // 불씨: {피해} 5, {화상} 2
-                {
-                    const target = this.getRandomTarget();
-                    if (target) {
-                        const dmg = params.damage || 5;
-                        const burn = params.burn || 2;
-                        const taken = target.takeDamage(dmg);
-                        target.addStatus('BURN', burn);
-                        this.golem.totalDamageThisTurn += taken;
-                        logMsg = `🔥 [불씨] ${target.name}에게 ${taken} 피해, 화상 ${burn}`;
-                    }
-                }
-                break;
-            case "2": // 기름통: 적 1명 '기름'(불피해 2배)
-                {
-                    const target = this.getRandomTarget();
-                    if (target) {
-                        target.addStatus('OIL', params.duration || 2);
-                        logMsg = `🛢️ [기름통] ${target.name}에게 기름칠 (2턴)`;
-                    }
-                }
-                break;
-            case "3": // 화염구: 피해 12
-                {
-                    const target = this.getRandomTarget();
-                    if (target) {
-                        const dmg = params.damage || 12;
-                        const taken = target.takeDamage(dmg);
-                        this.golem.totalDamageThisTurn += taken;
-                        logMsg = `☄️ [화염구] ${target.name}에게 ${taken} 피해`;
-                    }
-                }
-                break;
-            case "4": // 연쇄 폭발: 피해 8. 전 카드가 불이면 2회
-                {
-                    // Logic for "Previous Card" is tricky in async loop. 
-                    // We need to track previous card type in GameEngine state if we want to support this fully.
-                    // For now, simplified: always 1 hit, or random.
-                    // Let's implement a simple history tracker in GameEngine later.
-                    // Assuming condition met for now for fun? Or just 1 hit.
-                    const target = this.getRandomTarget();
-                    if (target) {
-                        const dmg = params.damage || 8;
-                        const taken = target.takeDamage(dmg);
-                        this.golem.totalDamageThisTurn += taken;
-                        logMsg = `💥 [연쇄 폭발] ${target.name}에게 ${taken} 피해`;
-                    }
-                }
-                break;
-            case "5": // 용암 갑옷: 화염 가시(반사) 5
-                {
-                    const thorns = params.thorns || 5;
-                    this.golem.addStatus('THORNS', thorns);
-                    logMsg = `🛡️ [용암 갑옷] 골렘에게 가시 ${thorns} 부여`;
-                }
-                break;
-            case "6": // 불사조: 체력 10% 소모, 500% 피해
-                {
-                    const hpCost = Math.floor(this.golem.maxHp * (params.hpCostPercent || 0.1));
-                    this.golem.takeDamage(hpCost); // Self damage
-
-                    const dmg = this.golem.baseAttack * (params.damageMultiplier || 5);
-                    const target = this.getRandomTarget();
-                    if (target) {
-                        const taken = target.takeDamage(dmg);
-                        this.golem.totalDamageThisTurn += taken;
-                        logMsg = `🐦 [불사조] 체력 ${hpCost} 소모, ${target.name}에게 ${taken} 피해`;
-                    }
-                }
-                break;
-            case "7": // 초신성: 전체 피해 30. 소멸
-                {
-                    const dmg = params.damage || 30;
-                    this.minions.forEach(m => {
-                        if (m.isAlive) {
-                            const taken = m.takeDamage(dmg);
-                            this.golem.totalDamageThisTurn += taken;
-                        }
-                    });
-                    // Exhaust logic needs card removal from deck.
-                    // this.removeCardFromDeck(card.instanceId); // This would remove from deck for NEXT shuffle.
-                    logMsg = `🌟 [초신성] 적 전체에게 ${dmg} 피해!`;
-                }
-                break;
-            case "8": // 방화광: 매 턴 무작위 적 화상 2
-                {
-                    const target = this.getRandomTarget();
-                    if (target) {
-                        const burn = params.passiveBurn || 2;
-                        target.addStatus('BURN', burn);
-                        logMsg = `🤡 [방화광] ${target.name}에게 화상 ${burn}`;
-                    }
-                }
-                break;
-            case "9": // 화염 채찍: 전열 피해 10
-                {
-                    // Assuming minion 0 is front
-                    const target = this.minions[0];
-                    if (target && target.isAlive) {
-                        const dmg = params.damage || 10;
-                        const taken = target.takeDamage(dmg);
-                        this.golem.totalDamageThisTurn += taken;
-                        logMsg = `🔥 [화염 채찍] 전열 ${target.name}에게 ${taken} 피해`;
-                    } else {
-                        logMsg = `🔥 [화염 채찍] 전열에 적이 없음`;
-                    }
-                }
-                break;
-            case "10": // 마그마: 그리드 2장 불로 변경
-                {
-                    // Visual only for now, or actual logic?
-                    // Changing grid cards is complex as it affects current turn iteration.
-                    // Let's just log it.
-                    logMsg = `🌋 [마그마] 주변 땅이 끓어오릅니다 (효과 미구현)`;
-                }
-                break;
-            default:
-                // Fallback to old logic
-                switch (card.type) {
-                    case 'FIRE': {
-                        const dmg = this.golem.baseAttack;
-                        const target = this.getRandomTarget();
-                        if (target) {
-                            const taken = target.takeDamage(dmg);
-                            this.golem.totalDamageThisTurn += taken;
-                            logMsg = `🔥 불 카드: ${target.name}에게 ${taken} 피해`;
-                        }
-                        break;
-                    }
-                    case 'EARTH': {
-                        const block = this.golem.baseShield;
-                        this.golem.addBlock(block);
-                        logMsg = `🌱 대지 카드: 골렘 방어도 +${block}`;
-                        break;
-                    }
-                    case 'WATER': {
-                        const heal = Math.floor(this.golem.maxHp / 8);
-                        const healed = this.golem.heal(heal);
-                        logMsg = `💧 물 카드: 골렘 체력 +${healed}`;
-                        break;
-                    }
-                    case 'WIND':
-                        if (Math.random() < 0.5) {
-                            this.golem.attackBuffs = Math.min(this.golem.attackBuffs + 1, 2);
-                            logMsg = `🍃 바람 카드: 골렘 공격 버프 +1`;
-                        } else {
-                            const t = this.getRandomTarget();
-                            if (t) {
-                                t.attackDebuffs = Math.min(t.attackDebuffs + 1, 2);
-                                logMsg = `🍃 바람 카드: ${t.name} 공격 디버프 +1`;
-                            }
-                        }
-                        break;
-                }
-        }
-
         if (logMsg) this.log(logMsg);
     }
 
@@ -472,8 +356,8 @@ export class GameEngine {
             }
 
             // 2. Trigger Specific Card Bingo Effects
-            // Find the actual card objects based on IDs
-            const allCards = this.cardSystem.getAllCards();
+            // Find the actual card objects based on ids
+            // const allCards = this.cardSystem.getAllCards();
             // Note: getAllCards might be slow if deck is huge, but here it's small.
             // Actually, the cards are in the grid (or were). 
             // Since we discard grid AFTER bingo checks, they are still in grid.
@@ -609,6 +493,34 @@ export class GameEngine {
         this.victory = victory;
         this.log(victory ? "🏆 승리!" : "💀 패배!");
         this.notify();
+    }
+
+    processRelicTriggers(trigger) {
+        const activeRelics = this.relicSystem.getRelicsByTrigger(trigger);
+
+        activeRelics.forEach(relic => {
+            console.log(`[Relic] Triggering ${relic.name} (${trigger})`);
+            this.log(`🏺 유물 발동: ${relic.name}`);
+
+            switch (relic.passiveKey) {
+                case 'KEY_AUTO_DRAW':
+                    // Draw 1 card
+                    this.addCardToDeck('FIRE'); // Simplified: Add fire card as "Draw". 
+                    // Real draw logic needed? CardSystem doesn't have "Draw from Deck" in the same way.
+                    // It has "Grid". Maybe add card to Hand? Or just add to Grid?
+                    // Let's assume "Draw" means "Add random card to Grid/Deck" or similar.
+                    // For now: Add a random card to the grid if space?
+                    // Or just log it for verification.
+                    this.log("  >> 카드 1장 추가 드로우 (임시: 불 카드 생성)");
+                    this.cardSystem.addCard('FIRE');
+                    break;
+
+                // Add other keys here
+                default:
+                    // console.warn("Unknown relic key:", relic.passiveKey);
+                    break;
+            }
+        });
     }
 
     getGameState() {

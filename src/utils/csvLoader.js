@@ -1,65 +1,44 @@
 import Papa from 'papaparse';
 
 /**
- * Parses CSV content into Card Definitions.
- * @param {string} csvText 
- * @returns {Object} CardDefinitions map
+ * Loads and parses a CSV file from the given path.
+ * @param {string} filePath - Relative or absolute path to the CSV file.
+ * @returns {Promise<Array>} - Resolves with an array of objects.
  */
-export const parseCardCSV = (csvText) => {
+export const loadCSV = async (filePath) => {
     return new Promise((resolve, reject) => {
-        Papa.parse(csvText, {
+        Papa.parse(filePath, {
+            download: true,
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
-                const definitions = {};
-
-                results.data.forEach(row => {
-                    // Map CSV columns to Card Definition structure
-                    // Assuming CSV columns: ID, Name, Type, Grade, Description, BingoDescription, ...
-                    // We need to adapt this based on the actual CSV structure.
-                    // For now, I'll map based on the sample structure I saw earlier.
-
-                    if (!row.ID) return; // Skip invalid rows
-
-                    definitions[row.ID] = {
-                        id: row.ID,
-                        name: row.Name || row.이름,
-                        type: mapType(row.Type || row.속성),
-                        grade: row.Grade || row.등급,
-                        description: row.Description || row.설명,
-                        bingoDescription: row.BingoEffect || row.빙고효과,
-                        effectParams: parseEffectParams(row.EffectParams || row.효과파라미터)
-                    };
-                });
-
-                resolve(definitions);
+                resolve(results.data);
             },
-            error: (err) => {
-                reject(err);
-            }
+            error: (error) => {
+                reject(error);
+            },
         });
     });
 };
 
-const mapType = (typeStr) => {
-    if (!typeStr) return 'FIRE'; // Default
-    const t = typeStr.toUpperCase();
-    if (t.includes('FIRE') || t.includes('불')) return 'FIRE';
-    if (t.includes('EARTH') || t.includes('대지')) return 'EARTH';
-    if (t.includes('WATER') || t.includes('물')) return 'WATER';
-    if (t.includes('WIND') || t.includes('바람')) return 'WIND';
-    return 'FIRE';
-};
-
-const parseEffectParams = (paramStr) => {
-    if (!paramStr) return {};
+/**
+ * Loads all game data (cards, keywords, artifacts).
+ * @returns {Promise<Object>} - Object containing parsed data arrays.
+ */
+export const loadGameData = async () => {
     try {
-        // Try JSON parse first
-        return JSON.parse(paramStr);
-    } catch (e) {
-        // If not JSON, maybe key:value format? 
-        // For now return empty or simple object if needed.
-        console.warn("Failed to parse effect params:", paramStr);
-        return {};
+        const baseUrl = import.meta.env.BASE_URL || '/';
+        const [cards, keywords, artifacts, potions] = await Promise.all([
+            loadCSV(`${baseUrl}data/연금술 오토 배틀러 컨텐츠 - 카드.csv`),
+            loadCSV(`${baseUrl}data/연금술 오토 배틀러 컨텐츠 - 키워드.csv`),
+            loadCSV(`${baseUrl}data/연금술 빙고 유물.csv`),
+            loadCSV(`${baseUrl}data/연금술 빙고 포션.csv`),
+        ]);
+
+        console.log("Game Data Loaded:", { cards, keywords, artifacts, potions });
+        return { cards, keywords, artifacts, potions };
+    } catch (error) {
+        console.error("Failed to load game data:", error);
+        return { cards: [], keywords: [], artifacts: [] }; // Fallback
     }
 };
