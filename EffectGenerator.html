@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON 효과 텍스트 자동 생성기</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 500px;
+        }
+
+        .panel {
+            flex: 1;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-panel {
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+        }
+
+        .output-panel {
+            background-color: #333333;
+            border: 1px solid #007acc;
+        }
+
+        h3 {
+            color: #007acc;
+            margin-top: 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 4px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .result-box {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1 style="text-align: center; color: #ffcc00;">카드 효과 JSON → 텍스트 검증 도구</h1>
+    </header>
+
+    <div class="container">
+        <div class="panel input-panel">
+            <h3>JSON 로직 입력 (Single_Logic/Bingo_Logic)</h3>
+            <textarea id="jsonInput" onkeyup="updateText()" placeholder="여기에 JSON 로직을 입력하세요."></textarea>
+            <div id="jsonError" class="error-message"></div>
+        </div>
+
+        <div class="panel output-panel">
+            <h3>결과 미리보기 (Card Description)</h3>
+            <div id="textOutput" class="result-box"></div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------
+        // 1. 핵심 효과 타입 정의 (EffectSystem.js에서 가져옴)
+        // --------------------------------------------------------
+        const EffectType = {
+            ATTACK: 'ATTACK',
+            HEAL: 'HEAL',
+            BLOCK: 'BLOCK',
+            BUFF: 'BUFF',
+            DEBUFF: 'DEBUFF',
+            CONDITIONAL: 'CONDITIONAL', // 조건부 로직
+            SPECIAL: 'SPECIAL',
+            LOG: 'LOG',
+        };
+
+        // --------------------------------------------------------
+        // 2. 조건부 텍스트 생성기 (generateConditionText)
+        // --------------------------------------------------------
+        const generateConditionText = (condition) => {
+            if (!condition) return "알 수 없는 조건";
+
+            const opMap = { '<': '미만', '>': '초과', '=': '와 같음' };
+            const opText = opMap[condition.op] || condition.op;
+
+            switch (condition.stat) {
+                case 'GOLEM_HP_PCT':
+                    return `골렘 체력 비율이 ${condition.value * 100}% ${opText}`;
+                case 'MINION_COUNT':
+                    return `생존한 적의 수가 ${condition.value} ${opText}`;
+                case 'HAS_STATUS_BURN':
+                    return `대상이 화상 스택을 가지고 ${opText} 있는 경우`;
+                default:
+                    return `[${condition.stat}]이 ${condition.value} ${opText}일 때`;
+            }
+        }
+
+        // --------------------------------------------------------
+        // 3. 메인 효과 텍스트 생성기 (generateEffectText)
+        // --------------------------------------------------------
+        const generateEffectText = (effects) => {
+            if (!Array.isArray(effects) || effects.length === 0) {
+                return "효과 없음";
+            }
+
+            const messages = effects.map(effect => {
+                switch (effect.type) {
+                    case EffectType.ATTACK: {
+                        const target = effect.target === 'ALL_ENEMIES' ? '적 전체에게' : '무작위 적에게';
+                        return `${target} ${effect.value} 피해를 줍니다.`;
+                    }
+                    case EffectType.HEAL: {
+                        return `체력을 ${effect.value} 회복합니다.`;
+                    }
+                    case EffectType.BLOCK: {
+                        return `방어도 ${effect.value}를 획득합니다.`;
+                    }
+                    case EffectType.BUFF: {
+                        const target = effect.target === 'SELF' ? '아군에게' : '골렘에게';
+                        return `${target} 공격력 버프 *${effect.value}를 부여합니다.`;
+                    }
+                    case EffectType.DEBUFF: {
+                        const target = effect.target === 'ALL_ENEMIES' ? '적 전체에게' : '무작위 적에게';
+                        return `${target} 공격력 디버프 *${effect.value}를 부여합니다.`;
+                    }
+                    case EffectType.CONDITIONAL: {
+                        const conditionText = generateConditionText(effect.condition);
+                        const thenText = generateEffectText(effect.effects); // 재귀 호출
+                        let text = `만약 [${conditionText}]이면, ${thenText}을(를) 실행합니다.`;
+
+                        if (effect.elseEffects) {
+                            const elseText = generateEffectText(effect.elseEffects);
+                            text += `\n그렇치 않으면 ${elseText}을(를) 실행합니다. `;
+                        }
+                        return text;
+                    }
+                    case EffectType.SPECIAL: {
+                        // 예시: 특수 효과는 subType에 따라 더 상세히 정의 가능
+                        if (effect.subType === 'APPLY_BURN') {
+                            return `적에게 화상 ${effect.value}를 부여합니다.`;
+                        }
+                        return `특수 효과: ${effect.value} 발동`;
+                    }
+                    case EffectType.LOG: {
+                        return `[로그 메시지: ${effect.message}]`;
+                    }
+                    default:
+                        return `[미정의 효과: ${effect.type}]`;
+                }
+            });
+
+            // 다중 효과를 자연스럽게 연결
+            return messages.join('\n그리고 ');
+        };
+
+        // --------------------------------------------------------
+        // 4. UI 상호작용 및 JSON 처리
+        // --------------------------------------------------------
+
+        const inputArea = document.getElementById('jsonInput');
+        const outputArea = document.getElementById('textOutput');
+        const errorArea = document.getElementById('jsonError');
+
+        // 기본 예시 JSON 설정 (하이브리드 로직 데모)
+        const defaultExample = [
+            {
+                "type": "CONDITIONAL",
+                "condition": { "stat": "GOLEM_HP_PCT", "op": "<", "value": 0.5 },
+                "effects": [
+                    { "type": "HEAL", "value": 30, "target": "GOLEM" },
+                    { "type": "LOG", "message": "로그 메세지 테스트" }
+                ],
+                "elseEffects": [
+                    { "type": "BLOCK", "value": 10, "target": "GOLEM" }
+                ]
+            },
+            {
+                "type": "ATTACK",
+                "value": 15,
+                "target": "RANDOM_ENEMY"
+            },
+            {
+                "type": "BUFF",
+                "value": 1.25,
+                "target": "GOLEM"
+            }
+        ];
+
+        inputArea.value = JSON.stringify(defaultExample, null, 4);
+
+        /**
+         * 입력된 JSON을 파싱하고 텍스트를 업데이트하는 메인 함수
+         */
+        window.updateText = function () {
+            const jsonString = inputArea.value.trim();
+            errorArea.textContent = '';
+
+            if (!jsonString) {
+                outputArea.textContent = 'JSON을 입력해 주세요.';
+                return;
+            }
+
+            try {
+                const effects = JSON.parse(jsonString);
+                const generatedText = generateEffectText(effects);
+                outputArea.textContent = generatedText;
+
+            } catch (e) {
+                errorArea.textContent = '⚠️ JSON 파싱 오류: ' + e.message;
+                outputArea.textContent = 'JSON 구문 오류로 인해 텍스트를 생성할 수 없습니다.';
+            }
+        }
+
+        // 페이지 로드 시 초기 텍스트 생성
+        updateText();
+
+    </script>
+</body>
+
+</html>

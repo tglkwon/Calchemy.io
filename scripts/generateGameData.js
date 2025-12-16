@@ -104,7 +104,8 @@ async function generate() {
     try {
         // 1. Load CSVs
         const cardData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 카드.csv');
-        const keywordData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 키워드.csv');
+        const keywordDataRaw = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 키워드.csv');
+        const keywordData = keywordDataRaw.filter(k => k.No !== "고유 번호" && k.No !== "No" && k.No !== undefined);
         const artifactData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 유물.csv');
         const potionData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 포션.csv');
 

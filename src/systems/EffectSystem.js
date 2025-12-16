@@ -12,7 +12,6 @@ export const EffectType = {
     BLOCK: 'BLOCK',
     BUFF: 'BUFF',
     DEBUFF: 'DEBUFF',
-    DRAW: 'DRAW',
     GAIN_ENERGY: 'GAIN_ENERGY',
     SPECIAL: 'SPECIAL',
     NONE: 'NONE'

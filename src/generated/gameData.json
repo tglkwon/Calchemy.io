@@ -2379,50 +2379,42 @@
   ],
   "keywords": [
     {
-      "No": "고유 번호",
-      "Key_ID": "키워드 ID (코드 참조용)",
-      "Name_KR": "게임 내 표시 이름",
-      "Desc_Template": "툴팁 텍스트 템플릿",
-      " Keyword_Logic": "키워드 로직",
-      "Note": "비고 (기획 메모)"
-    },
-    {
       "No": 0,
       "Key_ID": "KEY_BURN",
       "Name_KR": "화상",
       "Desc_Template": "2 만큼 화상을 입힙니다.",
-      " Keyword_Logic": "{\"화상\" : 2}",
+      " Keyword_Logic": "{ \"type\": \"ATTACK\", \"value\": 2, \"target\": \"RANDOM_ENEMY\" }",
       "Note": "도트 데미지는 즉발보다 가치 낮게 책정"
     },
     {
       "No": 1,
       "Key_ID": "ATTACT",
       "Name_KR": "공격",
-      "Desc_Template": null,
-      " Keyword_Logic": null,
+      "Desc_Template": "${target} ${effect.value} 피해를 줍니다.",
+      " Keyword_Logic": "{ \"type\": \"ATTACK\", \"value\": 2, \"target\": \"RANDOM_ENEMY\" }",
       "Note": "기본 카드"
     },
     {
       "No": 2,
-      "Key_ID": "DEFENCE",
+      "Key_ID": "BLOCK",
       "Name_KR": "방어",
-      "Desc_Template": null,
-      " Keyword_Logic": null,
+      "Desc_Template": "방어도 ${effect.value}를 획득합니다.",
+      " Keyword_Logic": "{ \"type\": \"BLOCK\", \"value\": ${effect.value}, \"target\": \"GOLEM\" }",
       "Note": "기본 카드"
     },
     {
       "No": 3,
       "Key_ID": "HEAL",
       "Name_KR": "회복",
-      "Desc_Template": null,
-      " Keyword_Logic": null,
-      "Note": null
+      "Desc_Template": "체력을 ${effect.value} 회복합니다.",
+      " Keyword_Logic": "{ \"type\": \"HEAL\", \"value\": ${effect.value}, \"target\": \"GOLEM\" }",
+      "Note": "기본 카드"
     },
     {
       "No": 4,
-      "Key_ID": "ACID",
+      "Key_ID": "BURN",
       "Name_KR": "화상/부패/독/풍화",
-      "Desc_Template": "{val} 만큼 화상을 입힙니다. 매 공격 턴 마다 {val}만큼 데미지를 주고, {val}를 1 줄입니다. ",
+      "Desc_Template": "적에게 화상 ${effect.value}를 부여합니다.",
       " Keyword_Logic": null,
       "Note": null
     }
@@ -3490,5 +3482,5 @@
       "description": "다음 턴, 첫 번째로 발동되는 빙고의 효과가 3배"
     }
   ],
-  "generatedAt": "2025-12-07T15:40:20.307Z"
+  "generatedAt": "2025-12-13T12:52:20.651Z"
 }
