@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import UnitFrame from '../components/UnitFrame';
 import Grid from '../components/Grid';
@@ -8,6 +8,24 @@ const BattlePage = () => {
     const { gameState, gameEngine } = useGame();
     const { golem, minions, isPaused, turnCount, grid, activeCardId, bingoCardIds, gameOver, victory, relics } = gameState;
     const activeRelics = relics.filter(r => r.isActive);
+
+    useEffect(() => {
+        const audio = new Audio(`${import.meta.env.BASE_URL}assets/audio/BGM_Main_251108.wav`);
+        audio.loop = true;
+        audio.volume = 0.5;
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn("BGM Autoplay prevented:", error);
+            });
+        }
+
+        return () => {
+            audio.pause();
+            audio.currentTime = 0;
+        };
+    }, []);
 
     return (
         <div className="h-full flex gap-4">
