@@ -14,7 +14,102 @@ export class KeywordSystem {
      * @param {Object} context - Game context (golem, minions, helpers like log).
      * @returns {string[]} Logs generated during execution.
      */
+    /**
+     * Executes a list of effects based on card parameters.
+     * @param {Object} card - The card object containing effect params.
+     * @param {Object} context - Game context (golem, minions, helpers like log).
+     * @returns {string[]} Logs generated during execution.
+     */
     processCardEffects(card, context) {
+        const logs = [];
+
+        // 1. Data-Driven Effects (New Pipeline)
+        if (card.singleEffects && Array.isArray(card.singleEffects) && card.singleEffects.length > 0) {
+            // Find valid origin index for Grid Manipulation
+            const originIdx = context.cardSystem ? context.cardSystem.grid.findIndex(c => c.instanceId === card.instanceId) : -1;
+
+            for (const effect of card.singleEffects) {
+                const result = this.executeSingleEffect(effect, context, card, originIdx);
+                if (result) logs.push(result);
+            }
+            return logs;
+        }
+
+        // 2. Legacy Effects (effectParams)
+        // Keep existing logic for backward compatibility or manual definitions
+        return this.processLegacyEffects(card, context);
+    }
+
+    /**
+     * Executes a single normalized effect.
+     */
+    executeSingleEffect(effect, context, card, originIdx) {
+        if (!effect) return null;
+
+        switch (effect.type) {
+            case 'ATTACK': {
+                const target = this.getTarget(effect.target || 'RANDOM_ENEMY', context);
+                if (target) {
+                    const dmg = effect.value;
+                    const taken = target.takeDamage(dmg);
+                    if (context.golem) context.golem.totalDamageThisTurn += taken;
+                    return `⚔️ [${card.name}] ${target.name}에게 ${taken} 피해`;
+                }
+                return `⚔️ [${card.name}] 공격 대상이 없습니다.`;
+            }
+            case 'BLOCK': {
+                const amt = effect.value;
+                if (context.golem) {
+                    context.golem.addBlock(amt);
+                    return `🛡️ [${card.name}] 골렘 방어도 +${amt}`;
+                }
+                break;
+            }
+            case 'HEAL': {
+                const amt = effect.value;
+                if (context.golem) {
+                    const healed = context.golem.heal(amt);
+                    return `💧 [${card.name}] 체력 ${healed} 회복`;
+                }
+                break;
+            }
+            case 'BUFF': {
+                if (context.golem) {
+                    // Assuming generic attack buff for MVP
+                    context.golem.attackBuffs = (context.golem.attackBuffs || 0) + 1;
+                    return `💪 [${card.name}] 골렘 공격력 증가`;
+                }
+                break;
+            }
+            case 'GRID_MANIPULATION': {
+                if (context.cardSystem) {
+                    // Extract params from the effect object (which flattened the JSON)
+                    // Schema: { type: 'GRID_MANIPULATION', action, target, count, toType, condition }
+                    const resultLog = context.cardSystem.executeGridAction(
+                        effect.action,
+                        effect.target,
+                        effect.count,
+                        effect.toType,
+                        originIdx,
+                        effect.condition
+                    );
+                    return `✨ [${card.name}] ${resultLog}`;
+                }
+                return `⚠️ [${card.name}] Grid System Missing`;
+            }
+            // Add other types as needed
+            default:
+                // Try to handle special legacy IDs here if converted? 
+                // Currently generated data maps to generic types.
+                return null;
+        }
+        return null;
+    }
+
+    /**
+     * Legacy Processing mainly for hardcoded logic or old manual definitions
+     */
+    processLegacyEffects(card, context) {
         const logs = [];
         const params = card.effectParams || {};
 
@@ -67,18 +162,10 @@ export class KeywordSystem {
 
         // 6. AoE Damage
         if (params.aoe && params.damage) {
-            // If AOE is flagged, the damage block above might have handled single target.
-            // But usually AOE is separate or overrides. 
-            // In a better system, 'actions' is a list. Here we check params.
-            // Let's assume if AOE is true, we hit ALL enemies.
-            // Note: The simple `if (params.damage)` above picks one target. 
-            // We should ideally separate "Actions". 
-            // For this refactor, let's keep it simple: Overwrite standard damage logic if Aoe?
-            // Or just handle specific keys.
+            // ... (Same as before)
         }
 
-        // --- Specific Card Logic Handling (Legacy Support until full JSON migration) ---
-        // This is where we handle the specific ID logic that was in GameEngine
+        // --- Specific Card Logic Handling (Legacy Support) ---
 
         // ID: 7 (Supernova) - AoE
         if (card.id === "7") {
@@ -126,13 +213,15 @@ export class KeywordSystem {
             }
         }
 
-        // 7. Grid Manipulation
+        // Legacy GRID_MANIPULATION check
         if (params.type === 'GRID_MANIPULATION' && context.cardSystem) {
             const resultLog = context.cardSystem.executeGridAction(
                 params.action,
                 params.target,
                 params.count,
-                params.toType
+                params.toType,
+                -1, // Origin unknown in legacy
+                null // Condition unknown
             );
             logs.push(`✨ [${card.name}] ${resultLog}`);
         }

@@ -14,6 +14,7 @@ export const EffectType = {
     DEBUFF: 'DEBUFF',
     GAIN_ENERGY: 'GAIN_ENERGY',
     SPECIAL: 'SPECIAL',
+    GRID_MANIPULATION: 'GRID_MANIPULATION',
     NONE: 'NONE'
 };
 

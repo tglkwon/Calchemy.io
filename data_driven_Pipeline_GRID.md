@@ -1,146 +1,121 @@
-그리드 기반 효과 데이터 주도형 구현 지침 (Data-Driven Grid Manipulation Effects)1. 개요 및 목표현재 시스템은 카드와 키워드의 단순 수치 기반 효과(Damage, Heal, Block 등)를 CSV JSON 로직을 통해 처리하고 있습니다. 이제 빙고 그리드 내부의 카드 위치, 타입, 상태 등을 조작하는 복잡한 효과들을 하드코딩 없이 데이터 주도형(Data-Driven)으로 구현하는 것이 목표입니다.이를 위해 새로운 효과 타입 GRID_MANIPULATION을 도입하고, 그 하위의 액션(Action)과 타겟(Target)을 JSON 스키마로 표준화합니다.2. JSON 데이터 스키마 정의 (CSV Logic 컬럼 입력값)기획자는 연금술 오토 배틀러 컨텐츠 - 카드.csv 파일의 Single_Logic 또는 Bingo_Logic 컬럼에 다음과 같은 JSON 구조를 입력해야 합니다.JSON Key (Korean/Internal)Internal Effect Type설명"그리드조작"GRID_MANIPULATION그리드 내부의 상태를 변경하는 모든 행위를 포함합니다.GRID_MANIPULATION 액션 스키마 (Action Schema)GRID_MANIPULATION 타입은 action, target, count 속성을 필수로 가집니다.{
+그리드 기반 효과 데이터 주도형 구현 지침
+1. 개요 및 목표
+본 지침은 4x4 빙고 그리드 내에서 카드의 위치와 속성을 조작하는 효과를 **데이터 주도형(Data-Driven)**으로 구현하기 위한 통합 표준입니다. 기획자가 CSV 파일의 JSON 로직을 수정하는 것만으로 새로운 그리드 상호작용을 즉시 생성할 수 있도록 하며, 모든 조작 후에도 그리드는 항상 16장의 카드로 채워져 있어야 함을 원칙으로 합니다.
+2. JSON 데이터 스키마 (CSV 입력 표준)
+기획자는 CSV의 Single_Logic 또는 Bingo_Logic 컬럼에 아래의 스키마를 사용하여 효과를 정의합니다.
+2.1. 기본 구조
+{
   "GRID_MANIPULATION": {
     "action": "[ACTION_TYPE]", 
     "target": "[TARGET_SELECTOR]", 
     "count": [NUMBER],          
-    // 선택적 파라미터:
-    "toType": "[ELEMENT_TYPE]",  // TRANSFORM 액션 시 필요
-    "condition": "[CONDITION_TYPE]" // 특정 조건의 카드만 대상으로 할 때 사용
+    "toType": "[ELEMENT_TYPE]",  
+    "condition": "[CONDITION_KEY]"
   }
 }
-필드타입설명예시 값actionString수행할 원자적 그리드 조작 명령"TRANSFORM", "SWAP", "UPGRADE", "DISCARD"targetString조작의 대상이 되는 카드 선택 방식"RANDOM", "ADJACENT", "SAME_TYPE", "FRONT"countNumber조작할 카드의 개수 (SWAP 시 쌍의 개수)1, 2, 4toTypeStringTRANSFORM 액션 시, 변경될 카드의 속성"FIRE", "WATER", "WIND"conditionString타겟팅 시 적용할 추가 조건 (선택 사항)"NOT_FIRE", "RARE"3. 구현 요구사항 및 변경 지점다음 파일들의 수정 및 확장이 필요합니다.3.1. src/systems/EffectSystem.js 수정요구사항 1: 새로운 이펙트 타입 및 한글 매핑 추가EffectType과 KoreanLogicMap에 그리드 조작 관련 상수를 추가합니다.// src/systems/EffectSystem.js (부분 수정)
 
-// 1. Effect Types (Internal Constants) 확장
-export const EffectType = {
-    // ... 기존 타입들 (ATTACK, HEAL, BLOCK, ...)
-    GRID_MANIPULATION: 'GRID_MANIPULATION' 
-};
 
-// 2. Korean Key Mapping (For parsing JSON logic from CSV) 확장
-export const KoreanLogicMap = {
-    // ... 기존 매핑들 ("공격", "회복", ...)
-    "그리드조작": EffectType.GRID_MANIPULATION
-};
-요구사항 2: executeEffect 내 GRID_MANIPULATION 로직 구현executeEffect 함수 내에 새로운 case를 추가하여 그리드 조작 로직을 CardSystem에 위임합니다.// src/systems/EffectSystem.js (executeEffect 함수 내부)
 
-export const executeEffect = (effect, gameState, targetUnit = null) => {
-    // ...
-    // NOTE: gameState 객체는 CardSystem 인스턴스를 포함해야 합니다.
-    const { golem, minions, engine, cardSystem } = gameState; // cardSystem 추가
+참고: 내부 시스템에서 "그리드조작" 키는 "GRID_MANIPULATION"으로 자동 매핑됩니다.
+2.2. 액션 타입 (Action Type)
+|
+| 키워드 | 설명 | 구현 세부 로직 |
+| TRANSFORM | 변환 | 대상 카드의 ID는 유지하되 type만 toType으로 변경합니다. |
+| SWAP | 위치 교환 | **발동 카드(Origin)**와 **대상 카드(Target)**의 그리드 위치를 서로 맞바꿉니다. |
+| REPLACE | 카드 교체 | 대상 카드를 제거(버림더미 이동)하고, 덱에서 새 카드를 1장 뽑아 그 자리에 즉시 채웁니다. |
+| UPGRADE | 강화 | 대상 카드의 등급(grade) 또는 효과 수치를 상승시킵니다. |
 
-    switch (effect.type) {
-        // ... 기존 ATTACK, HEAL, BLOCK 로직
+2.3. 타겟 셀렉터 (Target Selector) 및 반사 로직
+단일 방향 지정 시 경계에 도달하면 **반대 방향(Reflection)**으로 타겟을 자동 전환합니다.
+| 키워드 | 설명 | 좌표 연산 | 경계 도달 시 반사(Fallback) |
+| UP | 위 | (x, y - 1) | DOWN (x, y + 1) |
+| DOWN | 아래 | (x, y + 1) | UP (x, y - 1) |
+| LEFT | 왼쪽 | (x - 1, y) | RIGHT (x + 1, y) |
+| RIGHT | 오른쪽 | (x + 1, y) | LEFT (x - 1, y) |
+| NEAR_4 | 주변 4칸 | 상하좌우 4개 | 유효한 좌표만 필터링 |
+| NEAR_8 | 주변 8칸 | 인접 8개 모든 칸 | 유효한 좌표만 필터링 |
+| RANDOM | 랜덤 | 전체(자기 제외) | 무작위 인덱스 추출 |
+| ALL | 전체 | 그리드 16칸 전체 | 모든 유효 인덱스 |
 
-        case EffectType.GRID_MANIPULATION: {
-            const params = effect.value; // GRID_ACTION의 세부 파라미터
-            const { action, target, count, toType } = params; 
-            
-            // 이 부분이 데이터를 로직(그리드 조작)으로 변환하는 핵심부입니다.
-            if (cardSystem) {
-                const log = cardSystem.executeGridAction(action, target, count, toType);
-                return `✨ 그리드 조작: ${log}`;
-            }
-            return `⚠️ 그리드 조작: CardSystem이 없어 실행 실패.`;
-        }
+2.4. 타겟 필터링 조건 (Condition) 10선
+선택된 타겟들 중 아래 조건에 부합하는 카드만 최종 확정합니다.
+SAME_TYPE: 발동 카드와 속성(type)이 같은 카드.
+DIFF_TYPE: 발동 카드와 속성이 다른 카드.
+HIGHEST_GRADE: 후보군 중 등급(grade)이 가장 높은 카드 순.
+BASIC_ONLY: 효과가 없는 '기본 속성 카드'만 대상.
+MOST_FREQUENT: 현재 그리드에서 가장 많은 속성을 가진 카드군.
+LEAST_FREQUENT: 현재 그리드에서 가장 적은 속성을 가진 카드군.
+UPGRADED: 이미 강화(UPGRADE)된 이력이 있는 카드.
+NOT_UPGRADED: 아직 강화되지 않은 순수 상태의 카드.
+SAME_LINE: 발동 카드와 같은 행(Row) 또는 열(Column) 위치.
+IS_EDGE: 그리드의 테두리(0, 3행 또는 0, 3열)에 위치한 카드.
 
-        default:
-            // ...
-            break;
+3. 시스템 구현 가이드
+3.1. 좌표 및 경계 유틸리티
+const isValidCoord = (x, y) => x >= 0 && x < 4 && y >= 0 && y < 4;
+const getIndex = (x, y) => y * 4 + x;
+const getCoord = (index) => ({ x: index % 4, y: Math.floor(index / 4) });
+
+
+
+3.2. CardSystem.js 핵심 로직
+A. 타겟팅 및 반사 구현 (getTargetIndices)
+getTargetIndices(selector, count, originIdx) {
+    const { x, y } = getCoord(originIdx);
+    let tx = x, ty = y;
+
+    switch (selector) {
+        case 'UP':    ty = y - 1; if(!isValidCoord(tx, ty)) ty = y + 1; break;
+        case 'DOWN':  ty = y + 1; if(!isValidCoord(tx, ty)) ty = y - 1; break;
+        case 'LEFT':  tx = x - 1; if(!isValidCoord(tx, ty)) tx = x + 1; break;
+        case 'RIGHT': tx = x + 1; if(!isValidCoord(tx, ty)) tx = x - 1; break;
+        // NEAR_4, NEAR_8 등은 기존의 필터링 방식 적용
     }
-    // ...
-};
-3.2. src/systems/CardSystem.js 수정요구사항 3: 그리드 조작 위임 함수 구현 (executeGridAction)EffectSystem에서 위임받은 액션을 처리하는 메인 함수를 구현합니다. 이 함수는 타겟팅과 액션 실행을 분리하여 처리해야 합니다.// src/systems/CardSystem.js (새로운 메서드 추가)
+    return isValidCoord(tx, ty) ? [getIndex(tx, ty)] : [];
+}
 
-export class CardSystem {
-    // ... 기존 메서드 (constructor, initDeck, shuffle, drawGrid, ...)
 
-    /**
-     * EffectSystem에서 호출되어 데이터 기반의 그리드 조작을 실행합니다.
-     * @param {string} actionType - TRANSFORM, SWAP, UPGRADE 등
-     * @param {string} targetSelector - RANDOM, ADJACENT 등 타겟 선택 방식
-     * @param {number} count - 조작할 카드의 수
-     * @param {string} toType - TRANSFORM 시 변경될 카드 타입
-     * @returns {string} 실행 로그
-     */
-    executeGridAction(actionType, targetSelector, count, toType) {
-        const targetIndices = this.getTargetIndices(targetSelector, count);
 
-        if (targetIndices.length === 0) {
-            return `대상이 없어 (${actionType}) 실행되지 않았습니다.`;
-        }
-        
-        // 1. Action 분기 처리
-        let logs = [];
-        switch (actionType) {
-            case 'TRANSFORM':
-                targetIndices.forEach(idx => {
-                    this.transformCard(idx, toType);
-                    logs.push(`(${idx})번 카드가 ${toType}으로 변환.`);
-                });
-                break;
-            case 'SWAP':
-                // SWAP 로직은 count를 짝지어 줘야 하므로 별도의 로직 필요
-                // this.swapCards(targetIndices);
-                logs.push(`미구현 액션: SWAP`);
-                break;
-            // ... 기타 액션 (UPGRADE, DISCARD) 구현
-            default:
-                logs.push(`알 수 없는 액션 타입: ${actionType}`);
-        }
-
-        return logs.join(' ');
-    }
-
-    /**
-     * [원자적 함수] 특정 인덱스의 카드 타입을 강제로 변경합니다.
-     * @param {number} index - 그리드 인덱스 (0-15)
-     * @param {string} newType - 변경될 요소 타입 (FIRE, WATER 등)
-     */
-    transformCard(index, newType) {
-        if (this.grid[index]) {
-            // 카드의 기본 정의를 찾거나, 최소한 타입만 변경
-            this.grid[index] = {
-                ...this.grid[index],
-                type: newType,
-                // 인스턴스 ID 변경으로 React/UI가 강제 업데이트 되도록 유도
-                instanceId: `${newType}_TR_${Date.now()}_${index}` 
-            };
-        }
-    }
-
-    /**
-     * [원자적 함수] 타겟 셀렉터에 따라 대상 카드의 인덱스를 반환합니다.
-     * @param {string} selector - 타겟 선택 방식 (RANDOM, ADJACENT 등)
-     * @param {number} count - 필요한 카드의 수
-     * @returns {number[]} 대상 인덱스 배열
-     */
-    getTargetIndices(selector, count) {
-        const indices = this.grid.map((_, i) => i);
-        
-        switch (selector) {
-            case 'RANDOM':
-                // 무작위 count 개 선택
-                return indices.sort(() => 0.5 - Math.random()).slice(0, count);
-            case 'FRONT':
-                // 전열 (0, 4, 8, 12) 중 하나
-                const frontIndices = [0, 4, 8, 12];
-                return frontIndices.sort(() => 0.5 - Math.random()).slice(0, 1); // 1개만 반환
-            // ... ADJACENT, SAME_TYPE 등 추가 타겟팅 로직 구현 필요
-            default:
-                return [];
-        }
+B. 카드 교체 구현 (replaceCard)
+replaceCard(index) {
+    if (this.grid[index]) {
+        this.discardPile.push(this.grid[index]); // 버림더미 이동
+        if (this.deck.length === 0) this.refillDeck(); // 셔플 로직
+        const newCard = this.deck.pop();
+        this.grid[index] = { ...newCard, instanceId: `REP_${Date.now()}_${index}` };
     }
 }
-4. gameState 컨텍스트 업데이트 지침executeEffect가 cardSystem을 참조할 수 있도록, 게임 상태를 관리하는 상위 컨텍스트(GameProvider.jsx 또는 GameContext.js)에서 CardSystem 인스턴스를 gameState 객체에 포함시켜야 합니다.// GameProvider.jsx (또는 유사 파일) 내부
 
-// ...
-const cardSystem = useMemo(() => new CardSystem(), []);
-// ...
 
-const gameState = {
-    golem: golemState,
-    minions: minionsState,
-    engine: gameEngine,
-    cardSystem: cardSystem, // CardSystem 인스턴스 추가
-};
-// ...
+C. 통합 실행 프로세스 (executeGridAction)
+executeGridAction(action, selector, count, toType, originIdx, condition) {
+    let candidates = this.getTargetIndices(selector, 16, originIdx);
+    let finalTargets = this.filterTargets(candidates, condition, originIdx);
+    finalTargets = finalTargets.slice(0, count);
+
+    finalTargets.forEach(tIdx => {
+        if (action === 'SWAP') {
+            [this.grid[originIdx], this.grid[tIdx]] = [this.grid[tIdx], this.grid[originIdx]];
+        } else if (action === 'REPLACE') {
+            this.replaceCard(tIdx);
+        } else if (action === 'TRANSFORM') {
+            const type = (toType === 'ORIGIN') ? this.grid[originIdx].type : toType;
+            this.grid[tIdx] = { ...this.grid[tIdx], type: type };
+        }
+    });
+    this.grid = [...this.grid]; // 상태 갱신
+    return `조작 완료 (대상: ${finalTargets.length})`;
+}
+
+4. 기획 적용 예시
+바람의 교체 (Swap): "위쪽 카드와 위치를 바꿉니다. 위가 막혀있으면 아래와 바꿉니다."
+{"action": "SWAP", "target": "UP", "count": 1}
+원소 정화 (Replace): "그리드 전체에서 가장 흔한 속성의 카드 1장을 버리고 새로 뽑습니다."
+{"action": "REPLACE", "target": "ALL", "condition": "MOST_FREQUENT", "count": 1}
+심연의 부름 (Transform): "주변 8칸 중 기본 카드들을 모두 내 속성으로 바꿉니다."
+{"action": "TRANSFORM", "target": "NEAR_8", "condition": "BASIC_ONLY", "toType": "ORIGIN"}
+
+5. 최종 주의사항
+빙고 체크 강제 실행: 모든 그리드 조작 액션이 끝난 직후 checkBingos()를 명시적으로 호출해야 합니다.
+ID 재생성: REPLACE나 TRANSFORM 시 instanceId를 새롭게 할당하여 UI 컴포넌트(React 등)가 변경을 감지하게 하십시오.
+자기 자신 제외: SWAP이나 REPLACE 타겟팅 시 originIdx가 결과에 포함되지 않도록 필터링하십시오.

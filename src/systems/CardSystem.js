@@ -221,83 +221,244 @@ export class CardSystem {
         this.drawGrid();
     }
     /**
+     * Helper: Validates if coordinate is within 4x4 grid
+     */
+    isValidCoord(x, y) {
+        return x >= 0 && x < 4 && y >= 0 && y < 4;
+    }
+
+    /**
+     * Helper: Convert grid index to x,y coordinates
+     */
+    getCoord(index) {
+        return { x: index % 4, y: Math.floor(index / 4) };
+    }
+
+    /**
+     * Helper: Convert x,y coordinates to grid index
+     */
+    getIndex(x, y) {
+        return y * 4 + x;
+    }
+
+    /**
      * Executes a data-driven grid manipulation action.
-     * @param {string} actionType - TRANSFORM, SWAP, etc.
-     * @param {string} targetSelector - RANDOM, FRONT, etc.
+     * @param {string} actionType - TRANSFROM, SWAP, REPLACE, UPGRADE
+     * @param {string} targetSelector - UP, DOWN, LEFT, RIGHT, NEAR_4, NEAR_8, RANDOM, ALL
      * @param {number} count - Number of cards to affect
-     * @param {string} toType - Target type for TRANSFORM
+     * @param {string} toType - Target type for TRANSFORM (or 'ORIGIN')
+     * @param {number} originIdx - Index of the card triggering the effect
+     * @param {string} condition - Filter condition (SAME_TYPE, etc.)
      * @returns {string} Log message result
      */
-    executeGridAction(actionType, targetSelector, count, toType) {
-        const targetIndices = this.getTargetIndices(targetSelector, count);
+    executeGridAction(actionType, targetSelector, count, toType, originIdx, condition) {
+        // Fallback for missing origin (e.g. global effect)
+        if (originIdx === undefined || originIdx === null) originIdx = -1;
 
-        if (targetIndices.length === 0) {
+        // 1. Get Initial Candidates
+        let candidates = this.getTargetIndices(targetSelector, count, originIdx);
+
+        // 2. Filter Candidates
+        let finalTargets = this.filterTargets(candidates, condition, originIdx);
+
+        // 3. Limit count
+        // For Random/All, we might have many candidates, slice to count.
+        // For Directional, getTargetIndices usually returns 1 (or 0), but we check limit anyway.
+        if (targetSelector === 'RANDOM' || targetSelector === 'ALL' || condition) {
+            // For random selector, we shuffle first then slice if we have too many
+            if (targetSelector === 'RANDOM') {
+                this.shuffle(finalTargets);
+            }
+            finalTargets = finalTargets.slice(0, count);
+        } else {
+            finalTargets = finalTargets.slice(0, count);
+        }
+
+        if (finalTargets.length === 0) {
             return `대상이 없어 (${actionType}) 실행되지 않았습니다.`;
         }
 
-        // 1. Action 분기 처리
+        // 4. Execute Action on Targets
         let logs = [];
-        switch (actionType) {
-            case 'TRANSFORM':
-                targetIndices.forEach(idx => {
-                    this.transformCard(idx, toType);
-                    // logs.push(`(${idx})번 카드가 ${toType}으로 변환.`);
-                });
-                logs.push(`${targetIndices.length}장의 카드가 ${toType} 속성으로 변환되었습니다.`);
-                break;
-            case 'SWAP':
-                // SWAP 로직은 count를 짝지어 줘야 하므로 별도의 로직 필요
-                // this.swapCards(targetIndices);
-                logs.push(`미구현 액션: SWAP`);
-                break;
-            // ... 기타 액션 (UPGRADE, DISCARD) 구현
-            default:
-                logs.push(`알 수 없는 액션 타입: ${actionType}`);
-        }
+        finalTargets.forEach(tIdx => {
+            // Safety check
+            if (!this.grid[tIdx]) return;
 
-        return logs.join(' ');
+            if (actionType === 'SWAP') {
+                // Swap logic: origin vs target
+                // If origin is valid, swap with origin. If origin is -1 (global), swap with what?
+                // Usually SWAP is "Me <-> Target".
+                if (originIdx !== -1 && this.grid[originIdx]) {
+                    [this.grid[originIdx], this.grid[tIdx]] = [this.grid[tIdx], this.grid[originIdx]];
+                    // Refresh instanceIds to trigger React key updates if needed, but simple swap might reuse keys. 
+                    // Best practice: treat as move.
+                }
+            } else if (actionType === 'REPLACE') {
+                this.replaceCard(tIdx);
+            } else if (actionType === 'TRANSFORM') {
+                let type = toType;
+                if (toType === 'ORIGIN' && originIdx !== -1 && this.grid[originIdx]) {
+                    type = this.grid[originIdx].type;
+                }
+                // If type is still invalid, ignore or default
+                if (type) {
+                    this.grid[tIdx] = {
+                        ...this.grid[tIdx],
+                        type: type,
+                        instanceId: `${type}_TR_${Date.now()}_${tIdx}` // Force re-render
+                    };
+                }
+            } else if (actionType === 'UPGRADE') {
+                // upgrade logic stub
+                this.grid[tIdx] = {
+                    ...this.grid[tIdx],
+                    grade: (this.grid[tIdx].grade || 0) + 1,
+                    instanceId: `${this.grid[tIdx].type}_UP_${Date.now()}_${tIdx}`
+                };
+            }
+        });
+
+        // Force grid array update reference
+        this.grid = [...this.grid];
+
+        return `그리드 조작: ${actionType} (${finalTargets.length}장)`;
     }
 
     /**
-     * [Atomic] Force changes a card's type at a specific index.
-     * @param {number} index - Grid index (0-15)
-     * @param {string} newType - New element type (FIRE, WATER, etc.)
+     * Replaces a card at index with one from the deck.
+     * Moves old card to discard pile.
      */
-    transformCard(index, newType) {
+    replaceCard(index) {
         if (this.grid[index]) {
-            // Update type and regenerate instanceId to force React re-render
-            this.grid[index] = {
-                ...this.grid[index],
-                type: newType,
-                instanceId: `${newType}_TR_${Date.now()}_${index}`
-            };
+            this.discardPile.push(this.grid[index]);
+            if (this.deck.length === 0) {
+                // Shuffle discard into deck if empty
+                if (this.discardPile.length > 0) {
+                    this.deck = [...this.discardPile];
+                    this.discardPile = [];
+                    this.shuffle(this.deck);
+                } else {
+                    console.warn("No cards left to replace!");
+                    // Fallback check?
+                }
+            }
+
+            if (this.deck.length > 0) {
+                const newCard = this.deck.pop();
+                // Ensure new unique ID for the slot
+                this.grid[index] = { ...newCard, instanceId: `REP_${Date.now()}_${index}` };
+            }
         }
     }
 
     /**
-     * [Atomic] Returns target indices based on selector.
-     * @param {string} selector - Target selection method
-     * @param {number} count - Number of targets
-     * @returns {number[]} Array of target indices
+     * Filters target indices based on condition.
      */
-    getTargetIndices(selector, count) {
-        const indices = this.grid.map((_, i) => i);
+    filterTargets(indices, condition, originIdx) {
+        if (!condition) return indices;
+
+        const originCard = (originIdx !== -1) ? this.grid[originIdx] : null;
+
+        return indices.filter(idx => {
+            if (idx === originIdx) return false; // Self exclusion by default? MD says explicit filtering.
+
+            const targetCard = this.grid[idx];
+            if (!targetCard) return false;
+
+            switch (condition) {
+                case 'SAME_TYPE':
+                    return originCard && targetCard.type === originCard.type;
+                case 'DIFF_TYPE':
+                    return originCard && targetCard.type !== originCard.type;
+                case 'BASIC_ONLY':
+                    // Assuming 'grade' 0 or undefined is basic
+                    return !targetCard.grade || targetCard.grade === 0;
+                case 'UPGRADED':
+                    return targetCard.grade > 0;
+                case 'NOT_UPGRADED':
+                    return !targetCard.grade || targetCard.grade === 0;
+                case 'IS_EDGE': {
+                    const { x, y } = this.getCoord(idx);
+                    return x === 0 || x === 3 || y === 0 || y === 3;
+                }
+                // Complex conditions like MOST_FREQUENT need pre-calculation on the whole set, 
+                // which is hard in a simple filter.
+                // For MVP, we'll skip global count analysis logic inside per-card filter 
+                // or implement it separately if needed.
+                // Let's implement simple ones first.
+                default:
+                    return true;
+            }
+        });
+    }
+
+    /**
+     * Returns target indices based on selector and origin.
+     * Implements Reflection Logic.
+     */
+    getTargetIndices(selector, count, originIdx = -1) {
+        // If origin unspecified for relative selector, we can't do much.
+        // We'll treat originIdx 0 if -1 provided for safety, or return empty?
+        // MD implies origin is needed for UP/DOWN/etc.
+
+        const indices = []; // results
+
+        if (originIdx === -1 && ['UP', 'DOWN', 'LEFT', 'RIGHT'].includes(selector)) {
+            return [];
+        }
+
+        const { x, y } = (originIdx !== -1) ? this.getCoord(originIdx) : { x: 0, y: 0 };
+        let tx = x, ty = y;
+
+        // Valid candidates collection
+        let candidateIndices = [];
 
         switch (selector) {
+            case 'UP':
+                ty = y - 1;
+                if (!this.isValidCoord(tx, ty)) ty = y + 1; // Reflection
+                if (this.isValidCoord(tx, ty)) candidateIndices.push(this.getIndex(tx, ty));
+                break;
+            case 'DOWN':
+                ty = y + 1;
+                if (!this.isValidCoord(tx, ty)) ty = y - 1;
+                if (this.isValidCoord(tx, ty)) candidateIndices.push(this.getIndex(tx, ty));
+                break;
+            case 'LEFT':
+                tx = x - 1;
+                if (!this.isValidCoord(tx, ty)) tx = x + 1;
+                if (this.isValidCoord(tx, ty)) candidateIndices.push(this.getIndex(tx, ty));
+                break;
+            case 'RIGHT':
+                tx = x + 1;
+                if (!this.isValidCoord(tx, ty)) tx = x - 1;
+                if (this.isValidCoord(tx, ty)) candidateIndices.push(this.getIndex(tx, ty));
+                break;
+            case 'NEAR_4':
+                // Up, Down, Left, Right
+                [[x, y - 1], [x, y + 1], [x - 1, y], [x + 1, y]].forEach(([nx, ny]) => {
+                    if (this.isValidCoord(nx, ny)) candidateIndices.push(this.getIndex(nx, ny));
+                });
+                break;
+            case 'NEAR_8':
+                // All 8 neighbors
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (dx === 0 && dy === 0) continue;
+                        if (this.isValidCoord(x + dx, y + dy)) candidateIndices.push(this.getIndex(x + dx, y + dy));
+                    }
+                }
+                break;
             case 'RANDOM':
-                // Randomly select 'count' unique indices
-                return indices.sort(() => 0.5 - Math.random()).slice(0, count);
-            case 'FRONT':
-                // Front row usually means index 0-3 (if row 0 is top) or first encountered?
-                // Depending on UI, let's assume Row 0 (0,1,2,3) is front? 
-                // Or maybe the "Front" relative to enemy?
-                // Let's assume indices 0-3 are Row 0.
-                const frontIndices = [0, 1, 2, 3];
-                // Select 'count' from front row randomly? or just first 'count'?
-                return frontIndices.sort(() => 0.5 - Math.random()).slice(0, count);
-            // ... ADJACENT, SAME_TYPE etc.
+            case 'ALL':
+                // Return all exclude self
+                candidateIndices = this.grid.map((_, i) => i).filter(i => i !== originIdx);
+                break;
             default:
+                // Unknown selector
                 return [];
         }
+
+        return candidateIndices;
     }
 }

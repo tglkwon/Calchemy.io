@@ -189,3 +189,75 @@
 ## 🤖 AI 개발 프롬프트 (GEMINI.md)
 
 AI 어시스턴트를 활용한 개발 규칙 및 페르소나 설정 파일입니다.
+
+---
+
+## **7\. JSON 키워드 레퍼런스 (JSON Keyword Reference)**
+
+CSV의 `Single_Logic` 및 `Bingo_Logic` 작성 시 사용할 수 있는 전체 키워드 목록입니다.
+
+### **7.1. 일반 효과 (Standard Effects)**
+
+| 키워드 (JSON Key) | 한글 매핑 (CSV Header) | 값 (Value) | 설명 |
+| :--- | :--- | :--- | :--- |
+| `ATTACK` | 공격 | 정수 (Damage) | 단일 대상 피해 (기본: 랜덤 적) |
+| `BLOCK` | 방어 | 정수 (Amount) | 골렘 방어도 획득 |
+| `HEAL` | 회복 | 정수 (Amount) | 골렘 체력 회복 |
+| `BUFF` | 버프 | (임시) | 골렘 공격력 버프 (구현 중) |
+| `GRID_MANIPULATION` | 그리드조작 | 객체 (Object) | 그리드 조작 상세 정의 (아래 7.2 참조) |
+
+*   **레거시 파라미터 (Legacy Params - 하위 호환용):**
+    *   `burn`: 적에게 화상 상태 부여 (값: 수치)
+    *   `thorns`: 골렘 가시 상태 부여 (값: 수치)
+    *   `aoe`: `true`일 경우 `ATTACK`이 전체 공격으로 변경 (예정)
+
+### **7.2. 그리드 조작 상세 (GRID_MANIPULATION)**
+
+`GRID_MANIPULATION` 키의 값으로 들어가는 객체의 속성입니다.
+
+#### **필수 속성**
+*   **`action`**: 실행할 동작
+    *   `TRANSFORM`: 속성 변환
+    *   `SWAP`: 위치 교환 (자신 <-> 타겟)
+    *   `REPLACE`: 카드 제거 후 덱에서 뽑기
+    *   `UPGRADE`: 카드 등급 강화
+*   **`target`**: 대상 선택 규칙
+    *   `UP`, `DOWN`, `LEFT`, `RIGHT`: 인접 방향 (벽에 닿으면 반사됨)
+    *   `NEAR_4`: 상하좌우 4칸
+    *   `NEAR_8`: 주변 8칸 전체
+    *   `RANDOM`: 무작위 (자신 제외)
+    *   `ALL`: 전체 (자신 제외)
+
+#### **선택 속성**
+*   **`count`**: 적용할 카드의 개수 (기본: 1, `NEAR`나 `ALL` 사용 시 제한 가능)
+*   **`toType`**: `TRANSFORM` 시 변경할 속성
+    *   `FIRE`, `WATER`, `EARTH`, `WIND`: 해당 속성으로 고정
+    *   `ORIGIN`: 발동한 카드의 속성을 따라감
+*   **`condition`**: 타겟 필터링 조건
+    *   `SAME_TYPE`: 발동 카드와 같은 속성만
+    *   `DIFF_TYPE`: 발동 카드와 다른 속성만
+    *   `BASIC_ONLY`: 기본 등급(Grade 0) 카드만
+    *   `UPGRADED`: 강화된 카드만
+    *   `IS_EDGE`: 가장자리(테두리)에 있는 카드만
+
+### **7.3. 작성 예시 (JSON)**
+
+**예시 1: 공격 + 방어**
+```json
+{
+  "ATTACK": 10,
+  "BLOCK": 5
+}
+```
+
+**예시 2: 주변 4칸을 내 속성으로 변환**
+```json
+{
+  "GRID_MANIPULATION": {
+    "action": "TRANSFORM",
+    "target": "NEAR_4",
+    "toType": "ORIGIN",
+    "condition": "DIFF_TYPE"
+  }
+}
+```

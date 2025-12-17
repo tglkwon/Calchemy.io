@@ -2379,18 +2379,10 @@
   ],
   "keywords": [
     {
-      "No": 0,
-      "Key_ID": "KEY_BURN",
-      "Name_KR": "화상",
-      "Desc_Template": "2 만큼 화상을 입힙니다.",
-      " Keyword_Logic": "{ \"type\": \"ATTACK\", \"value\": 2, \"target\": \"RANDOM_ENEMY\" }",
-      "Note": "도트 데미지는 즉발보다 가치 낮게 책정"
-    },
-    {
       "No": 1,
-      "Key_ID": "ATTACT",
+      "Key_ID": "ATTACK",
       "Name_KR": "공격",
-      "Desc_Template": "${target} ${effect.value} 피해를 줍니다.",
+      "Desc_Template": "랜덤 1명에게 2 피해를 줍니다.",
       " Keyword_Logic": "{ \"type\": \"ATTACK\", \"value\": 2, \"target\": \"RANDOM_ENEMY\" }",
       "Note": "기본 카드"
     },
@@ -2399,7 +2391,7 @@
       "Key_ID": "BLOCK",
       "Name_KR": "방어",
       "Desc_Template": "방어도 ${effect.value}를 획득합니다.",
-      " Keyword_Logic": "{ \"type\": \"BLOCK\", \"value\": ${effect.value}, \"target\": \"GOLEM\" }",
+      " Keyword_Logic": "{ \"type\": \"BLOCK\", \"value\": 2, \"target\": \"GOLEM\" }",
       "Note": "기본 카드"
     },
     {
@@ -2407,16 +2399,472 @@
       "Key_ID": "HEAL",
       "Name_KR": "회복",
       "Desc_Template": "체력을 ${effect.value} 회복합니다.",
-      " Keyword_Logic": "{ \"type\": \"HEAL\", \"value\": ${effect.value}, \"target\": \"GOLEM\" }",
+      " Keyword_Logic": "{ \"type\": \"HEAL\", \"value\": 2, \"target\": \"GOLEM\" }",
       "Note": "기본 카드"
     },
     {
       "No": 4,
-      "Key_ID": "BURN",
-      "Name_KR": "화상/부패/독/풍화",
-      "Desc_Template": "적에게 화상 ${effect.value}를 부여합니다.",
-      " Keyword_Logic": null,
-      "Note": null
+      "Key_ID": "WEAK",
+      "Name_KR": "약화",
+      "Desc_Template": "대상이 가하는 피해가 {val}% 감소합니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"WEAK\", \"value\": {val}, \"target\": \"RANDOM_ENEMY\"}",
+      "Note": "골렘의 생존력을 높이는 방어적 디버프"
+    },
+    {
+      "No": 5,
+      "Key_ID": "VULNERABLE",
+      "Name_KR": "취약",
+      "Desc_Template": "대상이 받는 피해가 {val}% 증가합니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"VULNERABLE\", \"value\": {val}, \"target\": \"RANDOM_ENEMY\"}",
+      "Note": "공격 카드의 효율을 극대화"
+    },
+    {
+      "No": 6,
+      "Key_ID": "LIFESTEAL",
+      "Name_KR": "흡혈",
+      "Desc_Template": "입힌 피해의 {val}%만큼 체력을 회복합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"LIFESTEAL\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "공격과 생존을 동시에 챙기는 키워드"
+    },
+    {
+      "No": 7,
+      "Key_ID": "CATALYST",
+      "Name_KR": "촉매",
+      "Desc_Template": "대상의 현재 상태 이상 수치를 {val}배로 증가시킵니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"CATALYST\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "화상(BURN) 등 도트 데미지 폭발용"
+    },
+    {
+      "No": 8,
+      "Key_ID": "REGEN",
+      "Name_KR": "재생",
+      "Desc_Template": "매 턴 종료 시 체력을 {val}만큼 회복합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"REGEN\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "지속적인 유지력을 제공하는 회복 효과"
+    },
+    {
+      "No": 9,
+      "Key_ID": "PIERCE",
+      "Name_KR": "관통",
+      "Desc_Template": "방어도를 무시하고 {val}만큼의 피해를 직접 입힙니다.",
+      " Keyword_Logic": "{\"type\": \"ATTACK\", \"value\": {val}, \"target\": \"RANDOM_ENEMY\", \"ignoreBlock\": true}",
+      "Note": "고방어도 적을 카운터치는 효과"
+    },
+    {
+      "No": 10,
+      "Key_ID": "THORNS",
+      "Name_KR": "가시",
+      "Desc_Template": "피격 시 공격자에게 {val}만큼 피해를 반사합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"THORNS\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "대지(흙) 원소 카드와 시너지"
+    },
+    {
+      "No": 11,
+      "Key_ID": "SHIELD_BASH",
+      "Name_KR": "방패 밀치기",
+      "Desc_Template": "현재 방어도의 {val}%만큼 추가 피해를 입힙니다.",
+      " Keyword_Logic": "{\"type\": \"ATTACK\", \"useStat\": \"BLOCK\", \"multiplier\": {val}, \"target\": \"RANDOM_ENEMY\"}",
+      "Note": "방어 수치를 공격으로 전환하는 연계형"
+    },
+    {
+      "No": 12,
+      "Key_ID": "POISON",
+      "Name_KR": "독",
+      "Desc_Template": "매 턴 종료 시 {val}만큼의 피해를 입힙니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"POISON\", \"value\": {val}, \"target\": \"RANDOM_ENEMY\"}",
+      "Note": "도트 데미지"
+    },
+    {
+      "No": 13,
+      "Key_ID": "STUN",
+      "Name_KR": "기절",
+      "Desc_Template": "대상의 다음 턴 행동을 건너뜁니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"STUN\", \"value\": 1, \"target\": \"RANDOM_ENEMY\"}",
+      "Note": "메즈기"
+    },
+    {
+      "No": 14,
+      "Key_ID": "FREEZE",
+      "Name_KR": "빙결",
+      "Desc_Template": "대상을 굳혀 피해를 입지 않지만 행동도 불가능하게 합니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"FREEZE\", \"value\": 1, \"target\": \"RANDOM_ENEMY\"}",
+      "Note": "전략적 격리"
+    },
+    {
+      "No": 15,
+      "Key_ID": "PETRIFY",
+      "Name_KR": "석화",
+      "Desc_Template": "대상의 방어도를 {val}만큼 높이지만 공격력을 0으로 만듭니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"PETRIFY\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "공격 차단"
+    },
+    {
+      "No": 16,
+      "Key_ID": "BLEED",
+      "Name_KR": "출혈",
+      "Desc_Template": "공격할 때마다 {val}만큼 스스로 피해를 입습니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"BLEED\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "다단히트 카운터"
+    },
+    {
+      "No": 17,
+      "Key_ID": "BLIND",
+      "Name_KR": "실명",
+      "Desc_Template": "다음 {val}회의 공격이 50% 확률로 빗나갑니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"MISS\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "확률형 방어"
+    },
+    {
+      "No": 18,
+      "Key_ID": "SILENCE",
+      "Name_KR": "침묵",
+      "Desc_Template": "다음 {val}턴 동안 특수 효과를 발동할 수 없습니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"SILENCE\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "스킬 차단"
+    },
+    {
+      "No": 19,
+      "Key_ID": "TAUNT",
+      "Name_KR": "도발",
+      "Desc_Template": "적의 단일 타겟 공격을 {val}턴 동안 자신에게 강제합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"TAUNT\", \"value\": {val}, \"target\": \"MINION\"}",
+      "Note": "아군 보호"
+    },
+    {
+      "No": 20,
+      "Key_ID": "STEALTH",
+      "Name_KR": "은신",
+      "Desc_Template": "{val}턴 동안 단일 타겟 공격의 대상이 되지 않습니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"STEALTH\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "생존기"
+    },
+    {
+      "No": 21,
+      "Key_ID": "RESILIENCE",
+      "Name_KR": "강인함",
+      "Desc_Template": "받는 모든 디버프 수치를 {val}만큼 감소시킵니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"RESIST\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "상태이상 저항"
+    },
+    {
+      "No": 22,
+      "Key_ID": "ALACRITY",
+      "Name_KR": "민첩",
+      "Desc_Template": "{val}% 확률로 적의 공격을 완전히 회피합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"EVADE\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "완전 회피"
+    },
+    {
+      "No": 23,
+      "Key_ID": "HASTE",
+      "Name_KR": "가속",
+      "Desc_Template": "다음 턴에 카드 1장을 추가로 사용합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"EXTRA_ACT\", \"value\": 1, \"target\": \"SELF\"}",
+      "Note": "행동 횟수 증가"
+    },
+    {
+      "No": 24,
+      "Key_ID": "SLOW",
+      "Name_KR": "둔화",
+      "Desc_Template": "대상의 행동 순서를 가장 뒤로 미룹니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"INITIATIVE\", \"value\": -1, \"target\": \"ENEMY\"}",
+      "Note": "턴 제어"
+    },
+    {
+      "No": 25,
+      "Key_ID": "CORRODE",
+      "Name_KR": "부식",
+      "Desc_Template": "영구적으로 대상의 방어도를 매 턴 {val}만큼 감소시킵니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"DEF_BREAK\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "방어구 파괴"
+    },
+    {
+      "No": 26,
+      "Key_ID": "RESONANCE",
+      "Name_KR": "공명",
+      "Desc_Template": "필드에 같은 원소 카드가 {val}장 이상일 때 위력이 증가합니다.",
+      " Keyword_Logic": "{\"type\": \"CONDITIONAL\", \"condition\": {\"stat\": \"SAME_ELEM_COUNT\", \"op\": \">=\", \"value\": {val}}, \"effects\": {\"type\": \"BUFF\", \"subType\": \"POWER\", \"value\": 2}}",
+      "Note": "원소 시너지"
+    },
+    {
+      "No": 27,
+      "Key_ID": "OVERLOAD",
+      "Name_KR": "과부하",
+      "Desc_Template": "이번 턴 피해량이 {val}% 증가하지만 다음 턴 기절합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"OVERLOAD\", \"value\": {val}}",
+      "Note": "하이 리스크"
+    },
+    {
+      "No": 28,
+      "Key_ID": "TRANSMUTE",
+      "Name_KR": "변환",
+      "Desc_Template": "대상의 버프 1개를 무작위 디버프로 변경합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"FLIP_STATUS\", \"value\": 1, \"target\": \"ENEMY\"}",
+      "Note": "상태 변경"
+    },
+    {
+      "No": 29,
+      "Key_ID": "ABSORB",
+      "Name_KR": "흡수",
+      "Desc_Template": "이번 턴에 받는 피해의 {val}%를 방어도로 전환합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"DMG_TO_BLOCK\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "공격 흡수"
+    },
+    {
+      "No": 30,
+      "Key_ID": "REFLECTION",
+      "Name_KR": "반사",
+      "Desc_Template": "받은 피해의 {val}%를 공격자에게 되돌려줍니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"REFLECT\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "데미지 반사"
+    },
+    {
+      "No": 31,
+      "Key_ID": "MIRROR",
+      "Name_KR": "거울",
+      "Desc_Template": "대상이 자신에게 사용한 마지막 효과를 복사하여 되돌려줍니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"MIRROR_LAST\", \"target\": \"ENEMY\"}",
+      "Note": "효과 미러링"
+    },
+    {
+      "No": 32,
+      "Key_ID": "CHAIN",
+      "Name_KR": "사슬",
+      "Desc_Template": "{val}명의 적을 묶어, 한 명이 받는 피해를 공유하게 합니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"LINK\", \"value\": {val}, \"target\": \"ALL_ENEMIES\"}",
+      "Note": "데미지 링크"
+    },
+    {
+      "No": 33,
+      "Key_ID": "ECHO",
+      "Name_KR": "메아리",
+      "Desc_Template": "이 카드의 효과가 {val}% 확률로 한 번 더 발동합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"REPEAT\", \"value\": {val}}",
+      "Note": "연속 발동"
+    },
+    {
+      "No": 34,
+      "Key_ID": "SIPHON",
+      "Name_KR": "추출",
+      "Desc_Template": "적의 공격력을 {val}만큼 빼앗아 자신에게 더합니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"STEAL_ATK\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "공격력 흡수"
+    },
+    {
+      "No": 35,
+      "Key_ID": "RAGE",
+      "Name_KR": "분노",
+      "Desc_Template": "잃은 체력 10%당 공격력이 {val}만큼 증가합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"STAT_SCALING\", \"stat\": \"MISSING_HP\", \"value\": {val}}",
+      "Note": "위기 시 강화"
+    },
+    {
+      "No": 36,
+      "Key_ID": "CALM",
+      "Name_KR": "평온",
+      "Desc_Template": "디버프가 없을 때 방어도가 {val}만큼 추가로 증가합니다.",
+      " Keyword_Logic": "{\"type\": \"CONDITIONAL\", \"condition\": {\"stat\": \"DEBUFF_COUNT\", \"op\": \"=\", \"value\": 0}, \"effects\": {\"type\": \"BLOCK\", \"value\": {val}}}",
+      "Note": "상태 유지 보상"
+    },
+    {
+      "No": 37,
+      "Key_ID": "CONDUCTIVITY",
+      "Name_KR": "전도",
+      "Desc_Template": "피해를 입을 때 인접한 적들에게 {val}%의 피해를 전이합니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"SPREAD\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "연쇄 피해"
+    },
+    {
+      "No": 38,
+      "Key_ID": "EVAPORATION",
+      "Name_KR": "증발",
+      "Desc_Template": "화상 수치를 모두 소모하여 수치당 {val}배의 피해를 줍니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"CONSUME_STATUS\", \"status\": \"BURN\", \"multiplier\": {val}}",
+      "Note": "상태이상 소모"
+    },
+    {
+      "No": 39,
+      "Key_ID": "HARDENING",
+      "Name_KR": "경화",
+      "Desc_Template": "공격받을 때마다 방어도가 {val}만큼 영구히 상승합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"GROW_DEF\", \"value\": {val}, \"target\": \"SELF\"}",
+      "Note": "피격 시 성장"
+    },
+    {
+      "No": 40,
+      "Key_ID": "DISSOLVE",
+      "Name_KR": "용해",
+      "Desc_Template": "방어도를 무시하고 피해를 준 뒤 대상의 방어도를 0으로 만듭니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"RESET_BLOCK\", \"value\": {val}, \"target\": \"ENEMY\"}",
+      "Note": "방어도 초기화"
+    },
+    {
+      "No": 41,
+      "Key_ID": "MIMIC",
+      "Name_KR": "모사",
+      "Desc_Template": "무작위 아군의 가장 최근 발동한 효과를 복사합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"COPY_ALLY\"}",
+      "Note": "효과 복사"
+    },
+    {
+      "No": 42,
+      "Key_ID": "PURGE",
+      "Name_KR": "정화",
+      "Desc_Template": "자신의 모든 디버프를 제거하고 제거당 {val}만큼 회복합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"CLEANSE_HEAL\", \"value\": {val}}",
+      "Note": "디버프 정화"
+    },
+    {
+      "No": 43,
+      "Key_ID": "INFUSION",
+      "Name_KR": "주입",
+      "Desc_Template": "다음 사용하는 카드의 수치를 {val}% 강화합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"NEXT_BOOST\", \"value\": {val}}",
+      "Note": "다음 카드 강화"
+    },
+    {
+      "No": 44,
+      "Key_ID": "VOLATILITY",
+      "Name_KR": "휘발",
+      "Desc_Template": "사망 시 모든 적에게 {val}만큼의 피해를 입힙니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"DEATH_RATTLE\", \"value\": {val}}",
+      "Note": "자폭 효과"
+    },
+    {
+      "No": 45,
+      "Key_ID": "RESTORATION",
+      "Name_KR": "복구",
+      "Desc_Template": "이번 턴에 잃은 체력의 {val}%를 즉시 복구합니다.",
+      " Keyword_Logic": "{\"type\": \"HEAL\", \"subType\": \"PERCENT_LOST\", \"value\": {val}}",
+      "Note": "즉시 복구"
+    },
+    {
+      "No": 46,
+      "Key_ID": "UNITY",
+      "Name_KR": "결속",
+      "Desc_Template": "생존한 아군 하나당 모든 스탯이 {val}만큼 증가합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"ALLY_SCALING\", \"value\": {val}}",
+      "Note": "수적 우위 시너지"
+    },
+    {
+      "No": 47,
+      "Key_ID": "ISOLATION",
+      "Name_KR": "고립",
+      "Desc_Template": "적이 혼자 남았을 때 피해량이 {val}배가 됩니다.",
+      " Keyword_Logic": "{\"type\": \"CONDITIONAL\", \"condition\": {\"stat\": \"ENEMY_COUNT\", \"op\": \"=\", \"value\": 1}, \"effects\": {\"type\": \"BUFF\", \"subType\": \"FINAL_DMG\", \"value\": {val}}}",
+      "Note": "보스전 특화"
+    },
+    {
+      "No": 48,
+      "Key_ID": "GROWTH",
+      "Name_KR": "성장",
+      "Desc_Template": "매 턴 종료 시 공격력이 {val}만큼 영구히 증가합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"PERM_GROW\", \"stat\": \"ATK\", \"value\": {val}}",
+      "Note": "영구 성장"
+    },
+    {
+      "No": 49,
+      "Key_ID": "DECAY",
+      "Name_KR": "붕괴",
+      "Desc_Template": "매 턴 종료 시 최대 체력이 {val}만큼 감소합니다.",
+      " Keyword_Logic": "{\"type\": \"DEBUFF\", \"subType\": \"MAX_HP_DOWN\", \"value\": {val}}",
+      "Note": "최대 체력 감소"
+    },
+    {
+      "No": 50,
+      "Key_ID": "FORTIFY",
+      "Name_KR": "요새화",
+      "Desc_Template": "{val}턴 동안 방어도가 사라지지 않고 중첩됩니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"KEEP_BLOCK\", \"value\": {val}}",
+      "Note": "방어도 유지"
+    },
+    {
+      "No": 51,
+      "Key_ID": "RUPTURE",
+      "Name_KR": "균열",
+      "Desc_Template": "대상의 현재 체력의 {val}%만큼 추가 피해를 입힙니다.",
+      " Keyword_Logic": "{\"type\": \"ATTACK\", \"subType\": \"CURRENT_HP_PCT\", \"value\": {val}}",
+      "Note": "비례 피해"
+    },
+    {
+      "No": 52,
+      "Key_ID": "EXECUTE",
+      "Name_KR": "처형",
+      "Desc_Template": "대상의 체력이 {val}% 이하일 경우 즉사시킵니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"KILL_THRESHOLD\", \"value\": {val}}",
+      "Note": "즉사 효과"
+    },
+    {
+      "No": 53,
+      "Key_ID": "PLAGUE",
+      "Name_KR": "역병",
+      "Desc_Template": "공격받으면 공격자에게 무작위 디버프 {val}개를 옮깁니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"SPREAD_DEBUFF\", \"value\": {val}}",
+      "Note": "디버프 전염"
+    },
+    {
+      "No": 54,
+      "Key_ID": "STABILITY",
+      "Name_KR": "안정",
+      "Desc_Template": "수치 변동 효과가 항상 최대치로 적용됩니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"MAX_RNG\", \"value\": 1}",
+      "Note": "난수 고정"
+    },
+    {
+      "No": 55,
+      "Key_ID": "SPORES",
+      "Name_KR": "포자",
+      "Desc_Template": "사망 시 약한 버섯 미니언을 {val}마리 소환합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"SUMMON\", \"id\": \"MUSHROOM\", \"value\": {val}}",
+      "Note": "사망 시 소환"
+    },
+    {
+      "No": 56,
+      "Key_ID": "MAGNETISM",
+      "Name_KR": "자성",
+      "Desc_Template": "모든 적 미니언을 한곳으로 모읍니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"GROUP_ENEMIES\"}",
+      "Note": "진형 파괴"
+    },
+    {
+      "No": 57,
+      "Key_ID": "REPULSION",
+      "Name_KR": "반발",
+      "Desc_Template": "자신을 공격한 적을 뒤로 밀쳐 공격 범위를 벗어나게 합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"PUSH_BACK\"}",
+      "Note": "거리 제어"
+    },
+    {
+      "No": 58,
+      "Key_ID": "BARRIER",
+      "Name_KR": "장벽",
+      "Desc_Template": "{val}만큼의 피해를 흡수하는 보호막을 생성합니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"SHIELD\", \"value\": {val}}",
+      "Note": "보호막 획득"
+    },
+    {
+      "No": 59,
+      "Key_ID": "FOCUS",
+      "Name_KR": "집중",
+      "Desc_Template": "다음 공격의 치명타 확률을 {val}% 높입니다.",
+      " Keyword_Logic": "{\"type\": \"BUFF\", \"subType\": \"CRIT_CHANCE\", \"value\": {val}}",
+      "Note": "치명타 강화"
+    },
+    {
+      "No": 60,
+      "Key_ID": "PRECISION",
+      "Name_KR": "정밀",
+      "Desc_Template": "방어도는 관통하지 못하지만 보호막을 무시합니다.",
+      " Keyword_Logic": "{\"type\": \"ATTACK\", \"subType\": \"PIERCE_SHIELD\", \"value\": {val}}",
+      "Note": "보호막 무시"
+    },
+    {
+      "No": 61,
+      "Key_ID": "VITALITY",
+      "Name_KR": "활력",
+      "Desc_Template": "최대 체력이 {val}만큼 증가하고 즉시 회복합니다.",
+      " Keyword_Logic": "{\"type\": \"SPECIAL\", \"subType\": \"ADD_MAX_HP\", \"value\": {val}}",
+      "Note": "스탯 증강"
     }
   ],
   "artifacts": [
@@ -3482,5 +3930,5 @@
       "description": "다음 턴, 첫 번째로 발동되는 빙고의 효과가 3배"
     }
   ],
-  "generatedAt": "2025-12-16T06:36:42.238Z"
+  "generatedAt": "2025-12-17T15:33:31.840Z"
 }

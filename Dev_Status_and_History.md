@@ -58,6 +58,10 @@
 *   **데이터 파이프라인 전체 통합 (Data Pipeline Full Integration):** `GameProvider`가 CSV 데이터를 `GameEngine`에 주입.
 *   **효과 시스템 (Effect System):** `executeEffect`를 통해 공격, 치유, 방어 처리.
 *   **리팩토링 (Refactor):** `CardSystem`이 동적 정의를 지원하도록 개선.
+*   **그리드 조작 시스템 (Grid Manipulation):**
+    *   `CardSystem` 확장: `SWAP`, `REPLACE`, `TRANSFORM` 액션 및 반사형(Reflection) 타겟팅 구현 완료.
+    *   `KeywordSystem` 연동: CSV-JSON 파이프라인과 그리드 액션 실행 로직 연결.
+    *   문서화: `data_driven_Pipeline_GRID.md` 및 `README.md`에 JSON 키워드 레퍼런스 추가.
 
 ### **v1.2**
 
