@@ -12,8 +12,8 @@ JavaScript(React/Vite) 환경에서 '데이터 주도형(Data-Driven) 아키텍�
    - 대상 파일: `cards.csv`, `keywords.csv`, `artifacts.csv`
    - 라이브러리: `papaparse` 사용.
 
-2. **파싱 계층 (Parser Layer)**
-   - **Text Parser:** 카드 설명 텍스트(예: "적에게 10 데미지")를 정규표현식(Regex)으로 분석하여, 실행 가능한 JSON 객체(예: `{ type: 'DAMAGE', amount: 10, target: 'ENEMY' }`)로 변환해야 함.
+2. **데이터 처리 계층 (Data Processing Layer)**
+   - **JSON Logic Mapping:** CSV의 이펙트 파라미터(JSON 형식, 예: `{"damage": 10}`)를 파싱하여 게임 로직에 직접 전달함.
    - **Keyword Linker:** 텍스트 내에 `{화상}`, `{기절}` 같은 키워드가 있으면, `keywords.csv`의 데이터와 매칭하여 툴팁이나 상세 정보를 연결해야 함.
 
 3. **로직 계층 (Logic Layer - Registry Pattern)**
@@ -29,9 +29,9 @@ JavaScript(React/Vite) 환경에서 '데이터 주도형(Data-Driven) 아키텍�
 2. **`src/utils/csvLoader.js`**
    - 여러 CSV 파일을 병렬로 fetch하고 파싱하여 하나의 `GameData` 객체로 반환하는 로직.
 
-3. **`src/utils/textParser.js`**
-   - 정규식 기반 파서. 자연어를 읽어 이펙트 커맨드로 변환.
-   - 에러 처리: 파싱 불가능한 텍스트가 있을 경우 콘솔 경고 출력.
+3. **`src/utils/csvLoader.js` (Enhanced)**
+   - CSV 로딩 시 JSON 컬럼을 자동으로 객체로 변환.
+   - 파싱 오류 발생 시 기본값 처리 및 경고 로그.
 
 4. **`src/systems/EffectSystem.js`** (핵심)
    - `executeEffect(effectCommand, gameState, target)` 함수 구현.

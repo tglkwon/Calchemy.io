@@ -7,12 +7,13 @@
 import { Unit } from '../entities/Unit.js';
 import { CardSystem } from '../systems/CardSystem.js';
 import { RelicSystem } from '../systems/RelicSystem.js';
-import { executeEffect } from '../systems/EffectSystem.js';
+import { KeywordSystem } from './KeywordSystem.js';
 
 export class GameEngine {
     constructor() {
         this.cardSystem = new CardSystem();
         this.relicSystem = new RelicSystem();
+        this.keywordSystem = new KeywordSystem();
 
         // Game State
         this.isPaused = false;
@@ -251,55 +252,13 @@ export class GameEngine {
     }
 
     triggerCardEffect(card) {
-        // Data-Driven Logic First
-        if (card.singleEffects && card.singleEffects.length > 0) {
-            card.singleEffects.forEach(effect => {
-                const gameState = {
-                    golem: this.golem,
-                    minions: this.minions,
-                    engine: this
-                };
-                const msg = executeEffect(effect, gameState);
-                if (msg) this.log(msg);
-            });
-            return; // Skip legacy logic if effects exist
-        }
+        const context = {
+            golem: this.golem,
+            minions: this.minions,
+        };
 
-        // --- LEGACY FALLBACK FOR CARDS WITHOUT PARSED LOGIC ---
-        // (Keeping legacy switch case briefly for safety, but data-driven should cover most)
-        // ... (Original Code Truncated for Brevity or Removed entirely if confident)
-        // For this task, we want to replace it. Let's assume fallback to basic type logic if no effects found.
-
-        let logMsg = "";
-        switch (card.type) {
-            case 'FIRE': {
-                const dmg = this.golem.baseAttack;
-                const target = this.getRandomTarget();
-                if (target) {
-                    const taken = target.takeDamage(dmg);
-                    this.golem.totalDamageThisTurn += taken;
-                    logMsg = `🔥 불 기본: ${target.name}에게 ${taken} 피해`;
-                }
-                break;
-            }
-            case 'EARTH': {
-                const block = this.golem.baseShield;
-                this.golem.addBlock(block);
-                logMsg = `🌱 대지 기본: 골렘 방어도 +${block}`;
-                break;
-            }
-            case 'WATER': {
-                const heal = Math.floor(this.golem.maxHp / 8);
-                const healed = this.golem.heal(heal);
-                logMsg = `💧 물 기본: 골렘 체력 +${healed}`;
-                break;
-            }
-            case 'WIND':
-                this.golem.attackBuffs = Math.min(this.golem.attackBuffs + 1, 2);
-                logMsg = `🍃 바람 기본: 골렘 공격 버프 +1`;
-                break;
-        }
-        if (logMsg) this.log(logMsg);
+        const logs = this.keywordSystem.processCardEffects(card, context);
+        logs.forEach(msg => this.log(msg));
     }
 
     async applyBingoEffects(bingos) {
