@@ -7,7 +7,7 @@
 import { Unit } from '../entities/Unit.js';
 import { CardSystem } from '../systems/CardSystem.js';
 import { RelicSystem } from '../systems/RelicSystem.js';
-import { KeywordSystem } from './KeywordSystem.js';
+import { KeywordSystem } from '../systems/KeywordSystem.js';
 
 export class GameEngine {
     constructor() {
@@ -255,6 +255,7 @@ export class GameEngine {
         const context = {
             golem: this.golem,
             minions: this.minions,
+            cardSystem: this.cardSystem,
         };
 
         const logs = this.keywordSystem.processCardEffects(card, context);

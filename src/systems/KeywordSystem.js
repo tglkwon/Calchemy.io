@@ -1,7 +1,7 @@
 /**
  * KeywordSystem.js
  * Centralizes the logic for executing game effects (Keywords).
- * Located in Core as it defines the fundamental rules of effect execution.
+ * Part of the Systems layer, handling specific mechanic logic.
  */
 
 export class KeywordSystem {
@@ -124,6 +124,17 @@ export class KeywordSystem {
             } else if (card.type === 'WIND') {
                 logs.push(`🍃 [${card.type}] 바람이 분다...`);
             }
+        }
+
+        // 7. Grid Manipulation
+        if (params.type === 'GRID_MANIPULATION' && context.cardSystem) {
+            const resultLog = context.cardSystem.executeGridAction(
+                params.action,
+                params.target,
+                params.count,
+                params.toType
+            );
+            logs.push(`✨ [${card.name}] ${resultLog}`);
         }
 
         return logs;

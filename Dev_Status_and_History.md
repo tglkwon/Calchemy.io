@@ -91,4 +91,3 @@ npm run deploy
 ## **5\. 트러블슈팅 및 이슈**
 
 * **이미지 경로 문제:** 로컬 개발 환경과 GitHub Pages의 경로 차이로 인해 이미지가 깨질 경우 AssetManager.js의 경로 처리 로직이나 vite.config.js의 base 설정을 확인하세요.  
-* **CSV 파싱 오류:** 엑셀에서 CSV 저장 시 UTF-8 인코딩이 깨지는 경우, 메모장에서 'UTF-8(BOM 포함)' 또는 일반 'UTF-8'로 다시 저장해야 합니다.

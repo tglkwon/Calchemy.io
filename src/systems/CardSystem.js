@@ -220,4 +220,84 @@ export class CardSystem {
         this.grid = [];
         this.drawGrid();
     }
+    /**
+     * Executes a data-driven grid manipulation action.
+     * @param {string} actionType - TRANSFORM, SWAP, etc.
+     * @param {string} targetSelector - RANDOM, FRONT, etc.
+     * @param {number} count - Number of cards to affect
+     * @param {string} toType - Target type for TRANSFORM
+     * @returns {string} Log message result
+     */
+    executeGridAction(actionType, targetSelector, count, toType) {
+        const targetIndices = this.getTargetIndices(targetSelector, count);
+
+        if (targetIndices.length === 0) {
+            return `대상이 없어 (${actionType}) 실행되지 않았습니다.`;
+        }
+
+        // 1. Action 분기 처리
+        let logs = [];
+        switch (actionType) {
+            case 'TRANSFORM':
+                targetIndices.forEach(idx => {
+                    this.transformCard(idx, toType);
+                    // logs.push(`(${idx})번 카드가 ${toType}으로 변환.`);
+                });
+                logs.push(`${targetIndices.length}장의 카드가 ${toType} 속성으로 변환되었습니다.`);
+                break;
+            case 'SWAP':
+                // SWAP 로직은 count를 짝지어 줘야 하므로 별도의 로직 필요
+                // this.swapCards(targetIndices);
+                logs.push(`미구현 액션: SWAP`);
+                break;
+            // ... 기타 액션 (UPGRADE, DISCARD) 구현
+            default:
+                logs.push(`알 수 없는 액션 타입: ${actionType}`);
+        }
+
+        return logs.join(' ');
+    }
+
+    /**
+     * [Atomic] Force changes a card's type at a specific index.
+     * @param {number} index - Grid index (0-15)
+     * @param {string} newType - New element type (FIRE, WATER, etc.)
+     */
+    transformCard(index, newType) {
+        if (this.grid[index]) {
+            // Update type and regenerate instanceId to force React re-render
+            this.grid[index] = {
+                ...this.grid[index],
+                type: newType,
+                instanceId: `${newType}_TR_${Date.now()}_${index}`
+            };
+        }
+    }
+
+    /**
+     * [Atomic] Returns target indices based on selector.
+     * @param {string} selector - Target selection method
+     * @param {number} count - Number of targets
+     * @returns {number[]} Array of target indices
+     */
+    getTargetIndices(selector, count) {
+        const indices = this.grid.map((_, i) => i);
+
+        switch (selector) {
+            case 'RANDOM':
+                // Randomly select 'count' unique indices
+                return indices.sort(() => 0.5 - Math.random()).slice(0, count);
+            case 'FRONT':
+                // Front row usually means index 0-3 (if row 0 is top) or first encountered?
+                // Depending on UI, let's assume Row 0 (0,1,2,3) is front? 
+                // Or maybe the "Front" relative to enemy?
+                // Let's assume indices 0-3 are Row 0.
+                const frontIndices = [0, 1, 2, 3];
+                // Select 'count' from front row randomly? or just first 'count'?
+                return frontIndices.sort(() => 0.5 - Math.random()).slice(0, count);
+            // ... ADJACENT, SAME_TYPE etc.
+            default:
+                return [];
+        }
+    }
 }

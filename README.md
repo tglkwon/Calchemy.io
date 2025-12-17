@@ -15,6 +15,14 @@
 * **GitHub:** https://github.com/Calchemy-io/Calchemy.io
 * **Live Demo:** https://calchemy.io
 
+### **1.2. 데이터 주도형 게임 아키텍처 (Data-Driven Game Architecture)**
+
+데이터 주도형 게임 아키텍처를 구현하기 위한 문서들을 참고할 수 있습니다.   
+* (개발 완료) game_data_driven_Pipeline.md
+   - 데이터 주도형 게임 아키텍처를 구현하기 위한 문서입니다.
+* (개발 중) data_driven_Pipeline_GRID.md
+   - 데이터 주도형 게임 중 그리드 기반 효과를 구현하기 위한 문서입니다.
+
 ## **2\. 게임 메카닉 (Game Mechanics)**
 
 ### **2.1. 원소 (Elements)**
