@@ -8,6 +8,7 @@ import BattlePage from './pages/BattlePage';
 import LogPage from './pages/LogPage';
 import DeckPage from './pages/DeckPage';
 import RelicPage from './pages/RelicPage';
+import MapPage from './pages/MapPage';
 
 const NavBar = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const NavBar = () => {
       <div className="flex items-center gap-4">
         <h1 className="text-xl font-bold text-yellow-500 mr-4">Alchemy Auto-Battler</h1>
         <Link to="/" className={`px-3 py-2 rounded transition-colors ${isActive('/')}`}>전투</Link>
+        <Link to="/map" className={`px-3 py-2 rounded transition-colors ${isActive('/map')}`}>지도</Link>
         <Link to="/log" className={`px-3 py-2 rounded transition-colors ${isActive('/log')}`}>로그</Link>
         <Link to="/deck" className={`px-3 py-2 rounded transition-colors ${isActive('/deck')}`}>덱 구성</Link>
         <Link to="/relic" className={`px-3 py-2 rounded transition-colors ${isActive('/relic')}`}>유물</Link>
@@ -45,6 +47,7 @@ function App() {
               <main className="container mx-auto p-4 h-[calc(100vh-64px)] overflow-hidden">
                 <Routes>
                   <Route path="/" element={<BattlePage />} />
+                  <Route path="/map" element={<MapPage />} />
                   <Route path="/log" element={<LogPage />} />
                   <Route path="/deck" element={<DeckPage />} />
                   <Route path="/relic" element={<RelicPage />} />

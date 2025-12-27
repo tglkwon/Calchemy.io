@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import UnitFrame from '../components/UnitFrame';
 import Grid from '../components/Grid';
@@ -139,6 +140,14 @@ const BattlePage = () => {
                             >
                                 다시 하기
                             </button>
+                            {victory && (
+                                <Link
+                                    to="/map"
+                                    className="px-8 py-3 bg-yellow-600 text-white font-bold rounded hover:bg-yellow-500 transition-colors"
+                                >
+                                    지도로 돌아가기
+                                </Link>
+                            )}
                         </div>
                     </div>
                 )}

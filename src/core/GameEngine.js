@@ -8,6 +8,7 @@ import { Unit } from '../entities/Unit.js';
 import { CardSystem } from '../systems/CardSystem.js';
 import { RelicSystem } from '../systems/RelicSystem.js';
 import { KeywordSystem } from '../systems/KeywordSystem.js';
+import { MapGenerator, RoomType } from '../systems/MapGenerator.js';
 
 export class GameEngine {
     constructor() {
@@ -49,6 +50,22 @@ export class GameEngine {
         this.bingoCardIds = []; // For UI highlighting
         this.gameOver = false;
         this.victory = false;
+
+        // Map State
+        this.mapGenerator = new MapGenerator({
+            mapWidth: 7,
+            mapHeight: 15,
+            xSpacing: 100,
+            ySpacing: 100,
+            jitter: 30
+        });
+        this.mapData = null;
+        this.currentNodeId = null;
+        this.visitedNodeIds = new Set();
+
+        // Treasure Chest State
+        this.treasureSelectionMode = false;
+        this.offeredRelics = [];
 
         // Bindings
         this.runTurn = this.runTurn.bind(this);
@@ -163,6 +180,89 @@ export class GameEngine {
 
     toggleRelic(relicId) {
         this.relicSystem.toggleRelic(relicId);
+        this.notify();
+    }
+
+    // Map Methods
+    generateNewMap() {
+        this.mapData = this.mapGenerator.generateMap();
+        this.currentNodeId = null;
+        this.visitedNodeIds = new Set();
+        this.notify();
+    }
+
+    selectMapNode(nodeId) {
+        const node = this.mapData.nodes.find(n => n.id === nodeId);
+        if (!node) return;
+
+        // Logic check: Is it a valid move? 
+        // 1. If no current node, must be floor 0
+        // 2. If has current node, must be in current node's outgoing
+        const isValid = this.isNodeReachable(nodeId);
+        if (!isValid) return;
+
+        this.currentNodeId = nodeId;
+        this.visitedNodeIds.add(nodeId);
+
+        if ([RoomType.MONSTER, RoomType.ELITE, RoomType.BOSS].includes(node.roomType)) {
+            this.restart(); // Start/Reset battle
+            return true; // Indicate navigation needed
+        } else {
+            // Handle other room types (Rest, Shop, etc.)
+            this.notify();
+            return false;
+        }
+    }
+
+    isNodeReachable(nodeId) {
+        if (!this.mapData) return false;
+        if (this.visitedNodeIds.has(nodeId)) return false;
+
+        const node = this.mapData.nodes.find(n => n.id === nodeId);
+        if (!node) return false;
+
+        if (this.currentNodeId === null) {
+            return node.y === 0;
+        }
+
+        const currentNode = this.mapData.nodes.find(n => n.id === this.currentNodeId);
+        return currentNode.outgoing.includes(nodeId);
+    }
+
+    // Treasure Chest Methods
+    startTreasureSelection() {
+        this.offeredRelics = this.relicSystem.getRandomRelics(3);
+        this.treasureSelectionMode = true;
+        this.notify();
+    }
+
+    selectTreasureRelic(relicId) {
+        if (!this.treasureSelectionMode) {
+            console.warn('Not in treasure selection mode');
+            return false;
+        }
+
+        const offered = this.offeredRelics.find(r => r.id === relicId || r.artifactId === relicId);
+        if (!offered) {
+            console.warn('Relic not in offered list');
+            return false;
+        }
+
+        // Activate the selected relic
+        this.relicSystem.activateRelic(relicId);
+        this.log(`🎁 보물 획득: ${offered.name}`);
+
+        // Clear treasure mode
+        this.treasureSelectionMode = false;
+        this.offeredRelics = [];
+        this.notify();
+
+        return true;
+    }
+
+    skipTreasureSelection() {
+        this.treasureSelectionMode = false;
+        this.offeredRelics = [];
         this.notify();
     }
 
@@ -498,6 +598,11 @@ export class GameEngine {
             gameOver: this.gameOver,
             victory: this.victory,
             relics: this.relicSystem.getAllRelics(),
+            mapData: this.mapData,
+            currentNodeId: this.currentNodeId,
+            visitedNodeIds: Array.from(this.visitedNodeIds),
+            treasureSelectionMode: this.treasureSelectionMode,
+            offeredRelics: this.offeredRelics,
         };
     }
 }

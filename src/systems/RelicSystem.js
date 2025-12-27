@@ -67,5 +67,41 @@ export class RelicSystem {
             return (this.relics[r.id] && r.triggerCondition === trigger);
         });
     }
+
+    /**
+     * Get random relics for treasure chest selection
+     * @param {number} count - Number of random relics to select
+     * @returns {Array} Array of random relic definitions
+     */
+    getRandomRelics(count = 3) {
+        // Filter out already active relics
+        const availableRelics = this.relicDefinitions.filter(r => !this.relics[r.id]);
+
+        if (availableRelics.length === 0) {
+            console.warn('No available relics to offer');
+            return [];
+        }
+
+        // Shuffle and take count items
+        const shuffled = [...availableRelics].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, Math.min(count, shuffled.length));
+    }
+
+    /**
+     * Activate a relic (set to active without toggling)
+     * @param {string} relicId - ID or artifactId of the relic
+     * @returns {boolean} Success status
+     */
+    activateRelic(relicId) {
+        const def = this.relicMap[relicId];
+        if (!def) {
+            console.warn(`Relic not found: ${relicId}`);
+            return false;
+        }
+
+        this.relics[def.id] = true;
+        console.log(`Relic ${def.name} activated`);
+        return true;
+    }
 }
 

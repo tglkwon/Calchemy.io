@@ -1,0 +1,200 @@
+.map-page-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+    overflow-y: auto;
+    padding: 40px 20px;
+    position: relative;
+    user-select: none;
+}
+
+.map-header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.map-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #f1c40f;
+    text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    margin-bottom: 10px;
+}
+
+.map-controls {
+    margin-bottom: 20px;
+}
+
+.regenerate-btn {
+    background: rgba(241, 196, 15, 0.1);
+    border: 1px solid #f1c40f;
+    color: #f1c40f;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.regenerate-btn:hover {
+    background: #f1c40f;
+    color: #1a1a2e;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+}
+
+.map-viewport {
+    position: relative;
+    min-height: 1200px;
+    width: 100%;
+    max-width: 800px;
+    /* transform: scale(0.8); scaling if needed */
+}
+
+.map-svg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.map-node-container {
+    position: absolute;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-node {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: #2c3e50;
+    border: 3px solid #7f8c8d;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+.map-node:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 25px currentColor;
+    border-color: #fff;
+}
+
+.map-node.monster {
+    color: #bdc3c7;
+    border-color: #7f8c8d;
+}
+
+.map-node.elite {
+    color: #e74c3c;
+    border-color: #c0392b;
+}
+
+.map-node.shop {
+    color: #f1c40f;
+    border-color: #f39c12;
+}
+
+.map-node.rest {
+    color: #2ecc71;
+    border-color: #27ae60;
+}
+
+.map-node.treasure {
+    color: #3498db;
+    border-color: #2980b9;
+}
+
+.map-node.event {
+    color: #9b59b6;
+    border-color: #8e44ad;
+}
+
+.map-node.boss {
+    width: 100px;
+    height: 100px;
+    color: #e67e22;
+    border-color: #d35400;
+    font-size: 3rem;
+    animation: pulse-boss 2s infinite ease-in-out;
+}
+
+@keyframes pulse-boss {
+    0% {
+        box-shadow: 0 0 20px rgba(230, 126, 34, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(230, 126, 34, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 0 20px rgba(230, 126, 34, 0.4);
+    }
+}
+
+.map-node.visited {
+    opacity: 0.6;
+    border-color: #2c3e50;
+    box-shadow: none;
+    filter: grayscale(0.5);
+}
+
+.map-node.current {
+    border-color: #f1c40f;
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.8);
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.map-node.reachable {
+    animation: pulse-reachable 2s infinite ease-in-out;
+}
+
+@keyframes pulse-reachable {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+}
+
+.path-line {
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: all 0.5s ease;
+}
+
+.path-line.active {
+    stroke: rgba(241, 196, 15, 0.4);
+    stroke-width: 4;
+}
+
+.map-node:hover~.map-svg-overlay .path-line {
+    stroke: rgba(255, 255, 255, 0.2);
+}
