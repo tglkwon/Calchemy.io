@@ -69,6 +69,7 @@ const MapPage = () => {
     // Offset coordinates to center the map in the viewport
     const offsetX = viewportWidth / 2 - ((mapData.mapWidth - 1) * 100) / 2;
     const offsetY = 50;
+    const totalHeight = (mapData.mapHeight + 1) * 100 + offsetY * 2;
 
     return (
         <div className="map-page-container">
@@ -83,7 +84,7 @@ const MapPage = () => {
                 </button>
             </div>
 
-            <div className="map-viewport">
+            <div className="map-viewport" style={{ minHeight: `${totalHeight}px` }}>
                 <svg className="map-svg-overlay">
                     {mapData.nodes.map(node => (
                         node.outgoing.map(targetId => {
@@ -94,9 +95,9 @@ const MapPage = () => {
                                 <line
                                     key={`${node.id}-${targetId}`}
                                     x1={node.position.x + offsetX}
-                                    y1={1200 - (node.position.y + offsetY)}
+                                    y1={node.position.y + offsetY}
                                     x2={target.position.x + offsetX}
-                                    y2={1200 - (target.position.y + offsetY)}
+                                    y2={target.position.y + offsetY}
                                     className={`path-line ${isPathActive ? 'active' : ''}`}
                                 />
                             );
@@ -115,7 +116,7 @@ const MapPage = () => {
                             className="map-node-container"
                             style={{
                                 left: node.position.x + offsetX,
-                                top: 1200 - (node.position.y + offsetY)
+                                top: node.position.y + offsetY
                             }}
                             onClick={() => isReachable && handleNodeClick(node)}
                         >

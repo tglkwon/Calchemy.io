@@ -22,8 +22,8 @@ export class MapNode {
         this.y = y; // Grid Y (Floor)
         this.position = { x: posX, y: posY }; // Logical position for rendering
         this.roomType = RoomType.NONE;
-        this.incoming = []; // Array of node IDs
-        this.outgoing = []; // Array of node IDs
+        this.incoming = []; // Array of node IDs (from nodes above)
+        this.outgoing = []; // Array of node IDs (to nodes below)
     }
 }
 
@@ -75,6 +75,7 @@ export class MapGenerator {
 
             for (let y = 0; y < this.mapHeight; y++) {
                 if (!this.grid[y][currentX]) {
+                    // Option A: y=0 is top, position.y increases for downward flow
                     const posX = currentX * this.xSpacing + (Math.random() - 0.5) * this.jitter;
                     const posY = y * this.ySpacing + (Math.random() - 0.5) * this.jitter;
 
@@ -104,7 +105,7 @@ export class MapGenerator {
                 if (!node) continue;
 
                 const potentialTargets = [];
-                // Left-up, Up, Right-up
+                // Left-down, Down, Right-down (y+1)
                 if (x > 0 && this.grid[y + 1][x - 1]) potentialTargets.push(this.grid[y + 1][x - 1]);
                 if (this.grid[y + 1][x]) potentialTargets.push(this.grid[y + 1][x]);
                 if (x < this.mapWidth - 1 && this.grid[y + 1][x + 1]) potentialTargets.push(this.grid[y + 1][x + 1]);
@@ -137,9 +138,9 @@ export class MapGenerator {
             for (let i = this.nodes.length - 1; i >= 0; i--) {
                 const node = this.nodes[i];
 
-                // Prune if not bottom floor and has no incoming paths
+                // Prune if not top floor and has no incoming paths (from above)
                 const isUnreachable = node.y > 0 && node.incoming.length === 0;
-                // Prune if not top floor and has no outgoing paths
+                // Prune if not bottom floor and has no outgoing paths (to below)
                 const isDeadEnd = node.y < this.mapHeight - 1 && node.outgoing.length === 0;
 
                 if (isUnreachable || isDeadEnd) {
@@ -159,7 +160,7 @@ export class MapGenerator {
 
     createBossNode() {
         const bossX = (this.mapWidth - 1) * this.xSpacing / 2;
-        const bossY = this.mapHeight * this.ySpacing;
+        const bossY = (this.mapHeight) * this.ySpacing; // Bottom of the map
         const bossNode = new MapNode(-1, this.mapHeight, bossX, bossY);
         bossNode.roomType = RoomType.BOSS;
         bossNode.id = 'boss_node';

@@ -22,8 +22,8 @@ public class MapNode
     public int x, y; // 그리드 좌표
     public Vector2 position; // 월드 좌표
     public RoomType roomType;
-    public List<MapNode> incoming = new List<MapNode>(); // 아래층에서 연결된 방들
-    public List<MapNode> outgoing = new List<MapNode>(); // 위층으로 연결되는 방들
+    public List<MapNode> incoming = new List<MapNode>(); // 위층(부모)에서 연결된 방들
+    public List<MapNode> outgoing = new List<MapNode>(); // 아래층(자식)으로 연결되는 방들
 
     public MapNode(int x, int y, Vector2 position)
     {
@@ -99,8 +99,9 @@ public class MapGenerator : MonoBehaviour
                 if (grid[y][currentX] == null)
                 {
                     // 위치에 약간의 랜덤성(Jitter)을 줘서 자연스럽게 배치
+                    // 옵션 A: y=0이 상단, 실제 좌표는 (mapHeight - y)로 반전하여 아래로 흐르게 함
                     float randomX = (currentX * xSpacing) + Random.Range(-jitter, jitter);
-                    float randomY = (y * ySpacing) + Random.Range(-jitter, jitter);
+                    float randomY = ((mapHeight - y) * ySpacing) + Random.Range(-jitter, jitter);
                     Vector2 pos = new Vector2(randomX, randomY);
 
                     MapNode newNode = new MapNode(currentX, y, pos);
@@ -159,10 +160,10 @@ public class MapGenerator : MonoBehaviour
                 MapNode node = grid[y][x];
                 if (node == null) continue;
 
-                // 바로 위, 왼쪽 위, 오른쪽 위를 검사해서 노드가 있다면 연결
-                // 슬더스는 경로가 겹치면 합쳐지므로, 여기서는 인접한 위층 노드들을 찾아서 연결합니다.
+                // 바로 아래, 왼쪽 아래, 오른쪽 아래를 검사해서 노드가 있다면 연결
+                // 슬더스는 경로가 겹치면 합쳐지므로, 여기서는 인접한 아래층 노드들을 찾아서 연결합니다.
                 // *주의*: 실제 슬더스는 Path를 따라가며 연결하지만, 
-                // 여기서는 간단하게 '가까운 위층 노드'와 연결하여 교차를 자연스럽게 만듭니다.
+                // 여기서는 간단하게 '가까운 아래층 노드'와 연결하여 교차를 자연스럽게 만듭니다.
 
                 List<MapNode> potentialParents = new List<MapNode>();
 
@@ -173,7 +174,7 @@ public class MapGenerator : MonoBehaviour
                 // 오른쪽 위
                 if (x < mapWidth - 1 && grid[y + 1][x + 1] != null) potentialParents.Add(grid[y + 1][x + 1]);
 
-                // 위층에 연결할 후보가 있다면 그 중 하나 이상을 연결
+                // 아래층에 연결할 후보가 있다면 그 중 하나 이상을 연결
                 if (potentialParents.Count > 0)
                 {
                     // 무조건 하나는 연결 (길이 끊기지 않게)
@@ -215,7 +216,7 @@ public class MapGenerator : MonoBehaviour
                 nodes.RemoveAt(i);
                 grid[node.y][node.x] = null; // 그리드에서도 제거
             }
-            // 위층으로 가는 길이 없는 노드도 제거 (마지막 층 제외)
+            // 아래층으로 가는 길이 없는 노드도 제거 (마지막 층 제외)
             else if (node.y < mapHeight - 1 && node.outgoing.Count == 0)
             {
                 // 들어오는 연결 끊어주기
@@ -232,8 +233,8 @@ public class MapGenerator : MonoBehaviour
     // 3단계: 보스 방 생성
     private void CreateBossNode(List<List<MapNode>> grid)
     {
-        // 맵 중앙 상단에 보스 배치
-        Vector2 bossPos = new Vector2((mapWidth - 1) * xSpacing / 2f, (mapHeight) * ySpacing);
+        // 맵 중앙 하단에 보스 배치
+        Vector2 bossPos = new Vector2((mapWidth - 1) * xSpacing / 2f, -ySpacing);
         bossNode = new MapNode(-1, mapHeight, bossPos);
         bossNode.roomType = RoomType.Boss;
         
