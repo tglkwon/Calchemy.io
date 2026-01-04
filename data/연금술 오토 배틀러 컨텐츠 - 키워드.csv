@@ -1,7 +1,63 @@
 No,Key_ID,Name_KR,Desc_Template, Keyword_Logic,Note
 고유 번호,키워드 ID (코드 참조용),게임 내 표시 이름,툴팁 텍스트 템플릿,키워드 로직,비고 (기획 메모)
-0,KEY_BURN,화상,2 만큼 화상을 입힙니다.,"{ ""type"": ""ATTACK"", ""value"": 2, ""target"": ""RANDOM_ENEMY"" }",도트 데미지는 즉발보다 가치 낮게 책정
-1,ATTACT,공격,${target} ${effect.value} 피해를 줍니다.,"{ ""type"": ""ATTACK"", ""value"": 2, ""target"": ""RANDOM_ENEMY"" }",기본 카드
-2,BLOCK,방어,방어도 ${effect.value}를 획득합니다.,"{ ""type"": ""BLOCK"", ""value"": ${effect.value}, ""target"": ""GOLEM"" }",기본 카드
-3,HEAL,회복,체력을 ${effect.value} 회복합니다.,"{ ""type"": ""HEAL"", ""value"": ${effect.value}, ""target"": ""GOLEM"" }",기본 카드
-4,BURN,화상/부패/독/풍화,적에게 화상 ${effect.value}를 부여합니다.,,
+1,ATTACK,공격,랜덤 1명에게 2 피해를 줍니다.,"{ ""type"": ""ATTACK"", ""value"": 2, ""target"": ""RANDOM_ENEMY"" }",기본 카드
+2,BLOCK,방어,방어도 ${effect.value}를 획득합니다.,"{ ""type"": ""BLOCK"", ""value"": 2, ""target"": ""GOLEM"" }",기본 카드
+3,HEAL,회복,체력을 ${effect.value} 회복합니다.,"{ ""type"": ""HEAL"", ""value"": 2, ""target"": ""GOLEM"" }",기본 카드
+4,WEAK,약화,대상이 가하는 피해가 {val}% 감소합니다.,"{""type"": ""DEBUFF"", ""subType"": ""WEAK"", ""value"": {val}, ""target"": ""RANDOM_ENEMY""}",골렘의 생존력을 높이는 방어적 디버프
+5,VULNERABLE,취약,대상이 받는 피해가 {val}% 증가합니다.,"{""type"": ""DEBUFF"", ""subType"": ""VULNERABLE"", ""value"": {val}, ""target"": ""RANDOM_ENEMY""}",공격 카드의 효율을 극대화
+6,LIFESTEAL,흡혈,입힌 피해의 {val}%만큼 체력을 회복합니다.,"{""type"": ""SPECIAL"", ""subType"": ""LIFESTEAL"", ""value"": {val}, ""target"": ""SELF""}",공격과 생존을 동시에 챙기는 키워드
+7,CATALYST,촉매,대상의 현재 상태 이상 수치를 {val}배로 증가시킵니다.,"{""type"": ""SPECIAL"", ""subType"": ""CATALYST"", ""value"": {val}, ""target"": ""ENEMY""}",화상(BURN) 등 도트 데미지 폭발용
+8,REGEN,재생,매 턴 종료 시 체력을 {val}만큼 회복합니다.,"{""type"": ""BUFF"", ""subType"": ""REGEN"", ""value"": {val}, ""target"": ""SELF""}",지속적인 유지력을 제공하는 회복 효과
+9,PIERCE,관통,방어도를 무시하고 {val}만큼의 피해를 직접 입힙니다.,"{""type"": ""ATTACK"", ""value"": {val}, ""target"": ""RANDOM_ENEMY"", ""ignoreBlock"": true}",고방어도 적을 카운터치는 효과
+10,THORNS,가시,피격 시 공격자에게 {val}만큼 피해를 반사합니다.,"{""type"": ""BUFF"", ""subType"": ""THORNS"", ""value"": {val}, ""target"": ""SELF""}",대지(흙) 원소 카드와 시너지
+11,SHIELD_BASH,방패 밀치기,현재 방어도의 {val}%만큼 추가 피해를 입힙니다.,"{""type"": ""ATTACK"", ""useStat"": ""BLOCK"", ""multiplier"": {val}, ""target"": ""RANDOM_ENEMY""}",방어 수치를 공격으로 전환하는 연계형
+12,POISON,독,매 턴 종료 시 {val}만큼의 피해를 입힙니다.,"{""type"": ""DEBUFF"", ""subType"": ""POISON"", ""value"": {val}, ""target"": ""RANDOM_ENEMY""}",도트 데미지
+13,STUN,기절,대상의 다음 턴 행동을 건너뜁니다.,"{""type"": ""DEBUFF"", ""subType"": ""STUN"", ""value"": 1, ""target"": ""RANDOM_ENEMY""}",메즈기
+14,FREEZE,빙결,대상을 굳혀 피해를 입지 않지만 행동도 불가능하게 합니다.,"{""type"": ""DEBUFF"", ""subType"": ""FREEZE"", ""value"": 1, ""target"": ""RANDOM_ENEMY""}",전략적 격리
+15,PETRIFY,석화,대상의 방어도를 {val}만큼 높이지만 공격력을 0으로 만듭니다.,"{""type"": ""SPECIAL"", ""subType"": ""PETRIFY"", ""value"": {val}, ""target"": ""ENEMY""}",공격 차단
+16,BLEED,출혈,공격할 때마다 {val}만큼 스스로 피해를 입습니다.,"{""type"": ""DEBUFF"", ""subType"": ""BLEED"", ""value"": {val}, ""target"": ""ENEMY""}",다단히트 카운터
+17,BLIND,실명,다음 {val}회의 공격이 50% 확률로 빗나갑니다.,"{""type"": ""DEBUFF"", ""subType"": ""MISS"", ""value"": {val}, ""target"": ""ENEMY""}",확률형 방어
+18,SILENCE,침묵,다음 {val}턴 동안 특수 효과를 발동할 수 없습니다.,"{""type"": ""DEBUFF"", ""subType"": ""SILENCE"", ""value"": {val}, ""target"": ""ENEMY""}",스킬 차단
+19,TAUNT,도발,적의 단일 타겟 공격을 {val}턴 동안 자신에게 강제합니다.,"{""type"": ""BUFF"", ""subType"": ""TAUNT"", ""value"": {val}, ""target"": ""MINION""}",아군 보호
+20,STEALTH,은신,{val}턴 동안 단일 타겟 공격의 대상이 되지 않습니다.,"{""type"": ""BUFF"", ""subType"": ""STEALTH"", ""value"": {val}, ""target"": ""SELF""}",생존기
+21,RESILIENCE,강인함,받는 모든 디버프 수치를 {val}만큼 감소시킵니다.,"{""type"": ""BUFF"", ""subType"": ""RESIST"", ""value"": {val}, ""target"": ""SELF""}",상태이상 저항
+22,ALACRITY,민첩,{val}% 확률로 적의 공격을 완전히 회피합니다.,"{""type"": ""BUFF"", ""subType"": ""EVADE"", ""value"": {val}, ""target"": ""SELF""}",완전 회피
+23,HASTE,가속,다음 턴에 카드 1장을 추가로 사용합니다.,"{""type"": ""SPECIAL"", ""subType"": ""EXTRA_ACT"", ""value"": 1, ""target"": ""SELF""}",행동 횟수 증가
+24,SLOW,둔화,대상의 행동 순서를 가장 뒤로 미룹니다.,"{""type"": ""DEBUFF"", ""subType"": ""INITIATIVE"", ""value"": -1, ""target"": ""ENEMY""}",턴 제어
+25,CORRODE,부식,영구적으로 대상의 방어도를 매 턴 {val}만큼 감소시킵니다.,"{""type"": ""DEBUFF"", ""subType"": ""DEF_BREAK"", ""value"": {val}, ""target"": ""ENEMY""}",방어구 파괴
+26,RESONANCE,공명,필드에 같은 원소 카드가 {val}장 이상일 때 위력이 증가합니다.,"{""type"": ""CONDITIONAL"", ""condition"": {""stat"": ""SAME_ELEM_COUNT"", ""op"": "">="", ""value"": {val}}, ""effects"": {""type"": ""BUFF"", ""subType"": ""POWER"", ""value"": 2}}",원소 시너지
+27,OVERLOAD,과부하,이번 턴 피해량이 {val}% 증가하지만 다음 턴 기절합니다.,"{""type"": ""BUFF"", ""subType"": ""OVERLOAD"", ""value"": {val}}",하이 리스크
+28,TRANSMUTE,변환,대상의 버프 1개를 무작위 디버프로 변경합니다.,"{""type"": ""SPECIAL"", ""subType"": ""FLIP_STATUS"", ""value"": 1, ""target"": ""ENEMY""}",상태 변경
+29,ABSORB,흡수,이번 턴에 받는 피해의 {val}%를 방어도로 전환합니다.,"{""type"": ""SPECIAL"", ""subType"": ""DMG_TO_BLOCK"", ""value"": {val}, ""target"": ""SELF""}",공격 흡수
+30,REFLECTION,반사,받은 피해의 {val}%를 공격자에게 되돌려줍니다.,"{""type"": ""BUFF"", ""subType"": ""REFLECT"", ""value"": {val}, ""target"": ""SELF""}",데미지 반사
+31,MIRROR,거울,대상이 자신에게 사용한 마지막 효과를 복사하여 되돌려줍니다.,"{""type"": ""SPECIAL"", ""subType"": ""MIRROR_LAST"", ""target"": ""ENEMY""}",효과 미러링
+32,CHAIN,사슬,"{val}명의 적을 묶어, 한 명이 받는 피해를 공유하게 합니다.","{""type"": ""DEBUFF"", ""subType"": ""LINK"", ""value"": {val}, ""target"": ""ALL_ENEMIES""}",데미지 링크
+33,ECHO,메아리,이 카드의 효과가 {val}% 확률로 한 번 더 발동합니다.,"{""type"": ""SPECIAL"", ""subType"": ""REPEAT"", ""value"": {val}}",연속 발동
+34,SIPHON,추출,적의 공격력을 {val}만큼 빼앗아 자신에게 더합니다.,"{""type"": ""DEBUFF"", ""subType"": ""STEAL_ATK"", ""value"": {val}, ""target"": ""ENEMY""}",공격력 흡수
+35,RAGE,분노,잃은 체력 10%당 공격력이 {val}만큼 증가합니다.,"{""type"": ""BUFF"", ""subType"": ""STAT_SCALING"", ""stat"": ""MISSING_HP"", ""value"": {val}}",위기 시 강화
+36,CALM,평온,디버프가 없을 때 방어도가 {val}만큼 추가로 증가합니다.,"{""type"": ""CONDITIONAL"", ""condition"": {""stat"": ""DEBUFF_COUNT"", ""op"": ""="", ""value"": 0}, ""effects"": {""type"": ""BLOCK"", ""value"": {val}}}",상태 유지 보상
+37,CONDUCTIVITY,전도,피해를 입을 때 인접한 적들에게 {val}%의 피해를 전이합니다.,"{""type"": ""DEBUFF"", ""subType"": ""SPREAD"", ""value"": {val}, ""target"": ""ENEMY""}",연쇄 피해
+38,EVAPORATION,증발,화상 수치를 모두 소모하여 수치당 {val}배의 피해를 줍니다.,"{""type"": ""SPECIAL"", ""subType"": ""CONSUME_STATUS"", ""status"": ""BURN"", ""multiplier"": {val}}",상태이상 소모
+39,HARDENING,경화,공격받을 때마다 방어도가 {val}만큼 영구히 상승합니다.,"{""type"": ""BUFF"", ""subType"": ""GROW_DEF"", ""value"": {val}, ""target"": ""SELF""}",피격 시 성장
+40,DISSOLVE,용해,방어도를 무시하고 피해를 준 뒤 대상의 방어도를 0으로 만듭니다.,"{""type"": ""SPECIAL"", ""subType"": ""RESET_BLOCK"", ""value"": {val}, ""target"": ""ENEMY""}",방어도 초기화
+41,MIMIC,모사,무작위 아군의 가장 최근 발동한 효과를 복사합니다.,"{""type"": ""SPECIAL"", ""subType"": ""COPY_ALLY""}",효과 복사
+42,PURGE,정화,자신의 모든 디버프를 제거하고 제거당 {val}만큼 회복합니다.,"{""type"": ""SPECIAL"", ""subType"": ""CLEANSE_HEAL"", ""value"": {val}}",디버프 정화
+43,INFUSION,주입,다음 사용하는 카드의 수치를 {val}% 강화합니다.,"{""type"": ""BUFF"", ""subType"": ""NEXT_BOOST"", ""value"": {val}}",다음 카드 강화
+44,VOLATILITY,휘발,사망 시 모든 적에게 {val}만큼의 피해를 입힙니다.,"{""type"": ""SPECIAL"", ""subType"": ""DEATH_RATTLE"", ""value"": {val}}",자폭 효과
+45,RESTORATION,복구,이번 턴에 잃은 체력의 {val}%를 즉시 복구합니다.,"{""type"": ""HEAL"", ""subType"": ""PERCENT_LOST"", ""value"": {val}}",즉시 복구
+46,UNITY,결속,생존한 아군 하나당 모든 스탯이 {val}만큼 증가합니다.,"{""type"": ""BUFF"", ""subType"": ""ALLY_SCALING"", ""value"": {val}}",수적 우위 시너지
+47,ISOLATION,고립,적이 혼자 남았을 때 피해량이 {val}배가 됩니다.,"{""type"": ""CONDITIONAL"", ""condition"": {""stat"": ""ENEMY_COUNT"", ""op"": ""="", ""value"": 1}, ""effects"": {""type"": ""BUFF"", ""subType"": ""FINAL_DMG"", ""value"": {val}}}",보스전 특화
+48,GROWTH,성장,매 턴 종료 시 공격력이 {val}만큼 영구히 증가합니다.,"{""type"": ""BUFF"", ""subType"": ""PERM_GROW"", ""stat"": ""ATK"", ""value"": {val}}",영구 성장
+49,DECAY,붕괴,매 턴 종료 시 최대 체력이 {val}만큼 감소합니다.,"{""type"": ""DEBUFF"", ""subType"": ""MAX_HP_DOWN"", ""value"": {val}}",최대 체력 감소
+50,FORTIFY,요새화,{val}턴 동안 방어도가 사라지지 않고 중첩됩니다.,"{""type"": ""BUFF"", ""subType"": ""KEEP_BLOCK"", ""value"": {val}}",방어도 유지
+51,RUPTURE,균열,대상의 현재 체력의 {val}%만큼 추가 피해를 입힙니다.,"{""type"": ""ATTACK"", ""subType"": ""CURRENT_HP_PCT"", ""value"": {val}}",비례 피해
+52,EXECUTE,처형,대상의 체력이 {val}% 이하일 경우 즉사시킵니다.,"{""type"": ""SPECIAL"", ""subType"": ""KILL_THRESHOLD"", ""value"": {val}}",즉사 효과
+53,PLAGUE,역병,공격받으면 공격자에게 무작위 디버프 {val}개를 옮깁니다.,"{""type"": ""SPECIAL"", ""subType"": ""SPREAD_DEBUFF"", ""value"": {val}}",디버프 전염
+54,STABILITY,안정,수치 변동 효과가 항상 최대치로 적용됩니다.,"{""type"": ""BUFF"", ""subType"": ""MAX_RNG"", ""value"": 1}",난수 고정
+55,SPORES,포자,사망 시 약한 버섯 미니언을 {val}마리 소환합니다.,"{""type"": ""SPECIAL"", ""subType"": ""SUMMON"", ""id"": ""MUSHROOM"", ""value"": {val}}",사망 시 소환
+56,MAGNETISM,자성,모든 적 미니언을 한곳으로 모읍니다.,"{""type"": ""SPECIAL"", ""subType"": ""GROUP_ENEMIES""}",진형 파괴
+57,REPULSION,반발,자신을 공격한 적을 뒤로 밀쳐 공격 범위를 벗어나게 합니다.,"{""type"": ""SPECIAL"", ""subType"": ""PUSH_BACK""}",거리 제어
+58,BARRIER,장벽,{val}만큼의 피해를 흡수하는 보호막을 생성합니다.,"{""type"": ""BUFF"", ""subType"": ""SHIELD"", ""value"": {val}}",보호막 획득
+59,FOCUS,집중,다음 공격의 치명타 확률을 {val}% 높입니다.,"{""type"": ""BUFF"", ""subType"": ""CRIT_CHANCE"", ""value"": {val}}",치명타 강화
+60,PRECISION,정밀,방어도는 관통하지 못하지만 보호막을 무시합니다.,"{""type"": ""ATTACK"", ""subType"": ""PIERCE_SHIELD"", ""value"": {val}}",보호막 무시
+61,VITALITY,활력,최대 체력이 {val}만큼 증가하고 즉시 회복합니다.,"{""type"": ""SPECIAL"", ""subType"": ""ADD_MAX_HP"", ""value"": {val}}",스탯 증강
