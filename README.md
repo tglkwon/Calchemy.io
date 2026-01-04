@@ -13,7 +13,7 @@
 ### **1.1. 게임 주소 (Game Links)**
 
 * **GitHub:** https://github.com/Calchemy-io/Calchemy.io
-* **Live Demo:** https://calchemy.io
+* **Live Demo:** https://tglkwon.github.io/Calchemy.io/
 
 ### **1.2. 데이터 주도형 게임 아키텍처 (Data-Driven Game Architecture)**
 
