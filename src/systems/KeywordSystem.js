@@ -50,10 +50,19 @@ export class KeywordSystem {
             case 'ATTACK': {
                 const target = this.getTarget(effect.target || 'RANDOM_ENEMY', context);
                 if (target) {
-                    const dmg = effect.value;
-                    const taken = target.takeDamage(dmg);
+                    let dmg = effect.value;
+
+                    // Apply WEAK debuff (-25% damage dealt)
+                    if (context.golem && context.golem.statuses['WEAK'] > 0) {
+                        dmg = Math.max(0, Math.floor(dmg * 0.75));
+                    }
+
+                    const taken = target.takeDamage(dmg, context.golem, { ignoreBlock: effect.ignoreBlock });
                     if (context.golem) context.golem.totalDamageThisTurn += taken;
-                    return `⚔️ [${card.name}] ${target.name}에게 ${taken} 피해`;
+
+                    const weakIcon = (context.golem && context.golem.statuses['WEAK'] > 0) ? ' (약화)' : '';
+                    const pierceIcon = effect.ignoreBlock ? ' (관통)' : '';
+                    return `⚔️ [${card.name}] ${target.name}에게 ${taken} 피해${weakIcon}${pierceIcon}`;
                 }
                 return `⚔️ [${card.name}] 공격 대상이 없습니다.`;
             }
@@ -74,12 +83,66 @@ export class KeywordSystem {
                 break;
             }
             case 'BUFF': {
-                if (context.golem) {
-                    // Assuming generic attack buff for MVP
-                    context.golem.attackBuffs = (context.golem.attackBuffs || 0) + 1;
-                    return `💪 [${card.name}] 골렘 공격력 증가`;
+                const target = this.getTarget(effect.target || 'SELF', context);
+                if (target) {
+                    const subType = effect.subType;
+                    const val = effect.value;
+                    if (subType === 'THORNS') {
+                        target.addStatus('THORNS', val);
+                        return `🌵 [${card.name}] ${target.name} 가시 ${val} 획득`;
+                    }
+                    // Default attack buff
+                    target.attackBuffs = (target.attackBuffs || 0) + 1;
+                    return `💪 [${card.name}] ${target.name} 공격력 증가`;
                 }
                 break;
+            }
+            case 'DEBUFF': {
+                const target = this.getTarget(effect.target || 'RANDOM_ENEMY', context);
+                if (target) {
+                    const subType = effect.subType; // WEAK, VULNERABLE, POISON
+                    const val = effect.value;
+                    target.addStatus(subType, val);
+                    const iconMap = { 'WEAK': '💢', 'VULNERABLE': '💔', 'POISON': '🧪' };
+                    return `${iconMap[subType] || '💀'} [${card.name}] ${target.name}에게 ${subType} ${val}`;
+                }
+                break;
+            }
+            case 'SPECIAL': {
+                const subType = effect.subType;
+                const val = effect.value;
+
+                if (subType === 'LIFESTEAL') {
+                    // This is usually passive, but if it's an effect: "Deal damage and heal"
+                    // Or if it's "Heal % of damage dealt this turn"
+                    // CSV implies it's an effect. Let's assume it heals based on current turn's dmg.
+                    if (context.golem) {
+                        const healAmt = Math.floor(context.golem.totalDamageThisTurn * (val / 100));
+                        const healed = context.golem.heal(healAmt);
+                        return `🩸 [${card.name}] 흡혈로 ${healed} 체력 회복`;
+                    }
+                }
+                if (subType === 'CATALYST') {
+                    const target = this.getTarget(effect.target || 'RANDOM_ENEMY', context);
+                    if (target) {
+                        // Double the highest status or all? Catalyst usually doubles Poison/Burn
+                        ['POISON', 'BURN'].forEach(st => {
+                            if (target.statuses[st] > 0) {
+                                target.statuses[st] *= val;
+                            }
+                        });
+                        return `🧪 [${card.name}] 촉매! 상태 이상 수치 증가`;
+                    }
+                }
+                break;
+            }
+            case 'CONDITIONAL': {
+                if (this.checkCondition(effect.condition, context, card)) {
+                    // Recursive call for the actual effect
+                    const result = this.executeSingleEffect(effect.effects, context, card, originIdx);
+                    return result ? `🔍 [${card.name}] 조건 충족: ${result}` : null;
+                }
+                return null;
             }
             case 'GRID_MANIPULATION': {
                 if (context.cardSystem) {
@@ -97,13 +160,59 @@ export class KeywordSystem {
                 }
                 return `⚠️ [${card.name}] Grid System Missing`;
             }
-            // Add other types as needed
             default:
-                // Try to handle special legacy IDs here if converted? 
-                // Currently generated data maps to generic types.
                 return null;
         }
-        return null;
+    }
+
+    /**
+     * Checks if a condition is met.
+     */
+    checkCondition(condition, context, card) {
+        if (!condition) return true;
+
+        const statValue = this.evaluateStat(condition.stat, context, card);
+        const op = condition.op;
+        const targetValue = condition.value;
+
+        switch (op) {
+            case '>=': return statValue >= targetValue;
+            case '<=': return statValue <= targetValue;
+            case '>': return statValue > targetValue;
+            case '<': return statValue < targetValue;
+            case '=':
+            case '==': return statValue === targetValue;
+            default: return false;
+        }
+    }
+
+    /**
+     * Evaluates a stat key into a numeric value.
+     */
+    evaluateStat(statKey, context, card) {
+        switch (statKey) {
+            case 'SAME_ELEM_COUNT':
+                if (context.cardSystem && card.element) {
+                    return context.cardSystem.grid.filter(c => c && c.element === card.element).length;
+                }
+                return 0;
+            case 'ENEMY_COUNT':
+                return context.minions.filter(m => m.isAlive).length;
+            case 'DEBUFF_COUNT': {
+                const target = context.golem; // Usually checks Golem for 'CALM'
+                if (!target) return 0;
+                // Count negative statuses
+                const debuffs = ['WEAK', 'VULNERABLE', 'POISON', 'BURN', 'OIL'];
+                return debuffs.reduce((acc, st) => acc + (target.statuses[st] > 0 ? 1 : 0), 0);
+            }
+            case 'MISSING_HP':
+                if (context.golem) {
+                    return context.golem.maxHp - context.golem.hp;
+                }
+                return 0;
+            default:
+                return 0;
+        }
     }
 
     /**

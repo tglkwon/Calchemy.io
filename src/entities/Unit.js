@@ -42,15 +42,31 @@ export class Unit {
     /**
      * Applies damage to the unit.
      * @param {number} amount - Raw damage amount.
+     * @param {Object} source - The unit dealing damage (optional, for Thorns).
+     * @param {Object} options - { ignoreBlock: boolean }
      * @returns {number} Actual damage taken to HP.
      */
-    takeDamage(amount) {
+    takeDamage(amount, source = null, options = {}) {
         if (!this.isAlive) return 0;
 
-        let remainingDamage = amount;
+        let finalAmount = amount;
 
-        // 1. Apply to Block first
-        if (this.block > 0) {
+        // 0. Apply Vulnerable (+50% damage taken if status exists)
+        if (this.statuses['VULNERABLE'] > 0) {
+            finalAmount = Math.floor(finalAmount * 1.5);
+        }
+
+        let remainingDamage = finalAmount;
+
+        // 1. Thorns Reflection (If unit has THORNS and source exists)
+        if (this.statuses['THORNS'] > 0 && source && source.isAlive) {
+            const reflect = this.statuses['THORNS'];
+            source.takeDamage(reflect);
+            console.log(`${this.name} reflected ${reflect} damage to ${source.name}`);
+        }
+
+        // 2. Apply to Block first (unless ignoreBlock is true)
+        if (!options.ignoreBlock && this.block > 0) {
             if (this.block >= remainingDamage) {
                 this.block -= remainingDamage;
                 remainingDamage = 0;
@@ -60,7 +76,7 @@ export class Unit {
             }
         }
 
-        // 2. Apply to HP
+        // 3. Apply to HP
         if (remainingDamage > 0) {
             this.hp -= remainingDamage;
             if (this.hp <= 0) {

@@ -326,6 +326,9 @@ export class GameEngine {
         // 6. Minion Actions
         this.executeMinionActions();
 
+        // 6.5 Process Status Effects (Poison, and reducing durations)
+        this.processEndTurnStatusEffects();
+
         // 7. Check Game Over
         this.checkGameOver();
 
@@ -520,9 +523,16 @@ export class GameEngine {
             if (!m.isAlive) return;
 
             if (m.intent === 'ATTACK') {
-                const dmg = m.baseAttack; // Simplified
+                let dmg = m.baseAttack; // Simplified
+
+                // Apply WEAK debuff (-25% damage dealt)
+                if (m.statuses['WEAK'] > 0) {
+                    dmg = Math.max(0, Math.floor(dmg * 0.75));
+                }
+
                 const taken = this.golem.takeDamage(dmg);
-                this.log(`⚔️ ${m.name} 공격! ${dmg} 피해 (실제: ${taken})`);
+                const weakIcon = (m.statuses['WEAK'] > 0) ? ' (약화)' : '';
+                this.log(`⚔️ ${m.name} 공격! ${dmg} 피해${weakIcon} (실제: ${taken})`);
                 m.block = 0; // Reset block after attack
             } else if (m.intent === 'BUFF') {
                 m.baseAttack += 2;
@@ -553,6 +563,33 @@ export class GameEngine {
         this.victory = victory;
         this.log(victory ? "🏆 승리!" : "💀 패배!");
         this.notify();
+    }
+
+    processEndTurnStatusEffects() {
+        const units = [this.golem, ...this.minions];
+
+        units.forEach(unit => {
+            if (!unit.isAlive) return;
+
+            // 1. POISON: Deal damage equal to stacks, then decrease stack by 1
+            if (unit.statuses['POISON'] > 0) {
+                const poisonDmg = unit.statuses['POISON'];
+                unit.takeDamage(poisonDmg);
+                this.log(`🧪 ${unit.name}: 독으로 인해 ${poisonDmg} 피해`);
+                unit.statuses['POISON'] -= 1;
+            }
+
+            // 2. DEBUFF Durations (WEAK, VULNERABLE, etc.)
+            // Assuming these are duration-based (turns)
+            ['WEAK', 'VULNERABLE'].forEach(st => {
+                if (unit.statuses[st] > 0) {
+                    unit.statuses[st] -= 1;
+                    if (unit.statuses[st] === 0) {
+                        this.log(`✨ ${unit.name}: ${st} 효과 종료`);
+                    }
+                }
+            });
+        });
     }
 
     processRelicTriggers(trigger) {
