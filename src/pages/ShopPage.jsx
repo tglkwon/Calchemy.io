@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { useGameData } from '../context/GameDataProvider';
 import AssetDisplay from '../components/AssetDisplay';
-import './ShopPage.css';
 
 const ShopPage = () => {
     const { gameState, gameEngine } = useGame();
@@ -43,8 +42,7 @@ const ShopPage = () => {
         // Card specific icon logic
         let displayId = item.type || item.id;
 
-        // Safety mapper for any remaining Korean elements if fallback is needed, 
-        // though Option C should have handled this in gameData.json
+        // Safety mapper for any remaining Korean elements
         if (displayId === '불') displayId = 'FIRE';
         else if (displayId === '물') displayId = 'WATER';
         else if (displayId === '흙') displayId = 'EARTH';
@@ -52,20 +50,30 @@ const ShopPage = () => {
 
         return (
             <div
-                className={`item-card p-4 parchment-panel flex flex-col items-center gap-2 border-2 ${isShaking ? 'unaffordable-shake border-red-500' : 'border-transparent'}`}
+                className={`
+                    relative p-4 parchment-panel flex flex-col items-center gap-2 border-2 transition-all duration-200 cursor-pointer hover:scale-110 hover:z-20 hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]
+                    ${isShaking ? 'animate-unaffordable-shake border-red-500' : 'border-transparent'}
+                `}
                 onClick={() => handleBuy(type, item)}
             >
-                {item.onSale && <div className="on-sale-badge">할인</div>}
+                {item.onSale && (
+                    <div className="absolute -top-2.5 -right-1 z-10 bg-red-600 text-white px-1.5 py-0.5 rounded-sm text-[10px] uppercase font-bold shadow-sm">
+                        할인
+                    </div>
+                )}
                 <div className="w-16 h-16 bg-black/20 rounded-full flex items-center justify-center text-3xl shadow-inner">
                     <AssetDisplay id={displayId} />
                 </div>
                 <div className="text-center">
-                    <div className="font-bold text-sm leading-tight">{item.name}</div>
-                    <div className="text-[10px] opacity-70 mt-1 line-clamp-2 h-6">{item.description}</div>
+                    <div className="font-bold text-sm leading-tight text-slate-900">{item.name}</div>
+                    <div className="text-[10px] text-slate-800/70 mt-1 line-clamp-2 h-6">{item.description}</div>
                 </div>
-                <div className={`price-tag mt-2 ${isAffordable ? 'affordable' : 'unaffordable'}`}>
-                    <span className="gold-icon">💰</span>
-                    {item.onSale && <span className="line-through text-xs opacity-50 mr-1">{item.originalPrice}</span>}
+                <div className={`
+                    mt-2 px-2 py-0.5 rounded flex items-center gap-1 font-bold text-xs shadow-sm border border-black/10 bg-black/10
+                    ${isAffordable ? 'text-yellow-600' : 'text-red-600'}
+                `}>
+                    <span className="drop-shadow-sm">💰</span>
+                    {item.onSale && <span className="line-through text-[10px] opacity-50 mr-1">{item.originalPrice}</span>}
                     {item.price}
                 </div>
             </div>
@@ -73,9 +81,9 @@ const ShopPage = () => {
     };
 
     return (
-        <div className="shop-background h-full text-[#2c1e12]">
+        <div className="shop-bg min-h-full p-8 border-[12px] border-shop-border relative overflow-y-auto text-slate-900">
             {/* Top Bar */}
-            <div className="flex justify-between items-center mb-12 bg-black/40 p-4 rounded-lg border border-[#4a3728] text-white">
+            <div className="flex justify-between items-center mb-12 bg-black/60 p-4 rounded-lg border border-shop-border/50 text-white backdrop-blur-sm">
                 <div className="flex gap-8">
                     <div className="flex items-center gap-2">
                         <span className="text-yellow-500 font-bold">💰 골드:</span>
@@ -90,13 +98,13 @@ const ShopPage = () => {
                         <span className="text-xl font-mono">{turnCount || 1}</span>
                     </div>
                 </div>
-                <h1 className="text-3xl font-serif font-bold text-yellow-600 tracking-widest uppercase">연금술 상점</h1>
+                <h1 className="text-3xl font-serif font-bold text-yellow-500 tracking-widest uppercase drop-shadow-md">연금술 상점</h1>
             </div>
 
             <div className="grid grid-cols-12 gap-8 max-w-6xl mx-auto">
                 {/* Main Card Section (8장: 4x2) */}
                 <div className="col-span-8 flex flex-col gap-4">
-                    <h2 className="text-xl font-serif font-bold border-b-2 border-[#4a3728]/30 mb-2">추천 카드</h2>
+                    <h2 className="text-xl font-serif font-bold border-b-2 border-shop-border/20 mb-2 py-1">추천 카드</h2>
                     <div className="grid grid-cols-4 gap-4">
                         {shopInventory.cards.map(card => (
                             <ItemCard key={card.id} type="card" item={card} />
@@ -108,18 +116,21 @@ const ShopPage = () => {
                 <div className="col-span-4 flex flex-col gap-8">
                     {/* Card Removal Service */}
                     <div className="flex flex-col gap-2">
-                        <h2 className="text-xl font-serif font-bold border-b-2 border-[#4a3728]/30 mb-2">상점 서비스</h2>
+                        <h2 className="text-xl font-serif font-bold border-b-2 border-shop-border/20 mb-2 py-1">상점 서비스</h2>
                         <div
-                            className="parchment-panel p-6 flex flex-col items-center gap-4 border-2 border-dashed border-[#4a3728]/50 hover:border-[#4a3728] cursor-pointer transition-all group"
+                            className="parchment-panel p-6 flex flex-col items-center gap-4 border-2 border-dashed border-shop-border/30 hover:border-shop-border/60 cursor-pointer transition-all group"
                             onClick={() => setRemovingCard(true)}
                         >
                             <div className="text-5xl group-hover:scale-110 transition-transform">🗑️</div>
                             <div className="text-center">
-                                <div className="font-bold text-lg">카드 제거</div>
-                                <div className="text-xs opacity-60">덱에서 원하지 않는 카드를 영구적으로 제거합니다.</div>
+                                <div className="font-bold text-lg text-slate-900">카드 제거</div>
+                                <div className="text-xs text-slate-800/60 leading-tight">덱에서 원하지 않는 카드를<br />영구적으로 제거합니다.</div>
                             </div>
-                            <div className={`price-tag ${gold >= shopRemovalCost ? 'affordable' : 'unaffordable'}`}>
-                                <span className="gold-icon">💰</span>
+                            <div className={`
+                                px-3 py-1 rounded flex items-center gap-1 font-bold shadow-sm border border-black/10 bg-black/10
+                                ${gold >= shopRemovalCost ? 'text-yellow-600' : 'text-red-600'}
+                            `}>
+                                <span className="drop-shadow-sm">💰</span>
                                 {shopRemovalCost}
                             </div>
                         </div>
@@ -127,7 +138,7 @@ const ShopPage = () => {
 
                     {/* Relics & Potions */}
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-xl font-serif font-bold border-b-2 border-[#4a3728]/30 mb-2">유물 및 비약</h2>
+                        <h2 className="text-xl font-serif font-bold border-b-2 border-shop-border/20 mb-2 py-1">유물 및 비약</h2>
                         <div className="grid grid-cols-3 gap-2">
                             {shopInventory.relics.map(relic => (
                                 <ItemCard key={relic.id || relic.artifactId} type="relic" item={relic} />
@@ -146,7 +157,7 @@ const ShopPage = () => {
             <div className="mt-12 flex justify-center">
                 <button
                     onClick={() => navigate('/map')}
-                    className="shop-exit-btn px-12 py-3 rounded-full font-serif font-bold text-xl uppercase tracking-widest shadow-lg"
+                    className="bg-shop-border border-2 border-shop-border/50 text-parchment-gold px-12 py-3 rounded-full font-serif font-bold text-xl uppercase tracking-widest shadow-xl transition-all hover:bg-shop-border/80 hover:scale-105 active:scale-95"
                 >
                     상점 나가기
                 </button>
@@ -154,20 +165,20 @@ const ShopPage = () => {
 
             {/* Card Removal Modal Overlay */}
             {removingCard && (
-                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-8">
-                    <div className="max-w-4xl w-full bg-[#1a1510] border-4 border-[#3d2b1f] p-8 flex flex-col h-[80vh]">
-                        <div className="flex justify-between items-center mb-8 border-b border-[#3d2b1f] pb-4">
+                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-8 backdrop-blur-sm">
+                    <div className="max-w-4xl w-full bg-shop-dark border-4 border-shop-border p-8 flex flex-col h-[80vh] shadow-2xl">
+                        <div className="flex justify-between items-center mb-8 border-b border-shop-border/50 pb-4">
                             <div>
-                                <h3 className="text-3xl font-serif font-bold text-yellow-600">덱 정화 (카드 제거)</h3>
-                                <p className="text-gray-400 text-sm mt-1">선택한 카드가 덱에서 영구적으로 제거됩니다.</p>
+                                <h3 className="text-3xl font-serif font-bold text-yellow-500">덱 정화 (카드 제거)</h3>
+                                <p className="text-slate-400 text-sm mt-1">선택한 카드가 덱에서 영구적으로 제거됩니다.</p>
                             </div>
                             <button
                                 onClick={() => setRemovingCard(false)}
-                                className="text-gray-500 hover:text-white text-2xl"
+                                className="text-slate-500 hover:text-white text-3xl leading-none transition-colors"
                             >✕</button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto pr-4">
+                        <div className="flex-1 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-shop-border/50">
                             <div className="flex flex-wrap gap-4 justify-center">
                                 {gameEngine.cardSystem.getAllCards().map(card => {
                                     let displayId = card.type;
@@ -180,24 +191,24 @@ const ShopPage = () => {
                                         <div
                                             key={card.instanceId}
                                             onClick={() => handleRemoveCard(card.instanceId)}
-                                            className="w-24 h-32 bg-[#c2b280] rounded border-2 border-transparent hover:border-red-600 hover:scale-110 transition-all cursor-pointer group relative shadow-lg"
+                                            className="w-24 h-32 bg-parchment-gold rounded border-2 border-transparent hover:border-red-600 hover:scale-110 transition-all cursor-pointer group relative shadow-lg overflow-hidden"
                                         >
-                                            <div className="flex flex-col items-center justify-center h-full p-2 text-center text-[#2c1e12]">
-                                                <div className="text-3xl mb-2"><AssetDisplay id={displayId} /></div>
+                                            <div className="flex flex-col items-center justify-center h-full p-2 text-center text-slate-950">
+                                                <div className="text-3xl mb-2 drop-shadow-sm"><AssetDisplay id={displayId} /></div>
                                                 <div className="text-[10px] font-bold leading-tight">{card.name || card.type}</div>
                                             </div>
                                             <div className="absolute inset-0 bg-red-600/0 group-hover:bg-red-600/20 transition-colors pointer-events-none" />
-                                            <div className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">✕</div>
+                                            <div className="absolute -top-1 -right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center scale-0 group-hover:scale-100 transition-transform shadow-md">✕</div>
                                         </div>
                                     );
                                 })}
                             </div>
                         </div>
 
-                        <div className="mt-8 pt-4 border-t border-[#3d2b1f] flex justify-center">
+                        <div className="mt-8 pt-4 border-t border-shop-border/50 flex justify-center">
                             <button
                                 onClick={() => setRemovingCard(false)}
-                                className="px-8 py-2 border border-[#4a3728] text-gray-400 hover:text-white hover:bg-[#3d2b1f] transition-all rounded"
+                                className="px-10 py-2 border border-shop-border text-slate-400 hover:text-white hover:bg-shop-border/30 transition-all rounded-lg font-semibold"
                             >
                                 취소
                             </button>
@@ -210,3 +221,4 @@ const ShopPage = () => {
 };
 
 export default ShopPage;
+
