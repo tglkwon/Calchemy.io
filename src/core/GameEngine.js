@@ -208,8 +208,8 @@ export class GameEngine {
         // Logic check: Is it a valid move? 
         // 1. If no current node, must be floor 0
         // 2. If has current node, must be in current node's outgoing
-        const isValid = this.isNodeReachable(nodeId);
-        if (!isValid) return;
+        // const isValid = this.isNodeReachable(nodeId);
+        // if (!isValid) return;
 
         this.currentNodeId = nodeId;
         this.visitedNodeIds.add(nodeId);
@@ -663,7 +663,12 @@ export class GameEngine {
         this.stop();
         this.gameOver = true;
         this.victory = victory;
-        this.log(victory ? "🏆 승리!" : "💀 패배!");
+        if (victory) {
+            this.addGold(75);
+            this.log("🏆 승리! 75 골드를 획득했습니다.");
+        } else {
+            this.log("💀 패배!");
+        }
         this.notify();
     }
 

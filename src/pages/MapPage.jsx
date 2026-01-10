@@ -23,6 +23,9 @@ const MapPage = () => {
             // Treasure chest - start treasure selection and navigate to relic page
             gameEngine.startTreasureSelection();
             navigate('/relic');
+        } else if (node.roomType === RoomType.SHOP) {
+            // Shop node - navigate to shop page
+            navigate('/shop');
         }
     };
 
@@ -135,14 +138,14 @@ const MapPage = () => {
                             }}
                         >
                             <div
-                                onClick={() => isReachable && handleNodeClick(node)}
+                                onClick={() => handleNodeClick(node)}
                                 className={`
                                     flex items-center justify-center border-3 rounded-full bg-slate-800 shadow-[0_4px_15px_rgba(0,0,0,0.6)] transition-all duration-300 cursor-pointer
                                     ${isBoss ? 'w-24 h-24 text-5xl animate-pulse-boss' : 'w-12 h-12 text-2xl'}
                                     ${getNodeColorClass(node.roomType)}
                                     ${isVisited ? 'opacity-60 border-slate-800 shadow-none grayscale-[0.5]' : ''}
                                     ${isCurrent ? 'border-yellow-500 shadow-[0_0_30px_rgba(241,196,15,0.8)] scale-110 z-30' : ''}
-                                    ${isReachable ? 'animate-pulse-reachable' : 'grayscale opacity-50 cursor-not-allowed'}
+                                    ${isReachable ? 'animate-pulse-reachable' : 'animate-pulse-reachable'}
                                     hover:scale-125 hover:shadow-[0_0_25px_currentColor] hover:border-white
                                 `}
                                 title={node.roomType}

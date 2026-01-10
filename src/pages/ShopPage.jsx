@@ -14,11 +14,9 @@ const ShopPage = () => {
     const { gold, shopInventory, shopRemovalCost, golem, turnCount } = gameState;
 
     useEffect(() => {
-        // Generate shop inventory if it's currently empty
-        if (shopInventory.cards.length === 0 && shopInventory.relics.length === 0 && shopInventory.potions.length === 0) {
-            gameEngine.generateShopInventory(gameData);
-        }
-    }, [gameEngine, gameData, shopInventory.cards.length, shopInventory.relics.length, shopInventory.potions.length]);
+        // Generate shop inventory every time the user enters the shop
+        gameEngine.generateShopInventory(gameData);
+    }, [gameEngine, gameData]);
 
     const handleBuy = (type, item) => {
         const success = gameEngine.buyItem(type, item);
