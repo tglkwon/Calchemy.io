@@ -9,6 +9,7 @@ import LogPage from './pages/LogPage';
 import DeckPage from './pages/DeckPage';
 import RelicPage from './pages/RelicPage';
 import MapPage from './pages/MapPage';
+import ShopPage from './pages/ShopPage';
 
 const NavBar = () => {
   const location = useLocation();
@@ -25,6 +26,7 @@ const NavBar = () => {
         <Link to="/log" className={`px-3 py-2 rounded transition-colors ${isActive('/log')}`}>로그</Link>
         <Link to="/deck" className={`px-3 py-2 rounded transition-colors ${isActive('/deck')}`}>덱 구성</Link>
         <Link to="/relic" className={`px-3 py-2 rounded transition-colors ${isActive('/relic')}`}>유물</Link>
+        <Link to="/shop" className={`px-3 py-2 rounded transition-colors ${isActive('/shop')}`}>상점</Link>
       </div>
       <button
         onClick={toggleMode}
@@ -51,6 +53,7 @@ function App() {
                   <Route path="/log" element={<LogPage />} />
                   <Route path="/deck" element={<DeckPage />} />
                   <Route path="/relic" element={<RelicPage />} />
+                  <Route path="/shop" element={<ShopPage />} />
                 </Routes>
               </main>
             </div>

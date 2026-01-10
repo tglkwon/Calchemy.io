@@ -67,6 +67,16 @@ export class GameEngine {
         this.treasureSelectionMode = false;
         this.offeredRelics = [];
 
+        // Economy & Shop State
+        this.gold = 100; // Starting gold
+        this.shopRemovalCost = 75; // Slay the Spire default starting cost
+        this.shopInventory = {
+            cards: [],
+            relics: [],
+            potions: [],
+            saleItemId: null
+        };
+
         // Bindings
         this.runTurn = this.runTurn.bind(this);
     }
@@ -263,6 +273,98 @@ export class GameEngine {
     skipTreasureSelection() {
         this.treasureSelectionMode = false;
         this.offeredRelics = [];
+        this.notify();
+    }
+
+    // Shop Methods
+    generateShopInventory(gameData) {
+        if (!gameData) return;
+
+        // 8 Cards (4x2 grid)
+        const allCards = gameData.cards || [];
+        const shopCards = [...allCards].sort(() => Math.random() - 0.5).slice(0, 8).map(card => ({
+            ...card,
+            price: Math.floor(25 + Math.random() * 50) // Basic cards 25-75 gold
+        }));
+
+        // 3 Relics
+        const allRelics = gameData.artifacts || [];
+        const activeRelicIds = this.relicSystem.getActiveRelicIds();
+        const availableRelics = allRelics.filter(r => !activeRelicIds.includes(r.id) && !activeRelicIds.includes(r.artifactId));
+        const shopRelics = [...availableRelics].sort(() => Math.random() - 0.5).slice(0, 3).map(relic => ({
+            ...relic,
+            price: Math.floor(150 + Math.random() * 150) // Relics 150-300 gold
+        }));
+
+        // 3 Potions
+        const allPotions = gameData.potions || [];
+        const shopPotions = [...allPotions].sort(() => Math.random() - 0.5).slice(0, 3).map(potion => ({
+            ...potion,
+            price: Math.floor(50 + Math.random() * 50) // Potions 50-100 gold
+        }));
+
+        // 1 Random item on sale (50% discount)
+        const combined = [...shopCards, ...shopRelics, ...shopPotions];
+        const saleItem = combined[Math.floor(Math.random() * combined.length)];
+        if (saleItem) {
+            saleItem.originalPrice = saleItem.price;
+            saleItem.price = Math.floor(saleItem.price * 0.5);
+            saleItem.onSale = true;
+        }
+
+        this.shopInventory = {
+            cards: shopCards,
+            relics: shopRelics,
+            potions: shopPotions,
+            saleItemId: saleItem ? saleItem.id : null
+        };
+
+        this.notify();
+    }
+
+    buyItem(itemType, itemData) {
+        if (this.gold < itemData.price) {
+            this.log(`❌ 골드가 부족합니다! (필요: ${itemData.price}, 보유: ${this.gold})`);
+            return false;
+        }
+
+        this.gold -= itemData.price;
+
+        if (itemType === 'card') {
+            this.log(`🛒 카드 구매: ${itemData.name}`);
+            this.cardSystem.addCard(itemData.id);
+            this.shopInventory.cards = this.shopInventory.cards.filter(c => c.id !== itemData.id);
+        } else if (itemType === 'relic') {
+            this.log(`🛒 유물 구매: ${itemData.name}`);
+            this.relicSystem.activateRelic(itemData.id || itemData.artifactId);
+            this.shopInventory.relics = this.shopInventory.relics.filter(r => (r.id !== itemData.id && r.artifactId !== itemData.id));
+        } else if (itemType === 'potion') {
+            this.log(`🛒 포션 구매: ${itemData.name}`);
+            // TODO: Implement potion system if not exists, but for now just log
+            this.shopInventory.potions = this.shopInventory.potions.filter(p => p.id !== itemData.id);
+        }
+
+        this.notify();
+        return true;
+    }
+
+    removeCardInShop(cardInstanceId) {
+        if (this.gold < this.shopRemovalCost) {
+            this.log(`❌ 골드가 부족합니다! (필요: ${this.shopRemovalCost}, 보유: ${this.gold})`);
+            return false;
+        }
+
+        this.gold -= this.shopRemovalCost;
+        this.cardSystem.removeCard(cardInstanceId);
+        this.shopRemovalCost += 25; // Price increases per removal
+
+        this.log(`🔥 카드 제거 서비스 이용 완료 (다음 비용: ${this.shopRemovalCost})`);
+        this.notify();
+        return true;
+    }
+
+    addGold(amount) {
+        this.gold += amount;
         this.notify();
     }
 
@@ -640,6 +742,9 @@ export class GameEngine {
             visitedNodeIds: Array.from(this.visitedNodeIds),
             treasureSelectionMode: this.treasureSelectionMode,
             offeredRelics: this.offeredRelics,
+            gold: this.gold,
+            shopInventory: this.shopInventory,
+            shopRemovalCost: this.shopRemovalCost,
         };
     }
 }

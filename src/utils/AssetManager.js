@@ -49,8 +49,17 @@ export class AssetManager {
      * @returns {object} { type: 'emoji'|'image', content: string, color?: string }
      */
     get(key) {
-        const asset = this.assets[key];
-        if (!asset) return { type: 'text', content: '?' };
+        let asset = this.assets[key];
+
+        // Fallback for numeric IDs or unknown keys
+        if (!asset) {
+            if (typeof key === 'string' && (key.startsWith('ART_') || !isNaN(key))) {
+                // Likely a Relic if starts with ART_ or is a number (Relic/Potion)
+                // For now, let's distinguish by a simple heuristic or just return a generic item
+                return { type: 'emoji', content: '🏺', color: 'text-yellow-600' };
+            }
+            return { type: 'text', content: '?' };
+        }
 
         if (this.mode === 'IMAGE' && asset.image) {
             return { type: 'image', content: asset.image };

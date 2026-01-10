@@ -31,6 +31,13 @@ const KoreanLogicMap = {
     "특수": "SPECIAL"
 };
 
+const KoreanElementMap = {
+    "불": "FIRE",
+    "물": "WATER",
+    "흙": "EARTH",
+    "바람": "WIND"
+};
+
 // --- Parsers ---
 
 function parseLogicString(logicString) {
@@ -112,11 +119,13 @@ async function generate() {
         // 2. Process Cards
         const processedCards = cardData.map(rawCard => {
             const id = String(rawCard['No.'] || rawCard['No'] || rawCard.id);
+            const element = rawCard.Element;
             const card = {
                 id: id,
                 name: rawCard.Name,
                 grade: rawCard.Rarity,
-                element: rawCard.Element,
+                element: element,
+                type: KoreanElementMap[element] || "NONE", // Normalize type based on element
                 description: rawCard.Single_Desc,
                 bingoDescription: rawCard.Bingo_Desc,
                 cost: rawCard.Cost || 0,
@@ -174,7 +183,12 @@ async function generate() {
         const mergedCards = processedCards.map(csvCard => {
             const manualDef = CardDefinitions[csvCard.id];
             if (manualDef) {
-                return { ...csvCard, ...manualDef };
+                const merged = { ...csvCard, ...manualDef };
+                // Ensure CSV element still dictates the type if it was set
+                if (csvCard.element && csvCard.type !== "NONE") {
+                    merged.type = csvCard.type;
+                }
+                return merged;
             }
             return csvCard;
         });
