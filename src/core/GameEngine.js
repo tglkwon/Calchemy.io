@@ -68,7 +68,7 @@ export class GameEngine {
         this.offeredRelics = [];
 
         // Economy & Shop State
-        this.gold = 100; // Starting gold
+        this.gold = 1000; // Starting gold (Modified to 1000 for testing)
         this.shopRemovalCost = 75; // Slay the Spire default starting cost
         this.shopInventory = {
             cards: [],

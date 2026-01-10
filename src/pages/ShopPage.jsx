@@ -48,6 +48,13 @@ const ShopPage = () => {
         else if (displayId === '흙') displayId = 'EARTH';
         else if (displayId === '바람') displayId = 'WIND';
 
+        // Override icons for Potions and Relics as requested
+        const renderIcon = () => {
+            if (type === 'potion') return <span className="text-4xl">🧪</span>;
+            if (type === 'relic') return <span className="text-4xl">🎁</span>;
+            return <AssetDisplay id={displayId} />;
+        };
+
         return (
             <div
                 className={`
@@ -62,7 +69,7 @@ const ShopPage = () => {
                     </div>
                 )}
                 <div className="w-16 h-16 bg-black/20 rounded-full flex items-center justify-center text-3xl shadow-inner">
-                    <AssetDisplay id={displayId} />
+                    {renderIcon()}
                 </div>
                 <div className="text-center">
                     <div className="font-bold text-sm leading-tight text-slate-900">{item.name}</div>
@@ -81,9 +88,9 @@ const ShopPage = () => {
     };
 
     return (
-        <div className="shop-bg min-h-full p-8 border-[12px] border-shop-border relative overflow-y-auto text-slate-900">
+        <div className="shop-bg h-full p-8 border-[12px] border-shop-border relative overflow-y-auto text-slate-900">
             {/* Top Bar */}
-            <div className="flex justify-between items-center mb-12 bg-black/60 p-4 rounded-lg border border-shop-border/50 text-white backdrop-blur-sm">
+            <div className="flex justify-between items-center mb-8 bg-black/60 p-4 rounded-lg border border-shop-border/50 text-white backdrop-blur-sm">
                 <div className="flex gap-8">
                     <div className="flex items-center gap-2">
                         <span className="text-yellow-500 font-bold">💰 골드:</span>
@@ -101,10 +108,9 @@ const ShopPage = () => {
                 <h1 className="text-3xl font-serif font-bold text-yellow-500 tracking-widest uppercase drop-shadow-md">연금술 상점</h1>
             </div>
 
-            <div className="grid grid-cols-12 gap-8 max-w-6xl mx-auto">
-                {/* Main Card Section (8장: 4x2) */}
-                <div className="col-span-8 flex flex-col gap-4">
-                    <h2 className="text-xl font-serif font-bold border-b-2 border-shop-border/20 mb-2 py-1">추천 카드</h2>
+            <div className="max-w-6xl mx-auto flex flex-col gap-10">
+                {/* Section 1: Main Products (Cards) */}
+                <div className="bg-black/5 p-6 rounded-xl border border-shop-border/20">
                     <div className="grid grid-cols-4 gap-4">
                         {shopInventory.cards.map(card => (
                             <ItemCard key={card.id} type="card" item={card} />
@@ -112,22 +118,21 @@ const ShopPage = () => {
                     </div>
                 </div>
 
-                {/* Right Items & Service Section */}
-                <div className="col-span-4 flex flex-col gap-8">
-                    {/* Card Removal Service */}
-                    <div className="flex flex-col gap-2">
-                        <h2 className="text-xl font-serif font-bold border-b-2 border-shop-border/20 mb-2 py-1">상점 서비스</h2>
+                {/* Section 2: Bottom Row (Services & Miscellaneous) */}
+                <div className="grid grid-cols-12 gap-8">
+                    {/* Left Station: Card Removal */}
+                    <div className="col-span-4">
                         <div
-                            className="parchment-panel p-6 flex flex-col items-center gap-4 border-2 border-dashed border-shop-border/30 hover:border-shop-border/60 cursor-pointer transition-all group"
+                            className="parchment-panel h-full p-6 flex flex-col items-center justify-center gap-4 border-2 border-dashed border-shop-border/30 hover:border-shop-border/60 cursor-pointer transition-all group shadow-lg"
                             onClick={() => setRemovingCard(true)}
                         >
-                            <div className="text-5xl group-hover:scale-110 transition-transform">🗑️</div>
+                            <div className="text-6xl group-hover:scale-110 transition-transform drop-shadow-md">🗑️</div>
                             <div className="text-center">
-                                <div className="font-bold text-lg text-slate-900">카드 제거</div>
+                                <div className="font-bold text-xl text-slate-900 mb-1">카드 제거</div>
                                 <div className="text-xs text-slate-800/60 leading-tight">덱에서 원하지 않는 카드를<br />영구적으로 제거합니다.</div>
                             </div>
                             <div className={`
-                                px-3 py-1 rounded flex items-center gap-1 font-bold shadow-sm border border-black/10 bg-black/10
+                                mt-2 px-4 py-1.5 rounded-full flex items-center gap-1 font-bold shadow-md border border-black/10 bg-black/20
                                 ${gold >= shopRemovalCost ? 'text-yellow-600' : 'text-red-600'}
                             `}>
                                 <span className="drop-shadow-sm">💰</span>
@@ -136,15 +141,12 @@ const ShopPage = () => {
                         </div>
                     </div>
 
-                    {/* Relics & Potions */}
-                    <div className="flex flex-col gap-4">
-                        <h2 className="text-xl font-serif font-bold border-b-2 border-shop-border/20 mb-2 py-1">유물 및 비약</h2>
-                        <div className="grid grid-cols-3 gap-2">
+                    {/* Right Station: Relics & Potions */}
+                    <div className="col-span-8 flex flex-col gap-4 bg-black/5 p-6 rounded-xl border border-shop-border/20">
+                        <div className="grid grid-cols-3 gap-4">
                             {shopInventory.relics.map(relic => (
                                 <ItemCard key={relic.id || relic.artifactId} type="relic" item={relic} />
                             ))}
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
                             {shopInventory.potions.map(potion => (
                                 <ItemCard key={potion.id} type="potion" item={potion} />
                             ))}
@@ -154,7 +156,7 @@ const ShopPage = () => {
             </div>
 
             {/* Exit Button */}
-            <div className="mt-12 flex justify-center">
+            <div className="mt-10 mb-6 flex justify-center">
                 <button
                     onClick={() => navigate('/map')}
                     className="bg-shop-border border-2 border-shop-border/50 text-parchment-gold px-12 py-3 rounded-full font-serif font-bold text-xl uppercase tracking-widest shadow-xl transition-all hover:bg-shop-border/80 hover:scale-105 active:scale-95"
@@ -162,6 +164,7 @@ const ShopPage = () => {
                     상점 나가기
                 </button>
             </div>
+
 
             {/* Card Removal Modal Overlay */}
             {removingCard && (

@@ -1,8 +1,8 @@
 # **연금술사 오토 배틀러 \- 개발 현황 및 히스토리**
 
-**문서 버전:** v1.4
+**문서 버전:** v1.5
 
-**최종 수정일:** 2025.12.27
+**최종 수정일:** 2026.01.10
 
 ## **1\. 기술 스택 (Tech Stack)**
 
@@ -62,6 +62,17 @@
     *   `CardSystem` 확장: `SWAP`, `REPLACE`, `TRANSFORM` 액션 및 반사형(Reflection) 타겟팅 구현 완료.
     *   `KeywordSystem` 연동: CSV-JSON 파이프라인과 그리드 액션 실행 로직 연결.
     *   문서화: `data_driven_Pipeline_GRID.md` 및 `README.md`에 JSON 키워드 레퍼런스 추가.
+
+### **v1.5 (2026.01.10)**
+
+*   **Tailwind CSS 스타일 시스템 통합 (Styling Unification):**
+    *   기존 개별 CSS 파일(`MapPage.css`, `ShopPage.css`, `App.css`)을 모두 제거하고 Tailwind CSS로 통일.
+    *   `index.css`에서 Tailwind 4의 `@theme` 및 `@layer utilities`를 활용해 공통 애니메이션(빙고 플래시, 보스 펄스 등) 및 배경 테마 관리.
+*   **상점 페이지 고도화 (Shop Page Redesign):**
+    *   **UI 개편:** 불필요한 텍스트 헤더를 제거하고 상단(카드), 하단(서비스/잡화) 선반 구조로 레이아웃 재배치.
+    *   **아이콘 표준화:** 유물은 보물상자(🎁), 포션은 실험관(🧪) 이모지로 시각적 통일성 부여.
+*   **테스트 환경 개선:**
+    *   초기 보유 골드를 100에서 1000으로 상향 조정하여 상점 기능 테스트 편의성 확보.
 
 ### **v1.4 (2025.12.27)**
 
