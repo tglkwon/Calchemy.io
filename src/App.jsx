@@ -10,6 +10,8 @@ import DeckPage from './pages/DeckPage';
 import RelicPage from './pages/RelicPage';
 import MapPage from './pages/MapPage';
 import ShopPage from './pages/ShopPage';
+import EventPage from './pages/EventPage';
+import GlobalStatusBar from './components/GlobalStatusBar';
 
 const NavBar = () => {
   const location = useLocation();
@@ -27,6 +29,7 @@ const NavBar = () => {
         <Link to="/deck" className={`px-3 py-2 rounded transition-colors ${isActive('/deck')}`}>덱 구성</Link>
         <Link to="/relic" className={`px-3 py-2 rounded transition-colors ${isActive('/relic')}`}>유물</Link>
         <Link to="/shop" className={`px-3 py-2 rounded transition-colors ${isActive('/shop')}`}>상점</Link>
+        <Link to="/event" className={`px-3 py-2 rounded transition-colors ${isActive('/event')}`}>이벤트</Link>
       </div>
       <button
         onClick={toggleMode}
@@ -46,7 +49,10 @@ function App() {
           <Router>
             <div className="min-h-screen bg-gray-950 text-gray-100 font-sans">
               <NavBar />
-              <main className="container mx-auto p-4 h-[calc(100vh-64px)] overflow-hidden">
+              <div className="sticky top-0 z-50">
+                <GlobalStatusBar />
+              </div>
+              <main className="container mx-auto p-4 h-[calc(100vh-120px)] overflow-hidden">
                 <Routes>
                   <Route path="/" element={<BattlePage />} />
                   <Route path="/map" element={<MapPage />} />
@@ -54,6 +60,7 @@ function App() {
                   <Route path="/deck" element={<DeckPage />} />
                   <Route path="/relic" element={<RelicPage />} />
                   <Route path="/shop" element={<ShopPage />} />
+                  <Route path="/event" element={<EventPage />} />
                 </Routes>
               </main>
             </div>

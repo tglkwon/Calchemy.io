@@ -78,6 +78,10 @@ export class GameEngine {
             saleItemId: null
         };
 
+        // Inventory
+        this.potions = []; // Max 3
+        this.maxPotions = 3;
+
         // Bindings
         this.runTurn = this.runTurn.bind(this);
     }
@@ -332,6 +336,19 @@ export class GameEngine {
             return false;
         }
 
+        if (itemType === 'potion') {
+            if (this.potions.length >= this.maxPotions) {
+                this.log(`❌ 포션 슬롯이 가득 찼습니다!`);
+                return false;
+            }
+            this.gold -= itemData.price;
+            this.log(`🛒 포션 구매: ${itemData.name}`);
+            this.potions.push(itemData);
+            this.shopInventory.potions = this.shopInventory.potions.filter(p => p.id !== itemData.id);
+            this.notify();
+            return true;
+        }
+
         this.gold -= itemData.price;
 
         if (itemType === 'card') {
@@ -342,14 +359,35 @@ export class GameEngine {
             this.log(`🛒 유물 구매: ${itemData.name}`);
             this.relicSystem.activateRelic(itemData.id || itemData.artifactId);
             this.shopInventory.relics = this.shopInventory.relics.filter(r => (r.id !== itemData.id && r.artifactId !== itemData.id));
-        } else if (itemType === 'potion') {
-            this.log(`🛒 포션 구매: ${itemData.name}`);
-            // TODO: Implement potion system if not exists, but for now just log
-            this.shopInventory.potions = this.shopInventory.potions.filter(p => p.id !== itemData.id);
         }
 
         this.notify();
         return true;
+    }
+
+    usePotion(index) {
+        if (index < 0 || index >= this.potions.length) return;
+        const potion = this.potions[index];
+
+        // MVP: Simple usage logic here. Later delegate to EffectSystem or ItemSystem
+        this.log(`🧪 포션 사용: ${potion.name}`);
+
+        // Hardcoded simple effects for MVP or parse logic
+        // Assuming potion has 'summary' or 'logic'? Data structure check needed.
+        // For now, let's assume it heals 20 if no logic found, or parsing name.
+        if (potion.name.includes('체력')) {
+            this.golem.heal(20);
+        } else if (potion.name.includes('힘')) {
+            this.golem.baseAttack += 2;
+        } else if (potion.name.includes('폭발')) {
+            this.minions.forEach(m => {
+                if (m.isAlive) m.takeDamage(20);
+            });
+        }
+
+        // Remove used potion
+        this.potions.splice(index, 1);
+        this.notify();
     }
 
     removeCardInShop(cardInstanceId) {
@@ -777,6 +815,8 @@ export class GameEngine {
             shopInventory: this.shopInventory,
             shopRemovalCost: this.shopRemovalCost,
             shopEnhanceCost: this.shopEnhanceCost,
+            potions: this.potions,
+            maxPotions: this.maxPotions
         };
     }
 }

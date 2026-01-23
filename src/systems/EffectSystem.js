@@ -15,6 +15,10 @@ export const EffectType = {
     GAIN_ENERGY: 'GAIN_ENERGY',
     SPECIAL: 'SPECIAL',
     GRID_MANIPULATION: 'GRID_MANIPULATION',
+    EVENT_GAIN_GOLD: 'EVENT_GAIN_GOLD',
+    EVENT_LOSE_HP: 'EVENT_LOSE_HP',
+    EVENT_HEAL_PAID: 'EVENT_HEAL_PAID',
+    // Add more as needed
     NONE: 'NONE'
 };
 
@@ -122,6 +126,44 @@ export const executeEffect = (effect, gameState, targetUnit = null) => {
             if (engine) {
                 // engine.drawCard(); // If engine has this method
                 logMsg = `🃏 드로우: (미구현)`;
+            }
+            break;
+        }
+
+        // --- Event Specific Effects ---
+        case EffectType.EVENT_GAIN_GOLD: {
+            if (engine) {
+                engine.addGold(effect.value);
+                logMsg = `💰 골드 획득: +${effect.value}`;
+            }
+            break;
+        }
+
+        case EffectType.EVENT_LOSE_HP: {
+            if (golem && golem.isAlive) {
+                const dmg = effect.value || 0;
+                // Direct HP reduction, not blockable? Usually events are direct damage.
+                // Using takeDamage might trigger block. 
+                // If we want "Lose HP" (unblockable), we modify hp directly or use a specific method.
+                // For now, let's use takeDamage for consistency, or check if we need unblockable.
+                // Slay the Spire "Lose HP" ignores block.
+                golem.hp -= dmg;
+                if (golem.hp < 0) golem.hp = 0;
+                logMsg = `💔 체력 손실: -${dmg}`;
+            }
+            break;
+        }
+
+        case EffectType.EVENT_HEAL_PAID: {
+            // value = heal amount, cost = gold cost
+            if (engine && golem && golem.isAlive) {
+                if (engine.gold >= effect.cost) {
+                    engine.addGold(-effect.cost);
+                    const healed = golem.heal(effect.value);
+                    logMsg = `✨ 치료 완료: 체력 +${healed} (골드 -${effect.cost})`;
+                } else {
+                    logMsg = `❌ 골드 부족!`;
+                }
             }
             break;
         }

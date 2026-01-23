@@ -66,24 +66,14 @@ const BattlePage = () => {
                     <div className="h-full bg-yellow-500 w-full animate-pulse"></div>
                 </div>
 
-                {/* Active Relics Display */}
+                {/* Active Relics Display - Moved to GlobalStatusBar */}
+                {/* 
                 {activeRelics.length > 0 && (
                     <div className="flex gap-2 justify-center w-full">
-                        {activeRelics.map(relic => (
-                            <div
-                                key={relic.id}
-                                className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center border border-yellow-600 text-lg relative group cursor-help"
-                            >
-                                <AssetDisplay id={relic.id} />
-                                {/* Tooltip */}
-                                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 bg-black/90 text-xs text-gray-200 p-2 rounded border border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                    <div className="font-bold text-yellow-500 mb-1">{relic.name}</div>
-                                    {relic.description}
-                                </div>
-                            </div>
-                        ))}
+                        ...
                     </div>
                 )}
+                */}
 
                 <div className="flex justify-between w-full items-center px-4">
                     <div className="text-xl font-bold">Turn: {turnCount}</div>

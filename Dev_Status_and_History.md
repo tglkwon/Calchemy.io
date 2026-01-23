@@ -1,8 +1,8 @@
 # **연금술사 오토 배틀러 \- 개발 현황 및 히스토리**
 
-**문서 버전:** v1.5
+**문서 버전:** v2.0
 
-**최종 수정일:** 2026.01.10
+**최종 수정일:** 2025.01.23
 
 ## **1\. 기술 스택 (Tech Stack)**
 
@@ -62,6 +62,29 @@
     *   `CardSystem` 확장: `SWAP`, `REPLACE`, `TRANSFORM` 액션 및 반사형(Reflection) 타겟팅 구현 완료.
     *   `KeywordSystem` 연동: CSV-JSON 파이프라인과 그리드 액션 실행 로직 연결.
     *   문서화: `data_driven_Pipeline_GRID.md` 및 `README.md`에 JSON 키워드 레퍼런스 추가.
+
+### **v2.0 (2025.01.23) - 이벤트 시스템 및 2.0 업데이트**
+
+*   **이벤트 시스템 구현 (Event System Implementation):**
+    *   **데이터 파이프라인 확장:** `generateGameData.js` 업데이트로 `연금술 오토 배틀러 컨텐츠 - 이벤트.csv` 자동 파싱 및 JSON 변환 지원.
+    *   **선택지 파싱 로직:** CSV의 요약 텍스트에서 `/`, `또는` 등의 구분자를 통해 다중 선택지를 자동 생성하는 로직 구현.
+    *   **핵심 로직:**
+        *   `MapGenerator.js`: 시드(Seed) 기반 랜덤 및 중복 방지(Unique Selection) 로직 적용.
+        *   `EventLibrary.js`: 런타임 이벤트 핸들링 및 조건부 효과 처리.
+        *   `EffectSystem.js`: `EVENT_GAIN_GOLD`, `EVENT_LOSE_HP` 등 이벤트 전용 효과 타입 추가.
+    *   **UI/UX:**
+        *   `EventPage.jsx`: 상단(비주얼/서사) - 하단(선택지) 2단 레이아웃 구현.
+        *   네비게이션: 상단 메뉴바에 '이벤트' 바로가기 추가 및 맵 노드 연동.
+*   **개발 환경 개선:**
+    *   Node.js 16 호환성 문제 해결을 위해 Vite 및 플러그인 버전을 다운그레이드(v4)하여 안정적인 `npm run dev` 환경 구축.
+    *   브라우저 기반 자동화 테스트를 통해 이벤트 진입-선택-귀환 플로우 검증 완료.
+    *   `walkthrough.md`에 검증 스크린샷 및 영상 포함.
+*   **UI/UX 대규모 개선 (Global Status Bar):**
+    *   **전역 상태 바 도입:** `NavBar` 하단에 HP, Gold, 포션, 유물 정보를 상시 표시하는 `GlobalStatusBar` 컴포넌트 추가.
+    *   **포션 시스템 (Potion System):**
+        *   `GameEngine`에 포션 인벤토리(최대 3슬롯) 및 사용(`usePotion`) 로직 구현.
+        *   상점 구매 시 인벤토리 추가, 전투/이동 중 클릭 시 즉시 사용 기능 연동.
+    *   **안정성 강화:** `GameProvider` 리팩토링 중 발생한 메서드 유실 복구 및 렌더링 안정화.
 
 ### **v1.5 (2026.01.10)**
 

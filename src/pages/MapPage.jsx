@@ -26,6 +26,8 @@ const MapPage = () => {
         } else if (node.roomType === RoomType.SHOP) {
             // Shop node - navigate to shop page
             navigate('/shop');
+        } else if (node.roomType === RoomType.EVENT) {
+            navigate('/event');
         }
     };
 

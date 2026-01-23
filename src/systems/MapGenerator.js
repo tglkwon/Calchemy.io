@@ -30,6 +30,45 @@ export class MapNode {
 /**
  * Procedural Map Generator based on Slay the Spire.
  */
+import gameData from '../generated/gameData.json';
+
+/**
+ * Simple Linear Congruential Generator for seeded randomness.
+ */
+class RNG {
+    constructor(seed) {
+        // Handle string seeds by hashing
+        if (typeof seed === 'string') {
+            this.state = this.hashString(seed);
+        } else {
+            this.state = seed ? seed : Math.floor(Math.random() * 2147483647);
+        }
+    }
+
+    hashString(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return Math.abs(hash);
+    }
+
+    next() {
+        this.state = (this.state * 48271) % 2147483647;
+        return this.state / 2147483647;
+    }
+
+    // Helper to get integer range [min, max)
+    range(min, max) {
+        return Math.floor(this.next() * (max - min)) + min;
+    }
+}
+
+/**
+ * Procedural Map Generator based on Slay the Spire.
+ */
 export class MapGenerator {
     constructor(settings = {}) {
         this.mapWidth = settings.mapWidth || 7;
@@ -38,6 +77,10 @@ export class MapGenerator {
         this.xSpacing = settings.xSpacing || 100;
         this.ySpacing = settings.ySpacing || 80;
         this.jitter = settings.jitter || 20;
+
+        // RNG Setup
+        this.seed = settings.seed || Math.random().toString(36).substring(7);
+        this.rng = new RNG(this.seed);
 
         this.nodes = [];
         this.grid = []; // 2D array [y][x]
@@ -65,19 +108,20 @@ export class MapGenerator {
         return {
             nodes: this.nodes,
             mapWidth: this.mapWidth,
-            mapHeight: this.mapHeight
+            mapHeight: this.mapHeight,
+            seed: this.seed
         };
     }
 
     createPaths() {
         for (let i = 0; i < this.pathCount; i++) {
-            let currentX = Math.floor(Math.random() * this.mapWidth);
+            let currentX = Math.floor(this.rng.next() * this.mapWidth);
 
             for (let y = 0; y < this.mapHeight; y++) {
                 if (!this.grid[y][currentX]) {
                     // Option A: y=0 is top, position.y increases for downward flow
-                    const posX = currentX * this.xSpacing + (Math.random() - 0.5) * this.jitter;
-                    const posY = y * this.ySpacing + (Math.random() - 0.5) * this.jitter;
+                    const posX = currentX * this.xSpacing + (this.rng.next() - 0.5) * this.jitter;
+                    const posY = y * this.ySpacing + (this.rng.next() - 0.5) * this.jitter;
 
                     const newNode = new MapNode(currentX, y, posX, posY);
                     this.grid[y][currentX] = newNode;
@@ -95,7 +139,7 @@ export class MapGenerator {
         const candidates = [currentX];
         if (currentX > 0) candidates.push(currentX - 1);
         if (currentX < this.mapWidth - 1) candidates.push(currentX + 1);
-        return candidates[Math.floor(Math.random() * candidates.length)];
+        return candidates[Math.floor(this.rng.next() * candidates.length)];
     }
 
     connectNodes() {
@@ -112,12 +156,12 @@ export class MapGenerator {
 
                 if (potentialTargets.length > 0) {
                     // Always link at least one
-                    const primary = potentialTargets[Math.floor(Math.random() * potentialTargets.length)];
+                    const primary = potentialTargets[Math.floor(this.rng.next() * potentialTargets.length)];
                     this.link(node, primary);
 
                     // Chance for extra links (crossings)
                     potentialTargets.forEach(target => {
-                        if (target !== primary && Math.random() < 0.2) {
+                        if (target !== primary && this.rng.next() < 0.2) {
                             this.link(node, target);
                         }
                     });
@@ -175,6 +219,15 @@ export class MapGenerator {
     }
 
     assignRoomTypes() {
+        // Pool of available events (Clone to avoid modifying original info if needed, though here we want a consumable list for this map generation)
+        let availableEvents = [...(gameData.events || [])];
+
+        // Shuffle events using seeded RNG (Fisher-Yates)
+        for (let i = availableEvents.length - 1; i > 0; i--) {
+            const j = Math.floor(this.rng.next() * (i + 1));
+            [availableEvents[i], availableEvents[j]] = [availableEvents[j], availableEvents[i]];
+        }
+
         this.nodes.forEach(node => {
             if (node.roomType === RoomType.BOSS) return;
 
@@ -185,7 +238,7 @@ export class MapGenerator {
             } else if (node.y === Math.floor(this.mapHeight / 2)) {
                 node.roomType = RoomType.TREASURE;
             } else {
-                const roll = Math.random();
+                const roll = this.rng.next();
                 const canElite = node.y >= 5;
 
                 if (canElite && roll < 0.15) {
@@ -194,12 +247,22 @@ export class MapGenerator {
                     node.roomType = RoomType.SHOP;
                 } else if (roll < 0.5) {
                     node.roomType = RoomType.EVENT;
+
+                    // Assign specific event ID
+                    if (availableEvents.length > 0) {
+                        // Pop an event to ensure uniqueness
+                        const pickedEvent = availableEvents.pop();
+                        node.eventId = pickedEvent.id;
+                    } else {
+                        // Fallback if we run out of events
+                        node.eventId = "EVENT_GENERIC";
+                    }
                 } else {
                     node.roomType = RoomType.MONSTER;
                 }
             }
-            
-            // Post-process: Replace any remaining REST with SHOP (though the logic above already avoids REST)
+
+            // Post-process: Replace any remaining REST with SHOP
             if (node.roomType === RoomType.REST) {
                 node.roomType = RoomType.SHOP;
             }

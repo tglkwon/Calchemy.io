@@ -116,6 +116,7 @@ async function generate() {
         const artifactData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 유물.csv');
         const potionData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 포션.csv');
         const enhancementData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 강화.csv');
+        const eventData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 이벤트.csv');
 
         // 2. Process Cards
         const processedCards = cardData.map(rawCard => {
@@ -193,6 +194,31 @@ async function generate() {
             };
         }).filter(e => e.id !== "undefined" && e.id !== "No");
 
+        // 6. Process Events
+        let lastRange = "모든 막"; // Default fallback
+        const processedEvents = eventData.map(raw => {
+            // Handle merged cells (empty range inherits from previous)
+            let range = raw['등장 구간'];
+            if (range && range.trim() !== "" && range !== "-") {
+                lastRange = range;
+            } else {
+                range = lastRange;
+            }
+
+            const name = raw['이벤트명'];
+            if (!name) return null; // Skip invalid rows
+
+            return {
+                id: `EVENT_${name}`, // Simple ID generation
+                name: name,
+                range: range,
+                summary: raw['주요 선택지 및 효과'],
+                // Attempt to parse simple choices if delimiters exist
+                choices: raw['주요 선택지 및 효과'] ? raw['주요 선택지 및 효과'].split(/ \/ | 또는 | vs /).map(s => s.trim()) : [],
+                condition: raw['특이사항 / 등장 조건'] || "-"
+            };
+        }).filter(e => e !== null);
+
         // 6. Merge with Manual Definitions
         const mergedCards = processedCards.map(csvCard => {
             const manualDef = CardDefinitions[csvCard.id];
@@ -222,6 +248,7 @@ async function generate() {
             artifacts: processedArtifacts,
             potions: processedPotions,
             enhancements: processedEnhancements,
+            events: processedEvents,
             generatedAt: new Date().toISOString()
         };
 
@@ -231,6 +258,7 @@ async function generate() {
         console.log(`Total Cards: ${mergedCards.length}`);
         console.log(`Total Artifacts: ${processedArtifacts.length}`);
         console.log(`Total Potions: ${processedPotions.length}`);
+        console.log(`Total Events: ${processedEvents.length}`);
 
     } catch (error) {
         console.error("Error generating game data:", error);
