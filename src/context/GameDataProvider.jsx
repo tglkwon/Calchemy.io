@@ -7,7 +7,7 @@ const GameDataContext = createContext(null);
 export const useGameData = () => useContext(GameDataContext);
 
 export const GameDataProvider = ({ children }) => {
-    const [gameData, setGameData] = useState({ cards: [], keywords: [], artifacts: [], potions: [] });
+    const [gameData, setGameData] = useState({ cards: [], keywords: [], artifacts: [], potions: [], enhancements: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 

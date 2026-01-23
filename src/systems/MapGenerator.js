@@ -181,7 +181,7 @@ export class MapGenerator {
             if (node.y === 0) {
                 node.roomType = RoomType.MONSTER;
             } else if (node.y === this.mapHeight - 1) {
-                node.roomType = RoomType.REST;
+                node.roomType = RoomType.SHOP; // Last floor before boss is always a shop
             } else if (node.y === Math.floor(this.mapHeight / 2)) {
                 node.roomType = RoomType.TREASURE;
             } else {
@@ -197,6 +197,11 @@ export class MapGenerator {
                 } else {
                     node.roomType = RoomType.MONSTER;
                 }
+            }
+            
+            // Post-process: Replace any remaining REST with SHOP (though the logic above already avoids REST)
+            if (node.roomType === RoomType.REST) {
+                node.roomType = RoomType.SHOP;
             }
         });
     }

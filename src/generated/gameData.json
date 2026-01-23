@@ -4121,5 +4121,61 @@
       "description": "다음 턴, 첫 번째로 발동되는 빙고의 효과가 3배"
     }
   ],
-  "generatedAt": "2026-01-10T11:47:01.930Z"
+  "enhancements": [
+    {
+      "id": "1",
+      "name": "보너스 공격",
+      "type": "ENHANCEMENT",
+      "field": "ATTACK",
+      "value": 10,
+      "description": "효과 수치 +10",
+      "icon": "⚔️"
+    },
+    {
+      "id": "2",
+      "name": "견고한 방어",
+      "type": "ENHANCEMENT",
+      "field": "BLOCK",
+      "value": 10,
+      "description": "방어도 수치 +10",
+      "icon": "🛡️"
+    },
+    {
+      "id": "3",
+      "name": "황금 인장",
+      "type": "SEAL",
+      "field": "BINGO",
+      "value": 1,
+      "description": "빙고 보상 2배",
+      "icon": "🏷️"
+    },
+    {
+      "id": "4",
+      "name": "영구 인장",
+      "type": "SEAL",
+      "field": "EXHAUST",
+      "value": 1,
+      "description": "이 카드는 소멸하지 않음",
+      "icon": "💙"
+    },
+    {
+      "id": "5",
+      "name": "홀로그램",
+      "type": "EDITION",
+      "field": "EFFECT",
+      "value": 0.5,
+      "description": "모든 피해 1.5배",
+      "icon": "✨"
+    },
+    {
+      "id": "6",
+      "name": "폴리크롬",
+      "type": "EDITION",
+      "field": "EFFECT",
+      "value": 1.5,
+      "description": "모든 피해 2.5배",
+      "icon": "🌈"
+    }
+  ],
+  "generatedAt": "2026-01-23T07:56:35.530Z"
 }

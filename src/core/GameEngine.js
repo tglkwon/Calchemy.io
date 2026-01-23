@@ -70,6 +70,7 @@ export class GameEngine {
         // Economy & Shop State
         this.gold = 1000; // Starting gold (Modified to 1000 for testing)
         this.shopRemovalCost = 75; // Slay the Spire default starting cost
+        this.shopEnhanceCost = 50; // Starting enhancement cost
         this.shopInventory = {
             cards: [],
             relics: [],
@@ -282,10 +283,22 @@ export class GameEngine {
 
         // 8 Cards (4x2 grid)
         const allCards = gameData.cards || [];
-        const shopCards = [...allCards].sort(() => Math.random() - 0.5).slice(0, 8).map(card => ({
-            ...card,
-            price: Math.floor(25 + Math.random() * 50) // Basic cards 25-75 gold
-        }));
+        const shopCards = [...allCards].sort(() => Math.random() - 0.5)
+            .slice(0, 8)
+            .map((card, index) => ({
+                ...card,
+                instanceId: `shop_card_${Date.now()}_${index}`, // Temporary ID for shop reference
+                price: Math.floor(40 + Math.random() * 40) // Cards 40-80 gold
+            }));
+
+        // 1 Random card on sale (50% discount) - strictly among cards as per request
+        const saleIndex = Math.floor(Math.random() * shopCards.length);
+        const saleItem = shopCards[saleIndex];
+        if (saleItem) {
+            saleItem.originalPrice = saleItem.price;
+            saleItem.price = Math.floor(saleItem.price * 0.5);
+            saleItem.onSale = true;
+        }
 
         // 3 Relics
         const allRelics = gameData.artifacts || [];
@@ -303,20 +316,11 @@ export class GameEngine {
             price: Math.floor(50 + Math.random() * 50) // Potions 50-100 gold
         }));
 
-        // 1 Random item on sale (50% discount)
-        const combined = [...shopCards, ...shopRelics, ...shopPotions];
-        const saleItem = combined[Math.floor(Math.random() * combined.length)];
-        if (saleItem) {
-            saleItem.originalPrice = saleItem.price;
-            saleItem.price = Math.floor(saleItem.price * 0.5);
-            saleItem.onSale = true;
-        }
-
         this.shopInventory = {
             cards: shopCards,
             relics: shopRelics,
             potions: shopPotions,
-            saleItemId: saleItem ? saleItem.id : null
+            saleItemId: saleItem ? (saleItem.instanceId || saleItem.id) : null
         };
 
         this.notify();
@@ -332,8 +336,8 @@ export class GameEngine {
 
         if (itemType === 'card') {
             this.log(`🛒 카드 구매: ${itemData.name}`);
-            this.cardSystem.addCard(itemData.id);
-            this.shopInventory.cards = this.shopInventory.cards.filter(c => c.id !== itemData.id);
+            this.cardSystem.addCard(itemData);
+            this.shopInventory.cards = this.shopInventory.cards.filter(c => c.instanceId !== itemData.instanceId);
         } else if (itemType === 'relic') {
             this.log(`🛒 유물 구매: ${itemData.name}`);
             this.relicSystem.activateRelic(itemData.id || itemData.artifactId);
@@ -361,6 +365,28 @@ export class GameEngine {
         this.log(`🔥 카드 제거 서비스 이용 완료 (다음 비용: ${this.shopRemovalCost})`);
         this.notify();
         return true;
+    }
+
+    enhanceCardInShop(cardInstanceId, enhancement) {
+        if (this.gold < this.shopEnhanceCost) {
+            this.log(`❌ 골드가 부족합니다! (필요: ${this.shopEnhanceCost}, 보유: ${this.gold})`);
+            return false;
+        }
+
+        this.gold -= this.shopEnhanceCost;
+
+        // enhancement includes { type, field, value, name }
+        // e.g. { type: 'ENHANCEMENT', field: 'ATTACK', value: 10, name: '보너스 공격' }
+        const success = this.cardSystem.enhanceCard(cardInstanceId, enhancement);
+
+        if (success) {
+            this.log(`✨ 카드 강화 성공: [${enhancement.name}] 적용 완료!`);
+            // this.shopEnhanceCost += 25; // Option: increase cost
+            this.notify();
+            return true;
+        }
+
+        return false;
     }
 
     addGold(amount) {
@@ -750,6 +776,7 @@ export class GameEngine {
             gold: this.gold,
             shopInventory: this.shopInventory,
             shopRemovalCost: this.shopRemovalCost,
+            shopEnhanceCost: this.shopEnhanceCost,
         };
     }
 }

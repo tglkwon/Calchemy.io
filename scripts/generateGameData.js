@@ -115,6 +115,7 @@ async function generate() {
         const keywordData = keywordDataRaw.filter(k => k.No !== "고유 번호" && k.No !== "No" && k.No !== undefined);
         const artifactData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 유물.csv');
         const potionData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 포션.csv');
+        const enhancementData = await loadAndProcessCSV('연금술 오토 배틀러 컨텐츠 - 강화.csv');
 
         // 2. Process Cards
         const processedCards = cardData.map(rawCard => {
@@ -179,7 +180,20 @@ async function generate() {
             };
         }).filter(p => p.id !== "undefined" && p.id !== "고유 번호" && p.id !== "No");
 
-        // 5. Merge with Manual Definitions
+        // 5. Process Enhancements
+        const processedEnhancements = enhancementData.map(raw => {
+            return {
+                id: String(raw.No),
+                name: raw.Name,
+                type: raw.Type,
+                field: raw.Field,
+                value: raw.Value,
+                description: raw.Description,
+                icon: raw.Icon
+            };
+        }).filter(e => e.id !== "undefined" && e.id !== "No");
+
+        // 6. Merge with Manual Definitions
         const mergedCards = processedCards.map(csvCard => {
             const manualDef = CardDefinitions[csvCard.id];
             if (manualDef) {
@@ -207,6 +221,7 @@ async function generate() {
             keywords: keywordData,
             artifacts: processedArtifacts,
             potions: processedPotions,
+            enhancements: processedEnhancements,
             generatedAt: new Date().toISOString()
         };
 

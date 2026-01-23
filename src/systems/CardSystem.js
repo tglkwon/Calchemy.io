@@ -101,22 +101,32 @@ export class CardSystem {
 
     /**
      * Adds a card to the deck.
-     * @param {string} typeOrId - Element type or Card Definition ID
+     * @param {string|Object} cardOrId - Card object or ID
      */
-    addCard(typeOrId) {
-        // Check if it's a specific card ID
-        if (CardDefinitions[typeOrId]) {
-            const def = CardDefinitions[typeOrId];
-            this.deck.push({
-                ...def,
-                instanceId: `${def.type}_${def.id}_${Date.now()}`
-            });
+    addCard(cardOrId) {
+        let cardData;
+
+        if (typeof cardOrId === 'object' && cardOrId !== null) {
+            cardData = { ...cardOrId };
+        } else if (CardDefinitions[cardOrId]) {
+            cardData = { ...CardDefinitions[cardOrId] };
         } else {
             // Fallback for generic element type
-            const type = typeOrId;
+            const type = cardOrId;
             const id = `${type}_${Date.now()}`;
-            this.deck.push({ type, id, instanceId: id });
+            cardData = { type, id };
         }
+
+        // Ensure unique instanceId
+        cardData.instanceId = `${cardData.type || 'NONE'}_${cardData.id}_${Date.now()}`;
+
+        // Ensure price is removed if it came from shop data
+        delete cardData.price;
+        delete cardData.onSale;
+        delete cardData.originalPrice;
+
+        this.deck.push(cardData);
+        console.log(`CardSystem: Card added to deck: ${cardData.name || cardData.type}`);
     }
 
     /**
@@ -460,5 +470,33 @@ export class CardSystem {
         }
 
         return candidateIndices;
+    }
+
+    /**
+     * Enhances a card by modifying its properties.
+     * @param {string} instanceId 
+     * @param {Object} enhancement - { type, field, value, name }
+     */
+    enhanceCard(instanceId, enhancement) {
+        const cardRef = this.getAllCards().find(c => c.instanceId === instanceId);
+        if (!cardRef) return false;
+
+        // Ensure modifications array exists
+        if (!cardRef.modifications) cardRef.modifications = [];
+        cardRef.modifications.push(enhancement);
+
+        // Apply visual/logical changes based on type
+        if (enhancement.type === 'ENHANCEMENT') {
+            // Logic to modify Single_Logic or Bingo_Logic?
+            // For now, let's keep it simple: we store it and the systems will look for it.
+        } else if (enhancement.type === 'SEAL') {
+            cardRef.seal = enhancement.name;
+        } else if (enhancement.type === 'EDITION') {
+            cardRef.edition = enhancement.name;
+        }
+
+        // Force instanceId refresh for UI
+        cardRef.instanceId = `${cardRef.instanceId}_ENH_${Date.now()}`;
+        return true;
     }
 }
