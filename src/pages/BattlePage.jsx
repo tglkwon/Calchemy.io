@@ -102,6 +102,12 @@ const BattlePage = () => {
                         >
                             재시작
                         </button>
+                        <button
+                            onClick={() => gameEngine.endGame(true)}
+                            className="px-4 py-2 bg-purple-900 hover:bg-purple-800 rounded text-sm border border-purple-500"
+                        >
+                            승리(Debug)
+                        </button>
                     </div>
                 </div>
 

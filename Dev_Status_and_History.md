@@ -165,4 +165,6 @@ npm run deploy
 
 ## **5\. 트러블슈팅 및 이슈**
 
-* **이미지 경로 문제:** 로컬 개발 환경과 GitHub Pages의 경로 차이로 인해 이미지가 깨질 경우 AssetManager.js의 경로 처리 로직이나 vite.config.js의 base 설정을 확인하세요.  
+* **이미지 경로 문제:** 로컬 개발 환경과 GitHub Pages의 경로 차이로 인해 이미지가 깨질 경우 AssetManager.js의 경로 처리 로직이나 vite.config.js의 base 설정을 확인하세요.
+* **GameEngine 메서드 중복:** 클래스 메서드(getGameState 등)가 파일 내에 중복 정의될 경우, 아래쪽에 정의된 메서드가 덮어씌워져 의도치 않은 동작(상태 누락 등)을 유발할 수 있으므로 주의가 필요합니다.
+* **배포 후 ReferenceError:** 배포 직후 모듈을 찾을 수 없다는 오류(ItemSystem is not defined 등)가 발생하면, 주요 클래스 파일(`GameEngine.js` 등)의 import 구문이 리팩토링 과정에서 유실되지 않았는지 확인해야 합니다.

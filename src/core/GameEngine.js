@@ -1,4 +1,8 @@
-// ... imports
+import { Unit } from '../entities/Unit.js';
+import { CardSystem } from '../systems/CardSystem.js';
+import { RelicSystem } from '../systems/RelicSystem.js';
+import { KeywordSystem } from '../systems/KeywordSystem.js';
+import { MapGenerator, RoomType } from '../systems/MapGenerator.js';
 import { RewardSystem } from '../systems/RewardSystem.js';
 
 export class GameEngine {
@@ -173,30 +177,6 @@ export class GameEngine {
         this.notify();
     }
 
-    getGameState() {
-        return {
-            // ... existing
-            golem: this.golem.getState(),
-            minions: this.minions.map(m => m.getState()),
-            isPaused: this.isPaused,
-            turnCount: this.turnCount,
-            totalBingos: this.totalBingos,
-            harmonyBingos: this.harmonyBingos,
-            logs: this.logs,
-            // NEW
-            activeRewards: this.activeRewards,
-            gold: this.gold,
-            potions: this.potions,
-            mapData: this.mapData,
-            currentNodeId: this.currentNodeId,
-            shopInventory: this.shopInventory,
-            treasureSelectionMode: this.treasureSelectionMode,
-            offeredRelics: this.offeredRelics,
-            gameOver: this.gameOver,
-            victory: this.victory
-        };
-    }
-    // ...
 
 
     subscribe(listener) {
@@ -836,18 +816,6 @@ export class GameEngine {
         }
     }
 
-    endGame(victory) {
-        this.stop();
-        this.gameOver = true;
-        this.victory = victory;
-        if (victory) {
-            this.addGold(75);
-            this.log("🏆 승리! 75 골드를 획득했습니다.");
-        } else {
-            this.log("💀 패배!");
-        }
-        this.notify();
-    }
 
     processEndTurnStatusEffects() {
         const units = [this.golem, ...this.minions];
@@ -904,6 +872,7 @@ export class GameEngine {
         });
     }
 
+    // Unified getGameState (Legacy duplicates removed)
     getGameState() {
         return {
             golem: this.golem.getState(),
@@ -913,21 +882,38 @@ export class GameEngine {
             totalBingos: this.totalBingos,
             harmonyBingos: this.harmonyBingos,
             logs: this.logs,
+
+            // Card System
             grid: this.cardSystem.grid,
             activeCardId: this.activeCardId,
             bingoCardIds: this.bingoCardIds,
+
+            // Game End
             gameOver: this.gameOver,
             victory: this.victory,
+
+            // Relic System
             relics: this.relicSystem.getAllRelics(),
+
+            // Map System
             mapData: this.mapData,
             currentNodeId: this.currentNodeId,
             visitedNodeIds: Array.from(this.visitedNodeIds),
+
+            // Treasure
             treasureSelectionMode: this.treasureSelectionMode,
             offeredRelics: this.offeredRelics,
+
+            // Economy & Rewards
             gold: this.gold,
+            activeRewards: this.activeRewards, // Added
+
+            // Shop
             shopInventory: this.shopInventory,
             shopRemovalCost: this.shopRemovalCost,
             shopEnhanceCost: this.shopEnhanceCost,
+
+            // Potions
             potions: this.potions,
             maxPotions: this.maxPotions
         };
