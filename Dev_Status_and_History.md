@@ -2,7 +2,7 @@
 
 **문서 버전:** v2.0
 
-**최종 수정일:** 2025.01.23
+**최종 수정일:** 2026.01.24
 
 ## **1\. 기술 스택 (Tech Stack)**
 
@@ -62,6 +62,20 @@
     *   `CardSystem` 확장: `SWAP`, `REPLACE`, `TRANSFORM` 액션 및 반사형(Reflection) 타겟팅 구현 완료.
     *   `KeywordSystem` 연동: CSV-JSON 파이프라인과 그리드 액션 실행 로직 연결.
     *   문서화: `data_driven_Pipeline_GRID.md` 및 `README.md`에 JSON 키워드 레퍼런스 추가.
+
+### **v2.1 (2026.01.24) - 보상 시스템 개편 (Reward System Overhaul)**
+
+*   **보상 페이지 구현 (Reward Page Implementation):**
+    *   **UI 개편:** 양피지 테마의 전용 보상 화면(`RewardPage.jsx`) 도입.
+    *   **UX 개선:** 전투 승리 시 즉시 지도 복귀가 아닌, '보상 수령' 단계를 거쳐 사용자에게 성취감 부여.
+*   **보상 시스템 고도화 (Reward System Upgrade):**
+    *   `RewardSystem.js`: 보상 생성 로직을 별도 시스템으로 분리하여 관리.
+    *   **골드 2배 상향:** 몬스터 등급별 골드 획득량을 기존 대비 2배로 상향 조정 (예: 일반 20~50G).
+    *   **카드 드래프트 (Card Draft):** 3장의 카드 중 1장을 선택하는 '3-pick-1' 방식 및 '건너뛰기(Skip)' 기능 구현.
+    *   **유물 선택 (Relic Selection):** 엘리트/보스 처치 시 유물 선택지 제공 로직 추가.
+*   **기술적 개선:**
+    *   `GameEngine`에 `activeRewards` 상태를 추가하여 보상 데이터의 생명주기 관리.
+    *   브라우저 테스트 환경 문제(HOME 환경 변수) 트러블슈팅 및 문서화.
 
 ### **v2.0 (2025.01.23) - 이벤트 시스템 및 2.0 업데이트**
 

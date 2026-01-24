@@ -1,32 +1,24 @@
-/**
- * GameEngine.js
- * Central controller for the game loop and state management.
- * Adapted for React: Uses a subscription model for state updates.
- */
-
-import { Unit } from '../entities/Unit.js';
-import { CardSystem } from '../systems/CardSystem.js';
-import { RelicSystem } from '../systems/RelicSystem.js';
-import { KeywordSystem } from '../systems/KeywordSystem.js';
-import { MapGenerator, RoomType } from '../systems/MapGenerator.js';
+// ... imports
+import { RewardSystem } from '../systems/RewardSystem.js';
 
 export class GameEngine {
     constructor() {
         this.cardSystem = new CardSystem();
         this.relicSystem = new RelicSystem();
         this.keywordSystem = new KeywordSystem();
+        this.rewardSystem = new RewardSystem(); // NEW
 
         // Game State
         this.isPaused = false;
         this.turnIntervalId = null;
-        this.turnDuration = 5000; // 5 seconds
-        this.turnTimer = 0; // For UI progress (handled by CSS/Animation usually, but we might need to sync)
+        this.turnDuration = 5000;
+        this.turnTimer = 0;
 
         // Statistics
         this.turnCount = 0;
         this.totalBingos = 0;
         this.harmonyBingos = 0;
-        this.logs = []; // Store logs here
+        this.logs = [];
 
         // Entities
         this.golem = new Unit("Golem", 300, 0);
@@ -39,17 +31,19 @@ export class GameEngine {
             new Unit("Minion 3", 100, 0)
         ];
 
-        // Init Minion Stats
         this.minions.forEach(m => {
             m.baseAttack = 8;
             m.baseDefense = 8;
         });
 
         this.listeners = [];
-        this.activeCardId = null; // For UI highlighting
-        this.bingoCardIds = []; // For UI highlighting
+        this.activeCardId = null;
+        this.bingoCardIds = [];
         this.gameOver = false;
         this.victory = false;
+
+        // Reward State (NEW)
+        this.activeRewards = null; // { gold, cards, relics, potions, isClaimed... }
 
         // Map State
         this.mapGenerator = new MapGenerator({
@@ -63,28 +57,147 @@ export class GameEngine {
         this.currentNodeId = null;
         this.visitedNodeIds = new Set();
 
-        // Treasure Chest State
+        // Treasure State
         this.treasureSelectionMode = false;
         this.offeredRelics = [];
 
-        // Economy & Shop State
-        this.gold = 1000; // Starting gold (Modified to 1000 for testing)
-        this.shopRemovalCost = 75; // Slay the Spire default starting cost
-        this.shopEnhanceCost = 50; // Starting enhancement cost
-        this.shopInventory = {
-            cards: [],
-            relics: [],
-            potions: [],
-            saleItemId: null
-        };
+        // Economy & Shop
+        this.gold = 1000;
+        this.shopRemovalCost = 75;
+        this.shopEnhanceCost = 50;
+        this.shopInventory = { cards: [], relics: [], potions: [], saleItemId: null };
 
         // Inventory
-        this.potions = []; // Max 3
+        this.potions = [];
         this.maxPotions = 3;
 
         // Bindings
         this.runTurn = this.runTurn.bind(this);
     }
+    // ... (previous methods)
+
+    endGame(victory) {
+        this.stop();
+        this.gameOver = true;
+        this.victory = victory;
+
+        if (victory) {
+            // Updated Reward Logic
+            // 1. Determine monster type (hardcoded to NORMAL for MVP, better if passed from battle context)
+            const monsterType = 'NORMAL'; // TODO: Determine based on Map Node Type
+
+            // 2. Access Game Data (Need a way to pass this or cache it)
+            // For now, we will assume the caller (UI) might trigger generation OR we rely on cached definitions in Systems.
+            // But RewardSystem needs full list.
+            // HACK: We will generate rewards BUT we need the gameData.
+            // Let's defer generation until `generateBattleRewards` is called explicitly by UI or pass generic data?
+            // BETTER: Use `this.cardSystem.definitions` if available or empty.
+
+            // Since we need full CSV data for random drops, and GameEngine might not hold it all (only definitions),
+            // We might need to inject it or let the Provider trigger it.
+            // BUT, to keep logic central, GameEngine should handle it.
+            // Let's assume we can get it or we passed it in.
+
+            this.log("🏆 승리! 보상을 확인하세요.");
+        } else {
+            this.log("💀 패배!");
+        }
+        this.notify();
+    }
+
+    // NEW: Called by UI (GameProvider) to generate rewards with full data context
+    generateBattleRewards(monsterType, gameData) {
+        if (!this.victory) return; // Only generate if victorious
+
+        const rewards = this.rewardSystem.generateRewards({
+            type: monsterType,
+            gameData: gameData
+        });
+
+        this.activeRewards = rewards;
+        this.notify();
+    }
+
+    // NEW: Claim specific reward
+    claimReward(type, data) {
+        if (!this.activeRewards) return false;
+
+        if (type === 'GOLD') {
+            if (this.activeRewards.isClaimed.gold) return false;
+            this.addGold(this.activeRewards.gold);
+            this.activeRewards.isClaimed.gold = true;
+            this.log(`💰 골드 획득: ${this.activeRewards.gold}G`);
+        }
+        else if (type === 'CARD') {
+            // data is the selected card object
+            this.cardSystem.addCard(data);
+            this.activeRewards.isClaimed.cards = true; // One-time pick
+            this.log(`🃏 카드 획득: ${data.name}`);
+        }
+        else if (type === 'RELIC') {
+            this.relicSystem.activateRelic(data.id || data.artifactId);
+            this.activeRewards.isClaimed.relics = true;
+            this.log(`🏺 유물 획득: ${data.name}`);
+        }
+        else if (type === 'POTION') {
+            if (this.potions.length >= this.maxPotions) {
+                this.log("❌ 포션 슬롯이 가득 찼습니다.");
+                return false;
+            }
+            this.potions.push(data);
+            // Find and remove from list or mark claimed?
+            // Potions list in reward might be multiple? Usually just one specific potion clicked.
+            // For now assume single click claims that specific potion.
+            // Remove from reward list so it disappears
+            this.activeRewards.potions = this.activeRewards.potions.filter(p => p.id !== data.id);
+            this.log(`🧪 포션 획득: ${data.name}`);
+        }
+
+        this.notify();
+        return true;
+    }
+
+    skipReward(type) {
+        if (!this.activeRewards) return;
+
+        if (type === 'CARD') {
+            this.activeRewards.isClaimed.cards = true;
+            this.log("카드 보상을 건너뛰었습니다.");
+        }
+        // Add other skips if needed
+        this.notify();
+    }
+
+    completeRewards() {
+        this.activeRewards = null;
+        this.notify();
+    }
+
+    getGameState() {
+        return {
+            // ... existing
+            golem: this.golem.getState(),
+            minions: this.minions.map(m => m.getState()),
+            isPaused: this.isPaused,
+            turnCount: this.turnCount,
+            totalBingos: this.totalBingos,
+            harmonyBingos: this.harmonyBingos,
+            logs: this.logs,
+            // NEW
+            activeRewards: this.activeRewards,
+            gold: this.gold,
+            potions: this.potions,
+            mapData: this.mapData,
+            currentNodeId: this.currentNodeId,
+            shopInventory: this.shopInventory,
+            treasureSelectionMode: this.treasureSelectionMode,
+            offeredRelics: this.offeredRelics,
+            gameOver: this.gameOver,
+            victory: this.victory
+        };
+    }
+    // ...
+
 
     subscribe(listener) {
         this.listeners.push(listener);

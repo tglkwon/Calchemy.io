@@ -11,6 +11,7 @@ import RelicPage from './pages/RelicPage';
 import MapPage from './pages/MapPage';
 import ShopPage from './pages/ShopPage';
 import EventPage from './pages/EventPage';
+import RewardPage from './pages/RewardPage';
 import GlobalStatusBar from './components/GlobalStatusBar';
 
 const NavBar = () => {
@@ -61,6 +62,7 @@ function App() {
                   <Route path="/relic" element={<RelicPage />} />
                   <Route path="/shop" element={<ShopPage />} />
                   <Route path="/event" element={<EventPage />} />
+                  <Route path="/reward" element={<RewardPage />} />
                 </Routes>
               </main>
             </div>

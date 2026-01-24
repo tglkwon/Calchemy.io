@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
+import { useGameData } from '../context/GameDataProvider';
 import UnitFrame from '../components/UnitFrame';
 import Grid from '../components/Grid';
 import AssetDisplay from '../components/AssetDisplay';
 
 const BattlePage = () => {
+    const navigate = useNavigate();
     const { gameState, gameEngine } = useGame();
+    const { gameData } = useGameData();
     const { golem, minions, isPaused, turnCount, grid, activeCardId, bingoCardIds, gameOver, victory, relics } = gameState;
     const activeRelics = relics.filter(r => r.isActive);
 
@@ -66,15 +69,6 @@ const BattlePage = () => {
                     <div className="h-full bg-yellow-500 w-full animate-pulse"></div>
                 </div>
 
-                {/* Active Relics Display - Moved to GlobalStatusBar */}
-                {/* 
-                {activeRelics.length > 0 && (
-                    <div className="flex gap-2 justify-center w-full">
-                        ...
-                    </div>
-                )}
-                */}
-
                 <div className="flex justify-between w-full items-center px-4">
                     <div className="text-xl font-bold">Turn: {turnCount}</div>
                     <div className="flex gap-2">
@@ -131,12 +125,15 @@ const BattlePage = () => {
                                 다시 하기
                             </button>
                             {victory && (
-                                <Link
-                                    to="/map"
+                                <button
+                                    onClick={() => {
+                                        gameEngine.generateBattleRewards('NORMAL', gameData);
+                                        navigate('/reward');
+                                    }}
                                     className="px-8 py-3 bg-yellow-600 text-white font-bold rounded hover:bg-yellow-500 transition-colors"
                                 >
-                                    지도로 돌아가기
-                                </Link>
+                                    🎁 보상 수령
+                                </button>
                             )}
                         </div>
                     </div>
