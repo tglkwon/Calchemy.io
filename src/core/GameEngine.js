@@ -113,8 +113,22 @@ export class GameEngine {
     generateBattleRewards(monsterType, gameData) {
         if (!this.victory) return; // Only generate if victorious
 
+        // Auto-detect type from Map Node if not provided
+        let type = monsterType;
+        if (!type && this.mapData && this.currentNodeId) {
+            const node = this.mapData.nodes.find(n => n.id === this.currentNodeId);
+            if (node) {
+                if (node.roomType === RoomType.BOSS) type = 'BOSS';
+                else if (node.roomType === RoomType.ELITE) type = 'ELITE';
+                else type = 'NORMAL';
+            }
+        }
+
+        // Fallback
+        if (!type) type = 'NORMAL';
+
         const rewards = this.rewardSystem.generateRewards({
-            type: monsterType,
+            type: type,
             gameData: gameData
         });
 
@@ -248,8 +262,123 @@ export class GameEngine {
         this.cardSystem.grid = [];
         this.cardSystem.discardPile = [];
 
-        this.log("--- 게임 재시작 ---");
+        this.log("--- 전투 재시작 ---");
         this.startBattle();
+    }
+
+    startNewGame() {
+        this.stop();
+
+        // Full Reset
+        this.gold = 1000; // Reset Gold
+        this.potions = [];
+        this.relics = []; // Need to reset relics in RelicSystem too? 
+        // RelicSystem state isn't directly exposed here but `toggleRelic` calls it.
+        // We need to reset RelicSystem. `this.relicSystem = new RelicSystem()` might be cleaner but we need to re-bind?
+        // Let's just create new instances.
+        this.cardSystem = new CardSystem();
+        this.relicSystem = new RelicSystem();
+        this.keywordSystem = new KeywordSystem();
+        this.rewardSystem = new RewardSystem();
+
+        this.mapGenerator = new MapGenerator({
+            mapWidth: 7,
+            mapHeight: 15,
+            xSpacing: 100,
+            ySpacing: 100,
+            jitter: 30
+        });
+
+        this.activeRewards = null;
+        this.treasureSelectionMode = false;
+        this.offeredRelics = [];
+        this.shopInventory = { cards: [], relics: [], potions: [], saleItemId: null };
+
+        // Reset Map
+        this.generateNewMap();
+
+        // Stats
+        this.turnCount = 0;
+        this.totalBingos = 0;
+        this.harmonyBingos = 0;
+        this.logs = [];
+        this.gameOver = false;
+        this.victory = false;
+
+        // Entities
+        this.golem = new Unit("Golem", 300, 0);
+        this.golem.baseAttack = 2;
+        this.golem.baseShield = 2;
+
+        this.minions = [
+            new Unit("Minion 1", 100, 0),
+            new Unit("Minion 2", 100, 0),
+            new Unit("Minion 3", 100, 0)
+        ];
+
+        this.minions.forEach(m => {
+            m.baseAttack = 8;
+            m.baseDefense = 8;
+        });
+
+        this.log("--- 새로운 여정 시작 ---");
+        this.notify();
+    }
+
+    startNewGame() {
+        this.stop();
+
+        // Full Reset
+        this.gold = 1000;
+        this.potions = [];
+        this.relics = [];
+        this.cardSystem = new CardSystem();
+        this.relicSystem = new RelicSystem();
+        this.keywordSystem = new KeywordSystem();
+        this.rewardSystem = new RewardSystem();
+
+        this.mapGenerator = new MapGenerator({
+            mapWidth: 7,
+            mapHeight: 15,
+            xSpacing: 100,
+            ySpacing: 100,
+            jitter: 30
+        });
+
+        this.activeRewards = null;
+        this.treasureSelectionMode = false;
+        this.offeredRelics = [];
+        this.shopInventory = { cards: [], relics: [], potions: [], saleItemId: null };
+
+        // Reset Map
+        this.generateNewMap();
+
+        // Stats
+        this.turnCount = 0;
+        this.totalBingos = 0;
+        this.harmonyBingos = 0;
+        this.logs = [];
+        this.gameOver = false;
+        this.victory = false;
+
+        // Entities
+        this.golem = new Unit("Golem", 300, 0);
+        this.golem.baseAttack = 2;
+        this.golem.baseShield = 2;
+
+        this.minions = [
+            new Unit("Minion 1", 100, 0),
+            new Unit("Minion 2", 100, 0),
+            new Unit("Minion 3", 100, 0)
+        ];
+
+        this.minions.forEach(m => {
+            m.baseAttack = 8;
+            m.baseDefense = 8;
+        });
+
+        this.log("--- 새로운 여정 시작 ---");
+        this.notify();
     }
 
     stop() {

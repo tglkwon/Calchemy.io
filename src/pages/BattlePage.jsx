@@ -108,6 +108,16 @@ const BattlePage = () => {
                         >
                             승리(Debug)
                         </button>
+                        <button
+                            onClick={() => {
+                                gameEngine.activeRewards = gameEngine.rewardSystem.generateRewards({ type: 'BOSS', gameData: gameData });
+                                gameEngine.notify();
+                                navigate('/reward');
+                            }}
+                            className="px-4 py-2 bg-orange-900 hover:bg-orange-800 rounded text-sm border border-orange-500"
+                        >
+                            💥 보스 보상 테스트
+                        </button>
                     </div>
                 </div>
 
@@ -133,7 +143,7 @@ const BattlePage = () => {
                             {victory && (
                                 <button
                                     onClick={() => {
-                                        gameEngine.generateBattleRewards('NORMAL', gameData);
+                                        gameEngine.generateBattleRewards(null, gameData);
                                         navigate('/reward');
                                     }}
                                     className="px-8 py-3 bg-yellow-600 text-white font-bold rounded hover:bg-yellow-500 transition-colors"

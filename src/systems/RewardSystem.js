@@ -37,10 +37,11 @@ export class RewardSystem {
             cards: [],
             relics: [],
             potions: [],
+            isBossReward: type === 'BOSS', // Flag for multi-stage UI
             isClaimed: {
                 gold: false,
                 cards: false,
-                relics: false,
+                relics: false, // Boss Relic will use this too
                 potions: false
             }
         };

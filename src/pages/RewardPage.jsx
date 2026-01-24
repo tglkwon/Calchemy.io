@@ -6,18 +6,43 @@ import Card from '../components/Card';
 const RewardPage = () => {
     const navigate = useNavigate();
     const { gameState, gameEngine } = useGame();
-    const { activeRewards, gold: currentGold } = gameState; // Access activeRewards
+    const { activeRewards } = gameState;
+
+    // Phase: 0 = Loot (Gold/Cards), 1 = Relic (Boss Only), 2 = Victory (Boss Only)
+    const [phase, setPhase] = useState(0);
     const [showCardModal, setShowCardModal] = useState(false);
     const [showRelicModal, setShowRelicModal] = useState(false);
+    const [confettiFired, setConfettiFired] = useState(false);
 
-    // Redirect if no rewards (e.g. refreshed page without state persistence or accessed directly)
+    // Redirect if no rewards
     useEffect(() => {
         if (!activeRewards) {
             navigate('/map');
         }
     }, [activeRewards, navigate]);
 
+    // Boss Flow Management
+    useEffect(() => {
+        if (activeRewards?.isBossReward) {
+            // Victory Phase Animation
+            if (phase === 2 && !confettiFired) {
+                import('canvas-confetti').then((confetti) => {
+                    confetti.default({
+                        particleCount: 150,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }).catch(e => console.warn("Confetti failed", e));
+                setConfettiFired(true);
+            }
+        }
+    }, [phase, activeRewards, confettiFired]);
+
     if (!activeRewards) return null;
+
+    const isBoss = activeRewards.isBossReward;
+
+    // --- Actions ---
 
     const handleClaimGold = () => {
         gameEngine.claimReward('GOLD');
@@ -44,6 +69,10 @@ const RewardPage = () => {
     };
 
     const handleOpenRelicDraft = () => {
+        // Normal/Elite: Just open modal to pick ANY (if implemented as draft) or just claim single
+        // Current logic: Elite gives 3 random relics to choose 1 ??? 
+        // Logic in RewardSystem: `rewards.relics` is array of 3.
+        // So yes, it is a draft.
         if (!activeRewards.isClaimed.relics) {
             setShowRelicModal(true);
         }
@@ -52,13 +81,146 @@ const RewardPage = () => {
     const handleSelectRelic = (relic) => {
         gameEngine.claimReward('RELIC', relic);
         setShowRelicModal(false);
+
+        // If Boss Phase 1 (Relic), auto-advance to Victory
+        if (isBoss && phase === 1) {
+            setPhase(2);
+        }
     };
 
-    // Return to Map
+    // --- Navigation & Phase Control ---
+
+    const canAdvanceFromLoot = () => {
+        // Must claim Gold and (Claim or Skip) Cards
+        const goldDone = activeRewards.isClaimed.gold;
+        // Potion is optional
+        const cardsDone = activeRewards.isClaimed.cards || (activeRewards.cards.length === 0);
+        return goldDone && cardsDone;
+    };
+
+    const handleNextPhase = () => {
+        if (isBoss) {
+            if (phase === 0) setPhase(1); // Go to Relic
+        } else {
+            // Normal/Elite: Return to Map
+            handleReturnToMap();
+        }
+    };
+
     const handleReturnToMap = () => {
-        gameEngine.completeRewards(); // Clear rewards
+        gameEngine.completeRewards();
         navigate('/map');
     };
+
+    const handleRestart = () => {
+        gameEngine.restart();
+        navigate('/map'); // Or title screen? engine restart usually starts battle.
+        // GameEngine.restart() starts battle immediately. We might want a full reset to title?
+        // Current GameEngine.restart() resets everything and starts battle.
+        // Maybe we want `generateNewMap()` first?
+        gameEngine.generateNewMap(); // Reset Map
+        navigate('/map');
+    };
+
+
+    // --- Render Helpers ---
+
+    const renderLootPhase = () => (
+        <div className="space-y-6 animate-fade-in-up">
+            <h2 className="text-2xl text-yellow-500 font-bold mb-4">
+                {isBoss ? "전리품 획득" : "전투 보상"}
+            </h2>
+
+            {/* Gold Reward */}
+            <RewardItem
+                icon="💰"
+                label={`${activeRewards.gold} 골드`}
+                isClaimed={activeRewards.isClaimed.gold}
+                onClick={handleClaimGold}
+            />
+
+            {/* Card Reward */}
+            {activeRewards.cards && activeRewards.cards.length > 0 && (
+                <RewardItem
+                    icon="🃏"
+                    label="새로운 카드"
+                    subLabel="(3장 중 1장 선택)"
+                    isClaimed={activeRewards.isClaimed.cards}
+                    onClick={handleOpenCardDraft}
+                />
+            )}
+
+            {/* Elite/Normal Relic (If explicitly dropped in this phase, usually Elite) */}
+            {/* If Boss, Relic is next phase, so hide here */}
+            {!isBoss && activeRewards.relics && activeRewards.relics.length > 0 && (
+                <RewardItem
+                    icon="🏺"
+                    label="유물 획득"
+                    subLabel="(선택)"
+                    isClaimed={activeRewards.isClaimed.relics}
+                    onClick={handleOpenRelicDraft}
+                />
+            )}
+
+            {/* Potions */}
+            {activeRewards.potions && activeRewards.potions.map((potion, idx) => (
+                <RewardItem
+                    key={`potion-${idx}`}
+                    icon="🧪"
+                    label={`포션: ${potion.name}`}
+                    isClaimed={false}
+                    onClick={() => handleClaimPotion(potion)}
+                />
+            ))}
+        </div>
+    );
+
+    const renderBossRelicPhase = () => (
+        <div className="space-y-8 animate-fade-in-up flex flex-col items-center">
+            <h2 className="text-3xl text-purple-400 font-bold mb-8">보스 유물 선택</h2>
+            <div className="flex gap-6 flex-wrap justify-center">
+                {activeRewards.relics.map((relic, idx) => (
+                    <div key={idx}
+                        onClick={() => handleSelectRelic(relic)}
+                        className="w-64 p-6 bg-slate-900 border-2 border-slate-700 hover:border-purple-500 rounded-xl cursor-pointer hover:-translate-y-2 transition-transform shadow-xl flex flex-col items-center gap-4 group">
+                        <div className="text-6xl group-hover:scale-110 transition-transform">🏺</div>
+                        <h3 className="text-xl font-bold text-white group-hover:text-purple-400">{relic.name}</h3>
+                        <p className="text-sm text-gray-400 text-center">{relic.desc || relic.effect || "강력한 보스 유물입니다."}</p>
+                    </div>
+                ))}
+            </div>
+            <p className="text-gray-500 mt-4">신중하게 선택하세요. 단 하나만 가져갈 수 있습니다.</p>
+        </div>
+    );
+
+    const renderVictoryPhase = () => (
+        <div className="space-y-8 animate-fade-in-up text-center">
+            <h1 className="text-6xl font-bold text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)] mb-4">
+                STAGE CLEARED!
+            </h1>
+            <div className="text-2xl text-white mb-8">
+                축하합니다! 위대한 여정을 마쳤습니다.
+            </div>
+
+            {/* Simple Stats (Placeholder for now) */}
+            <div className="bg-white/10 p-6 rounded-lg text-left inline-block min-w-[300px]">
+                <h3 className="text-xl font-bold border-b border-white/20 pb-2 mb-4">여정 기록</h3>
+                <p>💰 획득 골드: <span className="float-right font-bold text-yellow-400">{activeRewards.gold + 500} G</span></p>
+                <p>🃏 덱 크기: <span className="float-right font-bold text-blue-400">15 장</span></p>
+                <p>💀 처치한 적: <span className="float-right font-bold text-red-400">12 마리</span></p>
+            </div>
+
+            <div className="mt-12">
+                <button
+                    onClick={handleRestart}
+                    className="px-8 py-4 bg-yellow-600 hover:bg-yellow-500 text-white text-xl font-bold rounded shadow-lg transition-transform hover:scale-105"
+                >
+                    처음부터 다시 하기
+                </button>
+            </div>
+        </div>
+    );
+
 
     return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center py-10 relative overflow-hidden"
@@ -67,75 +229,45 @@ const RewardPage = () => {
                 backgroundSize: 'cover'
             }}>
 
-            <div className="bg-black/80 p-8 rounded-lg max-w-2xl w-full text-center relative z-10 shadow-2xl border border-gray-600">
-                <h1 className="text-4xl font-bold mb-8 text-yellow-500 animate-pulse">
-                    🏆 승리!
-                </h1>
+            <div className={`bg-black/85 p-10 rounded-lg w-full max-w-4xl min-h-[600px] flex flex-col items-center relative z-10 shadow-2xl border border-gray-600 transition-all duration-500
+                ${phase === 2 ? 'bg-black/90 border-yellow-600' : ''}
+            `}>
 
-                <div className="space-y-6">
-                    {/* Gold Reward */}
-                    <RewardItem
-                        icon="💰"
-                        label={`${activeRewards.gold} 골드`}
-                        isClaimed={activeRewards.isClaimed.gold}
-                        onClick={handleClaimGold}
-                    />
+                {/* Header (Only show in non-victory phases) */}
+                {phase !== 2 && (
+                    <h1 className="text-4xl font-bold mb-10 text-yellow-500">
+                        {isBoss ? (phase === 0 ? "⚔️ 보스 처치!" : "👑 보상 선택") : "🏆 승리!"}
+                    </h1>
+                )}
 
-                    {/* Card Reward */}
-                    {activeRewards.cards && activeRewards.cards.length > 0 && (
-                        <RewardItem
-                            icon="🃏"
-                            label="새로운 카드 획득"
-                            subLabel="(3개 중 1개 선택)"
-                            isClaimed={activeRewards.isClaimed.cards}
-                            onClick={handleOpenCardDraft}
-                        />
-                    )}
-
-                    {/* Relic Reward */}
-                    {activeRewards.relics && activeRewards.relics.length > 0 && (
-                        <RewardItem
-                            icon="🏺"
-                            label="유물 획득"
-                            subLabel="(선택)"
-                            isClaimed={activeRewards.isClaimed.relics}
-                            onClick={handleOpenRelicDraft}
-                        />
-                    )}
-
-                    {/* Potion Rewards */}
-                    {activeRewards.potions && activeRewards.potions.map((potion, idx) => (
-                        <RewardItem
-                            key={`potion-${idx}`}
-                            icon="🧪"
-                            label={`포션: ${potion.name}`}
-                            isClaimed={false} // Potions are individual? Logic in engine removes them from list.
-                            // Accessing rewards.potions directly means they disappear when claimed.
-                            // So we technically don't need 'isClaimed' flag for list items if they vanish.
-                            // But usually list items stay and look 'dimmed' or 'checked'.
-                            // My engine implementation removes it from array:
-                            // activeRewards.potions = activeRewards.potions.filter(...)
-                            // So it will just disappear. That's fine.
-                            onClick={() => handleClaimPotion(potion)}
-                        />
-                    ))}
-                    {activeRewards.potions.length === 0 && gameState.activeRewards.potions_claimed_placeholder && (
-                        // Optional: Show claimed state if we stored it
-                        <div></div>
-                    )}
-
+                {/* Content Area */}
+                <div className="flex-1 w-full flex flex-col items-center justify-center">
+                    {phase === 0 && renderLootPhase()}
+                    {phase === 1 && isBoss && renderBossRelicPhase()}
+                    {phase === 2 && isBoss && renderVictoryPhase()}
                 </div>
 
-                <div className="mt-12">
-                    <button
-                        onClick={handleReturnToMap}
-                        className="px-8 py-3 bg-green-700 hover:bg-green-600 text-white font-bold rounded shadow-lg transition-transform hover:scale-105"
-                    >
-                        지도 복귀
-                    </button>
-                </div>
+                {/* Footer / Navigation */}
+                {phase === 0 && (
+                    <div className="mt-12 w-full flex justify-center">
+                        <button
+                            onClick={handleNextPhase}
+                            disabled={!canAdvanceFromLoot()}
+                            className={`
+                                px-12 py-4 text-xl font-bold rounded shadow-lg transition-all
+                                ${canAdvanceFromLoot()
+                                    ? 'bg-green-700 hover:bg-green-600 hover:scale-105 text-white cursor-pointer'
+                                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                }
+                            `}
+                        >
+                            {isBoss ? "다음 (보스 유물) ➡" : "지도 복귀"}
+                        </button>
+                    </div>
+                )}
             </div>
 
+            {/* Modals - Only used in Phase 0 (Loot) usually, or Relic for Normal/Elite */}
             {/* Card Draft Modal */}
             {showCardModal && (
                 <div className="fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-center p-4">
@@ -157,8 +289,10 @@ const RewardPage = () => {
                 </div>
             )}
 
-            {/* Relic Draft Modal */}
-            {showRelicModal && (
+            {/* Relic Draft Modal (For Normal/Elite usage, or if we used modal for Boss - but Boss uses Phase 1 inline) */}
+            {/* Actually, Normal/Elite uses this modal. Boss uses Phase 1. */}
+            {/* So check !isBoss or ensure Phase 1 logic doesn't trigger this modal. */}
+            {showRelicModal && !isBoss && (
                 <div className="fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-center p-4">
                     <h2 className="text-3xl font-bold text-white mb-8">유물 선택</h2>
                     <div className="flex gap-4 mb-12 flex-wrap justify-center">
@@ -172,7 +306,6 @@ const RewardPage = () => {
                             </div>
                         ))}
                     </div>
-                    {/* Relics usually mandatory in some games, but maybe skippable? Let's assume mandatory for now or click outside to close (but closing means not claiming). */}
                 </div>
             )}
 
