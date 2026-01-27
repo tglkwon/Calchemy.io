@@ -13,48 +13,8 @@ const BattlePage = () => {
     const { golem, minions, isPaused, turnCount, grid, activeCardId, bingoCardIds, gameOver, victory, relics } = gameState;
     const activeRelics = relics.filter(r => r.isActive);
 
-    const [isBgmBlocked, setIsBgmBlocked] = useState(false);
-    const audioRef = useRef(null);
-
-    useEffect(() => {
-        const audio = new Audio(`${import.meta.env.BASE_URL}assets/audio/BGM_Main_251108.wav`);
-        audio.loop = true;
-        audio.volume = 0.5;
-        audioRef.current = audio;
-
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.warn("BGM Autoplay prevented:", error);
-                setIsBgmBlocked(true);
-            });
-        }
-
-        return () => {
-            audio.pause();
-            audio.currentTime = 0;
-        };
-    }, []);
-
-    const enableBgm = () => {
-        if (audioRef.current) {
-            audioRef.current.play()
-                .then(() => setIsBgmBlocked(false))
-                .catch(e => console.error("Manual play failed:", e));
-        }
-    };
-
     return (
         <div className="h-full flex gap-4 relative">
-            {/* BGM Autoplay Blocked Warning */}
-            {isBgmBlocked && (
-                <button
-                    onClick={enableBgm}
-                    className="absolute top-2 right-2 z-50 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-full font-bold shadow-lg animate-pulse flex items-center gap-2"
-                >
-                    <span>🔇</span> BGM 켜기
-                </button>
-            )}
 
             {/* Left Column: Golem */}
             <div className="w-1/4 flex flex-col gap-4 overflow-y-auto">
