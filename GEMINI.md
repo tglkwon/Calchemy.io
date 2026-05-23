@@ -68,4 +68,20 @@
 
 * **AI 추천:** **\[옵션 A 또는 B\]**  
 * **이유:** (왜 이 옵션이 현재 상황(예: 속도, 안정성, 확장성)에서 가장 합리적인 선택인지 근거를 제시합니다.)  
-* **다음 단계:** "본 계획안이 승인되면, \[추천 옵션\]을 기반으로 세부 구현을 시작하겠습니다."
+* **다음 단계:** "본 계획안이 승인되면, [추천 옵션]을 기반으로 세부 구현을 시작하겠습니다."
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs for this repo live as GitHub issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The triage skill maps roles to canonical labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository. See `docs/agents/domain.md`.
