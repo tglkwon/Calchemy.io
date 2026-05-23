@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calchemy.io - 1막 시작 덱 축소 및 빈 슬롯 시스템 개발 완료 보고서</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0813;
+            --card-bg: rgba(25, 20, 38, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f1f6;
+            --text-muted: #a59fb6;
+            --accent-purple: #9d4edd;
+            --accent-blue: #00b4d8;
+            --accent-gold: #ffb703;
+            
+            --fire-grad: linear-gradient(135deg, #ff416c, #ff4b2b);
+            --earth-grad: linear-gradient(135deg, #11998e, #38ef7d);
+            --water-grad: linear-gradient(135deg, #00c6ff, #0072ff);
+            --wind-grad: linear-gradient(135deg, #a8ff78, #78ffd6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(157, 78, 221, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(0, 180, 216, 0.12) 0px, transparent 50%);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .tag {
+            display: inline-block;
+            background: rgba(157, 78, 221, 0.2);
+            border: 1px solid var(--accent-purple);
+            color: #d8b4fe;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #b39ddb, #00b4d8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* 2 Column Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 968px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+
+        /* Interactive Simulator */
+        .simulator-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn.active {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 12px rgba(157, 78, 221, 0.4);
+        }
+
+        .btn-action {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .btn-action:hover {
+            background: #0096c7;
+            box-shadow: 0 0 12px rgba(0, 180, 216, 0.4);
+        }
+
+        .btn-reset {
+            background: #d90429;
+            border-color: #d90429;
+        }
+
+        .btn-reset:hover {
+            background: #ef233c;
+            box-shadow: 0 0 12px rgba(217, 4, 41, 0.4);
+        }
+
+        /* 4x4 Grid */
+        .grid-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            margin-bottom: 15px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            aspect-ratio: 1;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .slot {
+            position: relative;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            aspect-ratio: 1;
+            user-select: none;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+        }
+
+        .slot.empty {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .slot.empty::after {
+            content: '?';
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Card Elements */
+        .slot.fire { background: var(--fire-grad); border-color: transparent; }
+        .slot.earth { background: var(--earth-grad); border-color: transparent; }
+        .slot.water { background: var(--water-grad); border-color: transparent; }
+        .slot.wind { background: var(--wind-grad); border-color: transparent; }
+
+        .slot.active-scan {
+            box-shadow: 0 0 0 3px var(--accent-gold);
+            z-index: 10;
+            transform: scale(1.05);
+        }
+
+        .slot.bingo-highlight {
+            box-shadow: 0 0 0 3px var(--accent-blue);
+            animation: flash 0.8s infinite alternate;
+            z-index: 9;
+        }
+
+        .slot .card-label {
+            font-size: 0.7rem;
+            position: absolute;
+            bottom: 4px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+
+        .sim-log {
+            background: #06040a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #a29bfe;
+            height: 90px;
+            overflow-y: auto;
+        }
+
+        /* Detail List */
+        .spec-list {
+            list-style: none;
+        }
+
+        .spec-item {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        .spec-item::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--accent-blue);
+            font-weight: 900;
+            font-size: 1rem;
+        }
+
+        .spec-item strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .spec-item span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Info Badge List */
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #e1bee7;
+        }
+
+        /* Flow Diagrams */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .flow-step {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 12px 18px;
+            border-radius: 8px;
+            min-width: 140px;
+        }
+
+        .flow-step h4 {
+            font-size: 0.9rem;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .flow-step p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--accent-purple);
+            padding: 0 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes flash {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.4); }
+        }
+
+        .code-box {
+            background: #08060d;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #e0dcf0;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .text-accent-gold { color: var(--accent-gold); }
+        .text-accent-purple { color: #d8b4fe; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="tag">Release Report (v2.2.0)</div>
+            <h1>1막 시작 덱 축소 및 빈 슬롯 시스템 보고서</h1>
+            <p class="subtitle">오토 배틀러 밸런싱 최적화 및 덱 압축 성장 모델 검증 완료</p>
+        </header>
+
+        <div class="layout">
+            <!-- Left Side: Technical Walkthrough -->
+            <div class="glass-card">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                    핵심 시스템 구현 스펙
+                </h2>
+
+                <ul class="spec-list">
+                    <li class="spec-item">
+                        <strong>그리드 명시적 빈 슬롯 사전 할당 (CardSystem.js)</strong>
+                        <span>덱 드로우 전에 그리드를 항상 16개의 고정 <code>EMPTY</code> 객체로 사전 할당합니다. 덱에서 드로우된 카드들이 0번부터 순차적으로 이 슬롯을 덮어쓰게 됩니다. 덱 크기가 16장 미만인 경우 남은 자리는 점선 격자의 빈 슬롯(EMPTY) 상태로 유지됩니다.</span>
+                    </li>
+                    <li class="spec-item">
+                        <strong>빈 슬롯 빙고 제외 및 딜레이 유지 (GameEngine.js)</strong>
+                        <span>빙고 검사 루프에서 <code>EMPTY</code> 타입 카드가 하나라도 섞인 라인은 즉시 판정에서 스킵합니다. 단, 자동 턴 루프 순차 발동 시에는 <b>딜레이(150ms)와 하이라이트 애니메이션을 그대로 유지</b>하도록 설계하여 플레이어가 상황을 인지하고 아이템(포션)을 쓸 수 있는 조작 반응 시간을 충분히 벌어줍니다.</span>
+                    </li>
+                    <li class="spec-item">
+                        <strong>그리드 조작 예외 및 덱 오염 필터링 완료</strong>
+                        <span><code>SWAP</code>(위치 교환)을 제외한 <code>TRANSFORM</code>, <code>REPLACE</code>, <code>UPGRADE</code> 조작이 빈 카드를 대상으로 오작동하지 않게 차단했습니다. 또한, 턴 종료 시 임시 <code>EMPTY</code> 카드들이 버린 카드 더미로 유입되어 전체 덱에 증식 누적되던 현상을 <code>discardGrid()</code>와 <code>getAllCards()</code> 필터링을 통해 원천적으로 해결했습니다.</span>
+                    </li>
+                    <li class="spec-item">
+                        <strong>카드당 턴당 빙고 참여 제한 (Bingo Limit)</strong>
+                        <span>특정 강화 카드 하나를 연쇄 SWAP하여 빙고를 무한 기여시키는 무한 루프 버그를 차단하기 위해, 각 카드 인스턴스별로 한 턴 동안 최대로 빙고 발동에 관여할 수 있는 기여 한도(<code>maxCardBingoContribPerTurn: 4</code>) 제약을 연동했습니다.</span>
+                    </li>
+                    <li class="spec-item">
+                        <strong>릴리즈 파이프라인 자동화 (npm run release)</strong>
+                        <span>플랫폼에 독립적으로 윈도우 및 리눅스 셸에서 원클릭으로 작동하는 <code>scripts/release.js</code> 파이프라인을 기획하여 <code>git add .</code> ➔ <code>commit</code> ➔ <code>push</code> ➔ <code>gh-pages 배포</code> 단계를 동기적으로 자동화하였습니다.</span>
+                    </li>
+                </ul>
+
+                <h3 style="margin-top: 30px; margin-bottom: 10px; font-size: 1.2rem; color: #fff;">배포 자동화 명령어 단축 연동 (package.json)</h3>
+                <div class="code-box">
+                    "release": "node scripts/release.js"<br>
+                    <span class="text-accent-purple">// 실행: npm run release "feat: 1막 빈슬롯 시스템 구현"</span>
+                </div>
+
+                <div class="badge-list">
+                    <span class="badge">React 19</span>
+                    <span class="badge">Vite</span>
+                    <span class="badge">Tailwind v4</span>
+                    <span class="badge">Data-Driven Design</span>
+                    <span class="badge">Auto-Battler Turn Loop</span>
+                </div>
+            </div>
+
+            <!-- Right Side: Interactive Simulator -->
+            <div class="glass-card">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    그리드 시뮬레이터 데모
+                </h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                    시작 덱의 카드 크기를 선택한 뒤 <b>'턴 순차 발동 시작'</b>을 눌러 딜레이 및 빈 격자 시각화를 검증해보세요!
+                </p>
+
+                <!-- Simulator Controls -->
+                <div class="simulator-controls">
+                    <button class="btn active" id="btn-4" onclick="initSimDeck(4)">덱 4장</button>
+                    <button class="btn" id="btn-8" onclick="initSimDeck(8)">덱 8장</button>
+                    <button class="btn" id="btn-16" onclick="initSimDeck(16)">덱 16장</button>
+                    <button class="btn btn-action" onclick="runScan()">턴 순차 발동 시작</button>
+                    <button class="btn btn-reset" onclick="resetSimGrid()">그리드 리셋</button>
+                </div>
+
+                <!-- 4x4 Grid Board -->
+                <div class="grid-container">
+                    <div class="grid" id="sim-grid">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <div class="sim-log" id="sim-log">
+                    [System]: 시뮬레이터 준비 완료. 덱 크기를 설정한 뒤 턴 순차 발동 버튼을 누르세요.
+                </div>
+                
+                <p style="font-size: 0.75rem; color: var(--accent-gold); margin-top: 10px; text-align: center;">
+                    * 팁: 카드가 깔린 칸을 클릭하면 오른쪽 빈 격자와 SWAP(위치 이동)을 테스트할 수 있습니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- System Flow Process -->
+        <div class="glass-card" style="margin-bottom: 0;">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                턴 진행 & 빙고 체크 생명주기
+            </h2>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <h4>1. EMPTY 프리필</h4>
+                    <p>그리드 16칸 EMPTY 카드 사전 할당</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <h4>2. 덱 드로우</h4>
+                    <p>0번부터 카드 순차 덮어쓰기</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <h4>3. 순차 하이라이트</h4>
+                    <p>빈 칸 포함 150ms 스캔 (후보 I)</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <h4>4. 빙고 판정</h4>
+                    <p>EMPTY 라인 배제 & 콤보 기여 제한 체크</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <h4>5. 덱 회수 필터</h4>
+                    <p>EMPTY를 제외하고 discardPile 회수</p>
+                </div>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+                조작 요인(포션, 유물)으로 그리드 변경 이벤트 발생 시 <b>4단계(빙고 판정) 및 빙고 효과가 실시간 재평가</b>되어 기동됩니다.
+            </p>
+        </div>
+    </div>
+
+    <!-- Simulator Javascript -->
+    <script>
+        const elements = ['fire', 'earth', 'water', 'wind'];
+        const emojiMap = { fire: '🔥', earth: '🌱', water: '💧', wind: '🍃' };
+        const labelMap = { fire: 'FIRE', earth: 'EARTH', water: 'WATER', wind: 'WIND' };
+        
+        let simDeckSize = 4;
+        let simGrid = [];
+        let isScanning = false;
+        let selectedSlotIdx = null;
+
+        function logMsg(msg) {
+            const logBox = document.getElementById('sim-log');
+            logBox.innerHTML += `<br>[Log]: ${msg}`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function initSimDeck(size) {
+            if (isScanning) return;
+            simDeckSize = size;
+            
+            // Toggle active class on buttons
+            document.querySelectorAll('.simulator-controls .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${size}`).classList.add('active');
+
+            resetSimGrid();
+        }
+
+        function resetSimGrid() {
+            if (isScanning) return;
+            simGrid = [];
+            selectedSlotIdx = null;
+
+            // 1. Fill 16 with EMPTY
+            for (let i = 0; i < 16; i++) {
+                simGrid.push({ type: 'EMPTY' });
+            }
+
+            // 2. Overwrite based on deck size
+            // Fill evenly from elements
+            for (let i = 0; i < simDeckSize; i++) {
+                const el = elements[i % elements.length];
+                simGrid[i] = { type: el };
+            }
+
+            renderGrid();
+            document.getElementById('sim-log').innerHTML = `[System]: 덱 크기 ${simDeckSize}장으로 그리드 16칸 초기화 완료. (${16 - simDeckSize}개의 EMPTY 슬롯 할당)`;
+        }
+
+        function renderGrid() {
+            const gridContainer = document.getElementById('sim-grid');
+            gridContainer.innerHTML = '';
+
+            simGrid.forEach((card, idx) => {
+                const slot = document.createElement('div');
+                slot.id = `slot-${idx}`;
+                slot.className = 'slot';
+
+                if (card.type === 'EMPTY') {
+                    slot.classList.add('empty');
+                } else {
+                    slot.classList.add(card.type);
+                    slot.innerText = emojiMap[card.type];
+                    
+                    const label = document.createElement('span');
+                    label.className = 'card-label';
+                    label.innerText = labelMap[card.type];
+                    slot.appendChild(label);
+                }
+
+                if (idx === selectedSlotIdx) {
+                    slot.style.boxShadow = '0 0 0 3px var(--accent-purple)';
+                }
+
+                slot.onclick = () => handleSlotClick(idx);
+                gridContainer.appendChild(slot);
+            });
+        }
+
+        function handleSlotClick(idx) {
+            if (isScanning) return;
+            const clickedCard = simGrid[idx];
+
+            if (selectedSlotIdx === null) {
+                // Select first slot (must be a valid card, not EMPTY, to start swap)
+                if (clickedCard.type !== 'EMPTY') {
+                    selectedSlotIdx = idx;
+                    logMsg(`카드 [${labelMap[clickedCard.type]}] 선택됨. SWAP할 대상을 클릭하세요.`);
+                }
+            } else {
+                // Execute Swap
+                const originCard = simGrid[selectedSlotIdx];
+                logMsg(`SWAP 조작 실행: Slot ${selectedSlotIdx} (${labelMap[originCard.type]}) ↔ Slot ${idx} (${clickedCard.type === 'EMPTY' ? 'EMPTY' : labelMap[clickedCard.type]})`);
+                
+                // Perform swap in grid array
+                const temp = simGrid[selectedSlotIdx];
+                simGrid[selectedSlotIdx] = simGrid[idx];
+                simGrid[idx] = temp;
+
+                selectedSlotIdx = null;
+                renderGrid();
+                
+                // Evaluate for new bingos instantly on swap
+                checkGridBingos();
+            }
+        }
+
+        function checkGridBingos() {
+            // Rows
+            const lines = [];
+            for (let r = 0; r < 4; r++) {
+                lines.push([r*4, r*4+1, r*4+2, r*4+3]);
+            }
+            // Cols
+            for (let c = 0; c < 4; c++) {
+                lines.push([c, c+4, c+8, c+12]);
+            }
+            // Diagonals
+            lines.push([0, 5, 10, 15]);
+            lines.push([3, 6, 9, 12]);
+
+            let bingoFound = false;
+
+            lines.forEach((line, idx) => {
+                const cardsInLine = line.map(idx => simGrid[idx]);
+                
+                // If there's an EMPTY card, skip bingo check
+                if (cardsInLine.some(c => c.type === 'EMPTY')) {
+                    return;
+                }
+
+                // Check Element Bingo (all same)
+                const firstType = cardsInLine[0].type;
+                if (cardsInLine.every(c => c.type === firstType)) {
+                    bingoFound = true;
+                    highlightBingoLine(line, firstType);
+                }
+
+                // Check Harmony Bingo (all 4 elements present)
+                const types = new Set(cardsInLine.map(c => c.type));
+                if (types.has('fire') && types.has('earth') && types.has('water') && types.has('wind')) {
+                    bingoFound = true;
+                    highlightBingoLine(line, 'HARMONY');
+                }
+            });
+
+            if (!bingoFound) {
+                // Clear any leftover bingo highlights
+                document.querySelectorAll('.slot').forEach(slot => {
+                    slot.classList.remove('bingo-highlight');
+                });
+            }
+        }
+
+        function highlightBingoLine(indices, type) {
+            logMsg(`✨ [BINGO] ${type.toUpperCase()} 빙고 완성! (라인 인덱스: ${indices.join(', ')})`);
+            
+            indices.forEach(idx => {
+                const el = document.getElementById(`slot-${idx}`);
+                if (el) {
+                    el.classList.add('bingo-highlight');
+                }
+            });
+
+            setTimeout(() => {
+                document.querySelectorAll('.slot').forEach(slot => {
+                    slot.classList.remove('bingo-highlight');
+                });
+            }, 2500);
+        }
+
+        async function runScan() {
+            if (isScanning) return;
+            isScanning = false; // Reset scan state
+            isScanning = true;
+            logMsg("--- 턴 카드 순차 발동 시작 (150ms 간격 스캔) ---");
+
+            for (let i = 0; i < 16; i++) {
+                if (!isScanning) break;
+                
+                const card = simGrid[i];
+                const slotEl = document.getElementById(`slot-${i}`);
+                
+                if (slotEl) slotEl.classList.add('active-scan');
+
+                if (card.type === 'EMPTY') {
+                    logMsg(`Slot ${i}: [EMPTY] 발동 스킵 (딜레이 150ms 유지)`);
+                } else {
+                    logMsg(`Slot ${i}: [${labelMap[card.type].toUpperCase()}] 카드 효과 발동!`);
+                }
+
+                await new Promise(r => setTimeout(r, 150));
+
+                if (slotEl) slotEl.classList.remove('active-scan');
+                await new Promise(r => setTimeout(r, 50));
+            }
+
+            logMsg("--- 순차 스캔 스캔 종료 ➔ 빙고 판정 실행 ---");
+            checkGridBingos();
+            isScanning = false;
+        }
+
+        // Initialize grid on load
+        resetSimGrid();
+    </script>
+</body>
+</html>
