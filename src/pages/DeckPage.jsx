@@ -10,14 +10,28 @@ const DeckPage = () => {
     // Get Library cards (Definitions)
     const libraryCards = gameEngine.cardSystem.getLibraryCards();
 
+    const handleResetDeck = (size) => {
+        gameEngine.cardSystem.resetDeckToSize(size);
+        gameEngine.notify();
+    };
+
     return (
         <div className="h-full p-4 overflow-hidden flex gap-4">
             {/* Total Deck (60%) */}
             <div className="w-[60%] bg-gray-900 p-4 rounded border border-gray-700 flex flex-col h-full">
-                <h2 className="text-xl font-bold mb-4 text-blue-400">
-                    전체 덱 ({allCards.length}장)
-                    <span className="text-xs text-gray-500 font-normal ml-2">(클릭하여 제거)</span>
-                </h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-blue-400">
+                        전체 덱 ({allCards.length}장)
+                        <span className="text-xs text-gray-500 font-normal ml-2">(클릭하여 제거)</span>
+                    </h2>
+                    <div className="flex gap-1">
+                        <span className="text-gray-400 text-xs self-center mr-1">시작 덱 재설정:</span>
+                        <button onClick={() => handleResetDeck(4)} className="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-xs font-bold text-gray-200 rounded border border-gray-600 transition-colors">4장</button>
+                        <button onClick={() => handleResetDeck(8)} className="px-2 py-1 bg-blue-900/50 hover:bg-blue-800 text-xs font-bold text-blue-300 rounded border border-blue-600 transition-colors">8장 (기본)</button>
+                        <button onClick={() => handleResetDeck(16)} className="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-xs font-bold text-gray-200 rounded border border-gray-600 transition-colors">16장</button>
+                        <button onClick={() => handleResetDeck(32)} className="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-xs font-bold text-gray-200 rounded border border-gray-600 transition-colors">32장</button>
+                    </div>
+                </div>
 
                 <div className="flex-1 overflow-y-auto pr-2">
                     <div className="flex flex-wrap gap-2 content-start">

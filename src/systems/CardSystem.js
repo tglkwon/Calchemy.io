@@ -19,12 +19,21 @@ export class CardSystem {
      * Uses definitions "FIRE", "WATER", "EARTH", "WIND" if they exist.
      */
     initDeck() {
+        this.resetDeckToSize(32);
+    }
+
+    /**
+     * Resets the deck with a specific total size, evenly distributed among the 4 elements.
+     * @param {number} size - Total cards in deck (e.g. 4, 8, 16, 32)
+     */
+    resetDeckToSize(size) {
         this.deck = [];
         this.discardPile = [];
+        this.grid = []; // Reset current grid
+
+        const countPerElement = Math.max(1, Math.floor(size / 4));
         for (const el of this.elements) {
-            for (let i = 0; i < 8; i++) {
-                // If a definition exists for the element name (e.g. "FIRE"), use it.
-                // Otherwise fallback to generic construction.
+            for (let i = 0; i < countPerElement; i++) {
                 const defId = el;
                 if (CardDefinitions[defId]) {
                     const def = CardDefinitions[defId];
@@ -33,7 +42,7 @@ export class CardSystem {
                         instanceId: `${def.id}_${i}_${Date.now()}` // Unique Instance ID
                     });
                 } else {
-                    // Legacy Fallback if definition not found
+                    // Legacy Fallback
                     const id = `${el}_${i}`;
                     this.deck.push({ type: el, id: id, instanceId: `${id}_${Date.now()}` });
                 }
@@ -64,39 +73,49 @@ export class CardSystem {
      * Reshuffles discard pile if deck is empty.
      */
     drawGrid() {
+        // 1. Pre-fill the 16 grid slots with EMPTY placeholder card objects
         this.grid = [];
         for (let i = 0; i < 16; i++) {
+            this.grid.push({
+                type: 'EMPTY',
+                id: `empty_${i}`,
+                instanceId: `empty_${i}_${Date.now()}`
+            });
+        }
+
+        // 2. Draw cards from deck and overwrite slots from index 0 sequentially
+        for (let i = 0; i < 16; i++) {
             if (this.deck.length === 0) {
-                if (this.discardPile.length === 0) {
-                    // Should not happen in normal play with 32 cards and 16 grid
-                    console.warn("Deck and Discard empty! Resetting.");
-                    this.initDeck();
-                } else {
+                if (this.discardPile.length > 0) {
                     this.deck = [...this.discardPile];
                     this.discardPile = [];
                     this.shuffle(this.deck);
+                } else {
+                    // No cards left in deck and discard pile
+                    break;
                 }
             }
             if (this.deck.length > 0) {
-                this.grid.push(this.deck.pop());
+                this.grid[i] = this.deck.pop();
             }
         }
         return this.grid;
     }
 
     /**
-     * Moves current grid cards to discard pile.
+     * Moves current grid cards to discard pile, excluding EMPTY placeholders.
      */
     discardGrid() {
-        this.discardPile.push(...this.grid);
+        const actualCards = this.grid.filter(card => card && card.type !== 'EMPTY');
+        this.discardPile.push(...actualCards);
         this.grid = [];
     }
 
     /**
-     * Returns all cards currently in the game (Deck + Discard + Grid).
+     * Returns all actual player cards currently in the game (excluding EMPTY placeholders).
      */
     getAllCards() {
-        return [...this.deck, ...this.discardPile, ...this.grid];
+        return [...this.deck, ...this.discardPile, ...this.grid].filter(c => c && c.type !== 'EMPTY');
     }
 
     /**
@@ -174,6 +193,11 @@ export class CardSystem {
         const results = [];
 
         for (const line of lines) {
+            // Skip check if the line contains any Empty Cards
+            if (line.some(card => !card || card.type === 'EMPTY')) {
+                continue;
+            }
+
             // Check Element Bingo (All same)
             const firstType = line[0].type;
             if (line.every(card => card.type === firstType)) {
@@ -293,6 +317,11 @@ export class CardSystem {
         finalTargets.forEach(tIdx => {
             // Safety check
             if (!this.grid[tIdx]) return;
+
+            // Restrict grid actions on EMPTY cards: Only SWAP is allowed
+            if (actionType !== 'SWAP' && this.grid[tIdx].type === 'EMPTY') {
+                return;
+            }
 
             if (actionType === 'SWAP') {
                 // Swap logic: origin vs target

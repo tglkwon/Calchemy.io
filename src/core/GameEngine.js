@@ -75,6 +75,10 @@ export class GameEngine {
         this.potions = [];
         this.maxPotions = 3;
 
+        // Bingo Limit Config (Safety limits per card per turn)
+        this.maxCardBingoContribPerTurn = 4;
+        this.cardBingoContribMap = new Map(); // instanceId -> count
+
         // Bindings
         this.runTurn = this.runTurn.bind(this);
     }
@@ -257,10 +261,12 @@ export class GameEngine {
             m.baseDefense = 8;
         });
 
-        // Reset System
-        this.cardSystem.initDeck();
-        this.cardSystem.grid = [];
+        // Reset and preserve current player deck
+        const currentCards = this.cardSystem.getAllCards();
+        this.cardSystem.deck = [...currentCards];
         this.cardSystem.discardPile = [];
+        this.cardSystem.grid = [];
+        this.cardSystem.shuffleDeck();
 
         this.log("--- 전투 재시작 ---");
         this.startBattle();
@@ -272,11 +278,12 @@ export class GameEngine {
         // Full Reset
         this.gold = 1000; // Reset Gold
         this.potions = [];
-        this.relics = []; // Need to reset relics in RelicSystem too? 
-        // RelicSystem state isn't directly exposed here but `toggleRelic` calls it.
-        // We need to reset RelicSystem. `this.relicSystem = new RelicSystem()` might be cleaner but we need to re-bind?
-        // Let's just create new instances.
+        this.relics = []; 
         this.cardSystem = new CardSystem();
+        
+        // Initialize Act 1 starting deck with 8 cards (2 of each element)
+        this.cardSystem.resetDeckToSize(8);
+
         this.relicSystem = new RelicSystem();
         this.keywordSystem = new KeywordSystem();
         this.rewardSystem = new RewardSystem();
@@ -305,63 +312,7 @@ export class GameEngine {
         this.gameOver = false;
         this.victory = false;
 
-        // Entities
-        this.golem = new Unit("Golem", 300, 0);
-        this.golem.baseAttack = 2;
-        this.golem.baseShield = 2;
-
-        this.minions = [
-            new Unit("Minion 1", 100, 0),
-            new Unit("Minion 2", 100, 0),
-            new Unit("Minion 3", 100, 0)
-        ];
-
-        this.minions.forEach(m => {
-            m.baseAttack = 8;
-            m.baseDefense = 8;
-        });
-
-        this.log("--- 새로운 여정 시작 ---");
-        this.notify();
-    }
-
-    startNewGame() {
-        this.stop();
-
-        // Full Reset
-        this.gold = 1000;
-        this.potions = [];
-        this.relics = [];
-        this.cardSystem = new CardSystem();
-        this.relicSystem = new RelicSystem();
-        this.keywordSystem = new KeywordSystem();
-        this.rewardSystem = new RewardSystem();
-
-        this.mapGenerator = new MapGenerator({
-            mapWidth: 7,
-            mapHeight: 15,
-            xSpacing: 100,
-            ySpacing: 100,
-            jitter: 30
-        });
-
-        this.activeRewards = null;
-        this.treasureSelectionMode = false;
-        this.offeredRelics = [];
-        this.shopInventory = { cards: [], relics: [], potions: [], saleItemId: null };
-
-        // Reset Map
-        this.generateNewMap();
-
-        // Stats
-        this.turnCount = 0;
-        this.totalBingos = 0;
-        this.harmonyBingos = 0;
-        this.logs = [];
-        this.gameOver = false;
-        this.victory = false;
-
-        // Entities
+        // Reset Entities
         this.golem = new Unit("Golem", 300, 0);
         this.golem.baseAttack = 2;
         this.golem.baseShield = 2;
@@ -587,7 +538,16 @@ export class GameEngine {
         return true;
     }
 
-    usePotion(index) {
+    // Helper to evaluate and trigger new combo/bingo checks on demand (e.g. after item/potion usage)
+    async triggerComboCheck() {
+        const bingos = this.cardSystem.checkBingos();
+        if (bingos.length > 0) {
+            await this.applyBingoEffects(bingos);
+        }
+        this.notify();
+    }
+
+    async usePotion(index) {
         if (index < 0 || index >= this.potions.length) return;
         const potion = this.potions[index];
 
@@ -610,6 +570,9 @@ export class GameEngine {
         // Remove used potion
         this.potions.splice(index, 1);
         this.notify();
+
+        // Check for new bingos triggered by potion use
+        await this.triggerComboCheck();
     }
 
     removeCardInShop(cardInstanceId) {
@@ -674,6 +637,9 @@ export class GameEngine {
         this.golem.resetTurnStats();
         this.golem.totalDamageThisTurn = 0;
         this.minions.forEach(m => m.resetTurnStats());
+        
+        // Reset card bingo contribution tracking for the new turn
+        this.cardBingoContribMap.clear();
 
         // 2. Minion Intent (Random for now)
         // 2. Minion Intent
@@ -732,8 +698,10 @@ export class GameEngine {
             this.activeCardId = card.instanceId;
             this.notify();
 
-            // Effect
-            this.triggerCardEffect(card);
+            // Effect: Skip trigger if card is EMPTY, but maintain delay/highlight
+            if (card.type !== 'EMPTY') {
+                this.triggerCardEffect(card);
+            }
 
             // Clear highlight after a short moment (optional, or let next card clear it)
             await new Promise(r => setTimeout(r, 50));
@@ -757,6 +725,31 @@ export class GameEngine {
         if (bingos.length === 0) return;
 
         for (const bingo of bingos) {
+            // 1. Check if any card in this bingo has exceeded its turn limit
+            let limitExceeded = false;
+            let offenderName = "";
+            
+            for (const cardId of bingo.ids) {
+                const count = this.cardBingoContribMap.get(cardId) || 0;
+                if (count >= this.maxCardBingoContribPerTurn) {
+                    limitExceeded = true;
+                    const card = this.cardSystem.grid.find(c => c.instanceId === cardId);
+                    offenderName = card ? (card.name || card.type) : "알 수 없는 카드";
+                    break;
+                }
+            }
+
+            if (limitExceeded) {
+                this.log(`⚠️ [${offenderName}] 카드가 턴당 빙고 참여 한도(${this.maxCardBingoContribPerTurn}회)를 초과하여 빙고 효과가 무효화되었습니다.`);
+                continue;
+            }
+
+            // 2. Increment contribution count for cards in this bingo
+            for (const cardId of bingo.ids) {
+                const count = this.cardBingoContribMap.get(cardId) || 0;
+                this.cardBingoContribMap.set(cardId, count + 1);
+            }
+
             this.totalBingos++;
 
             // Highlight ONLY the cards in this bingo line
